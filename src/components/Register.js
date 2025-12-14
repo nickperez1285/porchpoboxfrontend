@@ -13,7 +13,13 @@ const handleRegister = async (e) => {
 e.preventDefault();
 
 
-await axios.post("/api/auth/register", {
+// await axios.post("/api/auth/register", {
+// email,
+// password
+// });
+
+
+await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/register`, {
 email,
 password
 });
