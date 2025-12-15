@@ -16,7 +16,7 @@ const ProductList = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          `${API_BASE_URL}api/product-details`
+          `${API_BASE_URL}/api/product-details`
         );
         const productData = response.data.product
           ? [response.data.product]
