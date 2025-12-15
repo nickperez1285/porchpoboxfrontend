@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_BASE_URL from "../config/api";
+
 // import { clientEncryption } from "../../../Strip-Subcription-Integration-MERN-backend/backend/models/User";
 
 
@@ -15,7 +17,7 @@ e.preventDefault();
 
 
 const res = await 
-axios.post("/api/auth/login", {
+axios.post(`${API_BASE_URL}/api/auth/login`, {
 email,
 password,
 });
