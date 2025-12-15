@@ -18,5 +18,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-
-/Users/home/Desktop/stripeShit /stripe subscription app/Stripe frontend/.env
+.env
