@@ -58,7 +58,8 @@ const ProductList = () => {
   return (
 
     <center>
-      <h5>Get Unlimited packages for 30 days </h5>
+      <h5>Get Unlimited packages for 30 days </h5><br />
+      <b><p>$25</p></b>
    <Link to="https://buy.stripe.com/dRm8wQ5obct83Ns8Bx6kg03
 "> 
 <button type="button"    className="btn btn-dark hover:btn-ouline">
