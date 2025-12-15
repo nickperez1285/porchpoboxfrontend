@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import API_BASE_URL from "./config/api";
+import API_BASE_URL from "porchpoboxfrontend/src/config/api.js";
 
 // import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is included
 
