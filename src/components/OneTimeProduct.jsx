@@ -95,7 +95,7 @@ const ProductList = () => {
                     {isProcessing ? "Processing..." : "Subscribe"}
 
                   </button> */}
-                      <Link to="https://buy.stripe.com/test_7sY4gA8AneBg6ZEdVR6kg00
+                      <Link to="https://buy.stripe.com/5kQaEYeYL2Syfwa6tp6kg01
 "> <button type="button"    className="btn btn-dark hover:btn-ouline">
 checkout
      </button>
