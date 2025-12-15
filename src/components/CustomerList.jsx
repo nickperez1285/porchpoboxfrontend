@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_BASE_URL from "./config/api";
+
 // import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is included
 
 const CustomerList = () => {
@@ -10,7 +12,7 @@ const CustomerList = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/customers");
+        const response = await axios.get(`${API_BASE_URL}/api/customers`);
         setCustomers(response.data.customers);
       } catch (err) {
         setError("Failed to load customer data");

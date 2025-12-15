@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import {Link} from  "react-router-dom"
+import API_BASE_URL from "./config/api";
+
 
 const ProductList = () => {
   const [products, setProducts] = useState([]);
@@ -14,7 +16,7 @@ const ProductList = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          "http://localhost:3000/api/product-details"
+          `${API_BASE_URL}api/product-details`
         );
         const productData = response.data.product
           ? [response.data.product]
@@ -34,7 +36,7 @@ const ProductList = () => {
     try {
       setIsProcessing(true);
       const response = await axios.post(
-        "http://localhost:3000/api/create-checkout-session",
+        `${API_BASE_URL}/api/create-checkout-session`,
         {
           priceId: priceId,
         }

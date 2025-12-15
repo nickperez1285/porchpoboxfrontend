@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import OneTimeProduct from "./OneTimeProduct";
 import Login from "./Login";
+import API_BASE_URL from "./config/api";
 
 
 const SubscriptionPlans = () => {
@@ -20,7 +21,7 @@ const SubscriptionPlans = () => {
   const fetchPrices = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3000/api/get-all-prices");
+      const response = await fetch(`${API_BASE_URL}/api/get-all-prices`);
       const data = await response.json();
 
       if (data.success && data.prices) {
@@ -33,7 +34,7 @@ const SubscriptionPlans = () => {
         for (const plan of Object.keys(data.prices)) {
           try {
             const planPriceResponse = await fetch(
-              `http://localhost:3000/api/get-price/${data.prices[plan]}`
+              `${API_BASE_URL}/api/get-price/${data.prices[plan]}`
             );
             const planPriceData = await planPriceResponse.json();
 
@@ -112,7 +113,7 @@ const SubscriptionPlans = () => {
     setCouponLoading((prev) => ({ ...prev, [planType]: true }));
     try {
       const response = await fetch(
-        "http://localhost:3000/api/validate-coupon",
+        `${API_BASE_URL}/api/validate-coupon`,
         {
           method: "POST",
           headers: {
@@ -210,7 +211,7 @@ const SubscriptionPlans = () => {
   const redirectToCheckout = async (priceId, isSubscription, coupon) => {
     try {
       const response = await fetch(
-        "http://localhost:3000/api/create-checkout-session",
+        `${API_BASE_URL}/api/create-checkout-session`,
         {
           method: "POST",
           headers: {
