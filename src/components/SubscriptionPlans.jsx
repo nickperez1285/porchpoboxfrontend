@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import OneTimeProduct from "./OneTimeProduct";
 import Login from "./Login";
-import API_BASE_URL from "./config/api";
+import API_BASE_URL from "porchpoboxfrontend/src/config/api.js";
 
 
 const SubscriptionPlans = () => {
