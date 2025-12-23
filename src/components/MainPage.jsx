@@ -240,15 +240,15 @@ const MainPage = () => {
         }}
       >
         <hr></hr>
-        <div className="pricing-header p-3 pb-md-4 mx-auto text-center">
-          {/* <u><h1 className="display-5 fw-bold">Porch P.O. Box </h1></u> */}
-          {/* <Link to="/customers">view customers </Link><br></br> */}
-          <header>
-            <h3>Welcome to Porch P.O. Box </h3>
-          </header>
+        {/* <div className="pricing-header p-3 pb-md-4 mx-auto text-center"> */}
+        {/* <u><h1 className="display-5 fw-bold">Porch P.O. Box </h1></u> */}
+        {/* <Link to="/customers">view customers </Link><br></br> */}
+        {/* <header> */}
+        <h3>Welcome to Porch P.O. Box </h3>
+        {/* </header> */}
 
-          <p className="text-muted text-wrap">{/*etgagasfdsads */}</p>
-        </div>
+        <p className="text-muted text-wrap">{/*etgagasfdsads */}</p>
+        {/* </div> */}
 
         {/* Display One-time Product Component */}
         <div style={{ flex: 1 }}>

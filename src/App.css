@@ -1,3 +1,13 @@
-.body{
-  background-color: grey;
+.header{
+  /* background-color: black; */
+   background-image: url("/Users/home/Desktop/stripeShit /PORCH PO BOX MAIN FILES /Strip-Subcription-Integration-MERN-frontend/porchpoboxfrontend/public/logo.png");
+      background-repeat: no-repeat;
+  background-size: contain;
+  /* background-attachment: fixed; */
+    background-position: center center;
+        opacity: 1;
+        height:150px;
+
+          display: flex;
+
 }

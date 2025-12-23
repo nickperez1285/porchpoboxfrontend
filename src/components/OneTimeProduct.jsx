@@ -26,7 +26,9 @@ const ProductList = () => {
         <h5>`{defaultDescription}`</h5>
         <br />
         <b>
-          <h4>$25</h4>
+          <center>
+            <h3>$25</h3>
+          </center>
         </b>
         <Link
           to="https://buy.stripe.com/dRm8wQ5obct83Ns8Bx6kg03
