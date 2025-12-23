@@ -244,7 +244,7 @@ const MainPage = () => {
         {/* <u><h1 className="display-5 fw-bold">Porch P.O. Box </h1></u> */}
         {/* <Link to="/customers">view customers </Link><br></br> */}
         {/* <header> */}
-        <h3>Welcome to Porch P.O. Box </h3>
+        <h3 style={{ color: "gold" }}>Welcome to Porch P.O. Box </h3>
         {/* </header> */}
 
         <p className="text-muted text-wrap">{/*etgagasfdsads */}</p>
