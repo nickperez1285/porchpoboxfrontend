@@ -1,6 +1,6 @@
 .header{
   /* background-color: black; */
-   background-image: url("/Users/home/Desktop/stripeShit /PORCH PO BOX MAIN FILES /Strip-Subcription-Integration-MERN-frontend/porchpoboxfrontend/public/logo.png");
+   background-image: url("https://raw.githubusercontent.com/nickperez1285/porchpoboxfrontend/refs/heads/main/public/logo.png");
       background-repeat: no-repeat;
   background-size: contain;
   /* background-attachment: fixed; */
