@@ -15,7 +15,7 @@ export default function ContactPage() {
         {
           name: e.target.name.value,
           email: e.target.email.value,
-          message: e.target.message.value,
+          message: e.target.message.value
         },
         "Id1MelaGp_AdTTwf7"
       )
@@ -31,7 +31,7 @@ export default function ContactPage() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h1 style={styles.title}>Contact Us</h1>
+        <h1 style={styles.title}>Contact Us </h1>
 
         <input
           type="text"
@@ -62,20 +62,23 @@ export default function ContactPage() {
         </button>
         {status && <p style={styles.status}>{status}</p>}
       </form>
+      h
     </div>
   );
 }
 
 const styles = {
   container: {
+    background: "black",
     minHeight: "100vh",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#f5f5f5",
+    // background: "#f5f5f5",
     padding: "1rem",
   },
   form: {
+    background: "black",
     width: "100%",
     maxWidth: "420px",
     background: "#ffffff",

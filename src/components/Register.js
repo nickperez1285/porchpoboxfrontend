@@ -1,44 +1,138 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import API_BASE_URL from "../config/api";
+import { auth, db } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
+const Register = () => {
+    const navigate = useNavigate();
 
-export default function Register() {
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const navigate = useNavigate();
+    const [name, setName] = useState("");
+    const [phoneNumber, setPhoneNumber] = useState("");
+    const [email, setEmail] = useState("");
+    const [streetAddress, setStreetAddress] = useState("");
+    const [city, setCity] = useState("");
+    const [state, setState] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
+    const handleRegister = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError("");
 
-const handleRegister = async (e) => {
-e.preventDefault();
+        try {
+            // 🔹 1. Create user in Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
 
+            const user = userCredential.user;
 
-await axios.post(`${API_BASE_URL}/api/auth/register`, {
-email,
-password
-});
+            // ✅**** Add addional inputs here to  Update Auth profile
+            await updateProfile(user, {
+                displayName: name
+            });
 
+            // 🔥 Save extra user info in Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                name: name,
+                phoneNumber: phoneNumber,
+                email: email,
+                streetAddress: streetAddress,
+                city: city,
+                state: state,
+                zipCode: zipCode,
+                createdAt: serverTimestamp()
+            });
+            console.log("User registered and saved!");
 
-navigate("/");
+            // 🔹 3. Redirect
+            navigate("/");
+
+        } catch (err) {
+            console.error(err);
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <div style={{ maxWidth: 400, margin: "100px auto", textAlign: "center" }}>
+            <h2>Register</h2>
+
+            <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Phone Number"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Street Address"
+                    value={streetAddress}
+                    onChange={(e) => setStreetAddress(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="State"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    required
+                />
+                <input
+                    type="text"
+                    placeholder="Zip Code"
+                    value={zipCode}
+                    onChange={(e) => setZipCode(e.target.value)}
+                    required
+                />
+
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                />
+
+                {error && <p style={{ color: "red" }}>{error}</p>}
+
+                <button type="submit" disabled={loading}>
+                    {loading ? "Creating account..." : "Register"}
+                </button>
+            </form>
+        </div>
+    );
 };
 
-
-return (
-<form onSubmit={handleRegister}>
-<h2>Create Account</h2>
-<input
-placeholder="Email"
-required
-onChange={(e) => setEmail(e.target.value)}
-/>
-<input
-type="password"
-placeholder="Password"
-required
-onChange={(e) => setPassword(e.target.value)}
-/>
-<button>Create Account</button>
-</form>
-);
-}
+export default Register;

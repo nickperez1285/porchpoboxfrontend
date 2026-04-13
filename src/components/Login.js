@@ -1,47 +1,66 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import API_BASE_URL from "../config/api";
 
-// import { clientEncryption } from "../../../Strip-Subcription-Integration-MERN-backend/backend/models/User";
-
-
-export default function Login() {
-const [email, setEmail] = useState("");
-const [password, setPassword] = useState("");
-const navigate = useNavigate();
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 
-const handleLogin = async (e) => {
-e.preventDefault();
+const Login = ({ title = "Login", redirectTo = "/" }) => {
+    const navigate = useNavigate();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Logged in:", user.email);
+            } else {
+                console.log("Logged out");
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
 
 
-const res = await 
-axios.post(`${API_BASE_URL}/api/auth/login`, {
-email,
-password,
-});
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError("");
 
-// const res = await axios.post("/api/auth/login", {
-// email,
-// password,
-// });
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            navigate(redirectTo);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
+    return (
+        <div style={{ maxWidth: 400, margin: "100px auto", textAlign: "center" }}>
+            <h2>{title}</h2>
 
-localStorage.setItem("token", res.data.token);
+            <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
 
+                {error && <p>{error}</p>}
 
-navigate("/customers");
+                <button type="submit">Login</button>
+            </form>
+        </div>
+    );
 };
 
-
-return (
-    <center>
-<form onSubmit={handleLogin}>
-<input placeholder="Email" onChange={e => setEmail(e.target.value)} /><br/>
-<input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} /><br/>
-<button>Login</button>
-</form>
-</center>
-);
-}
+export default Login;

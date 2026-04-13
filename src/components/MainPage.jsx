@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import OneTimeProduct from "./OneTimeProduct";
-import Login from "./Login";
 import API_BASE_URL from "../config/api";
-import Contact from "./Contact";
+import { db } from "../firebase";
 
 const MainPage = () => {
   const [plans, setPlans] = useState({});
@@ -13,9 +13,13 @@ const MainPage = () => {
   const [loading, setLoading] = useState(true);
   const [couponLoading, setCouponLoading] = useState({});
   const [purchaseType, setPurchaseType] = useState("subscription");
+  const [activeVendors, setActiveVendors] = useState([]);
+  const [vendorsLoading, setVendorsLoading] = useState(true);
+  const [vendorsError, setVendorsError] = useState("");
 
   useEffect(() => {
     fetchPrices();
+    fetchActiveVendors();
   }, []);
 
   const fetchPrices = async () => {
@@ -153,10 +157,9 @@ const MainPage = () => {
         }));
 
         alert(
-          `Coupon applied! ${
-            data.coupon.percent_off
-              ? `${data.coupon.percent_off}% off`
-              : `$${((data.coupon.amount_off || 0) / 100).toFixed(2)} off`
+          `Coupon applied! ${data.coupon.percent_off
+            ? `${data.coupon.percent_off}% off`
+            : `$${((data.coupon.amount_off || 0) / 100).toFixed(2)} off`
           }`
         );
       } else {
@@ -229,6 +232,31 @@ const MainPage = () => {
     }
   };
 
+  const fetchActiveVendors = async () => {
+    setVendorsLoading(true);
+    setVendorsError("");
+    try {
+      const vendorSnapshot = await getDocs(
+        query(collection(db, "vendors"), where("approved", "==", true))
+      );
+      setActiveVendors(
+        vendorSnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+      );
+    } catch (error) {
+      console.error("Error loading active vendors:", error);
+      setActiveVendors([]);
+      setVendorsError(
+        error?.message || "Unable to load active vendors."
+      );
+    } finally {
+      setVendorsLoading(false);
+    }
+  };
+
   return (
     <div style={{ heigbt: "100%" }}>
       <div
@@ -250,22 +278,77 @@ const MainPage = () => {
         <p className="text-muted text-wrap">{/*etgagasfdsads */}</p>
         {/* </div> */}
 
-        {/* Display One-time Product Component */}
-        <div style={{ flex: 1 }}>
-          <OneTimeProduct />
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 1180,
+            display: "flex",
+            flexWrap: "wrap",
+            gap: 24,
+            alignItems: "flex-start",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            style={{
+              flex: "1 1 320px",
+              minWidth: 280,
+              maxWidth: 420,
+              maxHeight: 420,
+              overflowY: "auto",
+              background: "#111",
+              border: "1px solid #333",
+              borderRadius: 12,
+              padding: 20,
+              color: "#f5f5f5",
+            }}
+          >
+            <center><h4 style={{ marginTop: 0, color: "gold" }}>Porch P.O. Boxes</h4></center>
+            {vendorsLoading ? (
+              <p>Loading vendors...</p>
+            ) : vendorsError ? (
+              <p>{vendorsError}</p>
+            ) : activeVendors.length === 0 ? (
+              <p>No active vendors listed yet.</p>
+            ) : (
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                {activeVendors.map((vendor) => (
+                  <li
+                    key={vendor.id}
+                    style={{
+                      padding: "12px 0",
+                      borderBottom: "1px solid #2c2c2c",
+                    }}
+                  >
+                    <strong>{vendor.businessName || "Unnamed vendor"}</strong>
+                    <div>
+                      {vendor.streetAddress || "No street address"}
+                      {vendor.city ? `, ${vendor.city}` : ""}
+                      {vendor.state ? `, ${vendor.state}` : ""}
+                      {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div style={{ flex: "1 1 520px", minWidth: 320, maxWidth: 720 }}>
+            <OneTimeProduct />
+          </div>
         </div>
         <br />
       </div>
-      <footer>
+      <footer style={{ padding: '1em', background: "black" }}>
         <center>
           <Link
-            to="/login"
+            to="/vendor"
             style={{ display: "inline-block", paddingRight: 10 }}
           >
-            Business Portal
+            Vendors
           </Link>
           <></>
-          <Link to="/contact">Contact</Link>
+          <Link to="/contact">Contact </Link>
         </center>
       </footer>
     </div>

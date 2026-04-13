@@ -1,85 +1,63 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import API_BASE_URL from "../config/api";
 
-// import 'bootstrap/dist/css/bootstrap.min.css'; // Ensure Bootstrap is included
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const CustomerList = () => {
-  const [customers, setCustomers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchCustomers = async () => {
+    const fetchUsers = async () => {
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/customers`);
-        setCustomers(response.data.customers);
-      } catch (err) {
-        setError("Failed to load customer data");
-        console.error(err);
+        const querySnapshot = await getDocs(collection(db, "users"));
+
+        const usersList = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        setUsers(usersList);
+      } catch (error) {
+        console.error("Error fetching users:", error);
+        setError("Unable to load customers. Check Firestore vendor read permissions.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCustomers();
+    fetchUsers();
   }, []);
 
-  if (loading) return <p>Loading customers...</p>;
-  if (error) return <p>{error}</p>;
-
-  // Function to generate random background color for cards
-  const getRandomColor = () => {
-    const colors = ["bg-dark", "bg-dark", "bg-dark", "bg-dark", "bg-dark"];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    return randomColor;
-  };
-
   return (
-    <div className="container mt-2">
-      <h1 className="fw-bold text-center mb-4">Customer Details</h1>
-      <div className="row">
-        {customers.map((customer) => (
-          <div key={customer.customerId} className="col-md-4 mb-3">
-            <div className={`card text-white ${getRandomColor()}`}>
-              <div className="card-body shadow-lg">
-                <h2 className="card-title text-warning mb-2">
-                  {customer.customerName}
-                </h2>
-                <ul className="list-unstyled">
-                  {customer.plans.length > 0 ? (
-                    customer.plans.map((plan) => (
-                      <li key={plan.planId}>
-                        <p>
-                          <strong>Amount:</strong> {plan.amount} {plan.currency}
-                        </p>
-                        <p>
-                          <strong>Interval:</strong> {plan.interval}
-                        </p>
-                        <p>
-                          <strong>Status:</strong> {plan.status}
-                        </p>
-                        <p>
-                          <strong>Start Date:</strong>{" "}
-                          {new Date(plan.start_date).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <strong>End Date:</strong>{" "}
-                          {new Date(
-                            plan.current_period_end
-                          ).toLocaleDateString()}
-                        </p>
-                      </li>
-                    ))
-                  ) : (
-                    <p>No active plans for this customer.</p>
-                  )}
-                </ul>
+    <div style={{ padding: "20px" }}>
+      <h2>Customers</h2>
+
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : users.length === 0 ? (
+        <p>No users found</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>
+              <strong>Name: {user.name || "Unnamed user"}</strong>
+              <div>Email: {user.email || "No email"}</div>
+              <div>Phone: {user.phoneNumber || "No phone number"}</div>
+              <div>
+                Address: {user.streetAddress || "No street address"}
+                {user.city ? `, ${user.city}` : ""}
+                {user.state ? `, ${user.state}` : ""}
+                {user.zipCode ? ` ${user.zipCode}` : ""}
               </div>
-            </div>
-          </div>
-        ))}
-      </div>
+              <div>User ID: {user.id}</div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
