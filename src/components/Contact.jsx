@@ -78,7 +78,6 @@ const styles = {
     padding: "1rem",
   },
   form: {
-    background: "black",
     width: "100%",
     maxWidth: "420px",
     background: "#ffffff",

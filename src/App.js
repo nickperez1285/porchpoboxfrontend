@@ -58,7 +58,11 @@ function App() {
         <header style={{ position: "relative" }}>
           <center >
             <Link to="/" style={{ color: "gold", }}>
-              <h1 className="header"></h1>
+              <h1 className="header">
+                <span style={{ position: "absolute", left: "-9999px" }}>
+                  Porch P.O. Box
+                </span>
+              </h1>
             </Link>
           </center>
           {!authLoading && (

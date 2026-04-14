@@ -1,18 +1,8 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import { Link } from "react-router-dom";
-import API_BASE_URL from "../config/api.js";
 
 const ProductList = () => {
-  const [products, setProducts] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isProcessing, setIsProcessing] = useState(false);
   const defaultDescription = " Get unlimited packages for 30 days ";
-
-  if (error) {
-    return <div className="alert alert-danger">{error}</div>;
-  }
 
   return (
     <center>
