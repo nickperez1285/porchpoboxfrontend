@@ -50,7 +50,7 @@ const VendorRegister = () => {
       });
 
       try {
-        await fetch(`${API_BASE_URL}/api/notifications/vendor-registration`, {
+        const notificationResponse = await fetch(`${API_BASE_URL}/api/notifications/vendor-registration`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -70,8 +70,18 @@ const VendorRegister = () => {
             zipCode
           })
         });
+
+        if (!notificationResponse.ok) {
+          const errorBody = await notificationResponse.json().catch(() => null);
+          throw new Error(
+            errorBody?.message || "Vendor notification email failed."
+          );
+        }
       } catch (emailError) {
         console.error("Vendor notification email failed:", emailError);
+        setError(emailError.message);
+        setLoading(false);
+        return;
       }
 
       navigate("/vendor/pending");
