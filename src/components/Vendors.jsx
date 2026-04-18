@@ -1,8 +1,37 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { collection, getDocs } from "firebase/firestore";
 import CustomerList from "./CustomerList";
+import { db } from "../firebase";
 
 const Vendors = ({ user, vendorProfile, authLoading }) => {
+    const [packageCountTotal, setPackageCountTotal] = useState(0);
+
+    useEffect(() => {
+        const loadPackageCountTotal = async () => {
+            if (!vendorProfile?.id || !vendorProfile.approved) {
+                setPackageCountTotal(0);
+                return;
+            }
+
+            try {
+                const snapshot = await getDocs(
+                    collection(db, "vendors", vendorProfile.id, "packageCounts")
+                );
+                const total = snapshot.docs.reduce(
+                    (sum, entry) => sum + (entry.data().count || 0),
+                    0
+                );
+                setPackageCountTotal(total);
+            } catch (error) {
+                console.error("Error loading vendor package totals:", error);
+                setPackageCountTotal(0);
+            }
+        };
+
+        loadPackageCountTotal();
+    }, [vendorProfile]);
+
     if (authLoading) {
         return (
             <div style={{ maxWidth: 700, margin: "80px auto", textAlign: "center" }}>
@@ -34,7 +63,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                 <div style={{ textAlign: "center", marginBottom: 24 }}>
                     <h2>Vendor Portal</h2>
                     <p>Welcome {vendorProfile.businessName}</p>
-                    <p>Packages checked in: {vendorProfile.packageCheckInCount || 0}</p>
+                    <p>Packages checked in: {packageCountTotal}</p>
                     <p>
                         <Link to="/vendor/package-check-in">Package Check In</Link>
                     </p>

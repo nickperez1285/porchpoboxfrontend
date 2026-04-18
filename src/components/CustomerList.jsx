@@ -25,11 +25,13 @@ const CustomerList = ({ vendorId }) => {
           ])
         );
 
-        const usersList = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          packageCount: packageCounts[doc.id] || 0
-        }));
+        const usersList = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+            packageCount: packageCounts[doc.id] || 0
+          }))
+          .filter((user) => user.packageCount > 0);
 
         setUsers(usersList);
       } catch (error) {
@@ -52,7 +54,7 @@ const CustomerList = ({ vendorId }) => {
       ) : error ? (
         <p>{error}</p>
       ) : users.length === 0 ? (
-        <p>No users found</p>
+        <p>No customers currently have packages checked in at this vendor.</p>
       ) : (
         <ul>
           {users.map((user) => (
