@@ -48,51 +48,157 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
     if (user && vendorProfile) {
         if (!vendorProfile.approved) {
             return (
-                <div style={{ maxWidth: 700, margin: "80px auto", textAlign: "center" }}>
-                    <h2>Vendor Portal</h2>
-                    <p>
-                        {vendorProfile.status === "deactivated"
-                            ? "Your vendor account has been deactivated. Please contact Porch P.O. Box for assistance."
-                            : "Your registration information has been received and your request to become a vendor is being reviewed."}
-                    </p>
-                    <p>
-                        <Link to="/vendor/profile">Vendor Profile</Link>
-                    </p>
+                <div style={{ maxWidth: 760, margin: "60px auto", padding: "0 20px" }}>
+                    <div
+                        style={{
+                            background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+                            color: "#f5f5f5",
+                            borderRadius: 20,
+                            padding: "28px 24px",
+                            textAlign: "center"
+                        }}
+                    >
+                        <h2 style={{ marginTop: 0 }}>Vendor Portal</h2>
+                        <p style={{ color: "#d6d6d6" }}>
+                            {vendorProfile.status === "deactivated"
+                                ? "Your vendor account has been deactivated. Please contact Porch P.O. Box for assistance."
+                                : "Your registration information has been received and your request to become a vendor is being reviewed."}
+                        </p>
+                        <p style={{ marginBottom: 0 }}>
+                            <Link to="/vendor/profile">Vendor Profile</Link>
+                        </p>
+                    </div>
                 </div>
             );
         }
 
         return (
-            <div style={{ maxWidth: 900, margin: "60px auto" }}>
-                <div style={{ textAlign: "center", marginBottom: 24 }}>
-                    <h2>Vendor Portal</h2>
-                    <p>Welcome {vendorProfile.businessName}</p>
-                    <p>Packages In Stock: {packageCountTotal}</p>
-                    <p>
-                        <Link to="/vendor/package-check-in"> Check In Packages</Link>
-                    </p>
+            <div style={{ maxWidth: 1080, margin: "60px auto", padding: "0 20px" }}>
+                <div
+                    style={{
+                        background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+                        color: "#f5f5f5",
+                        borderRadius: 24,
+                        padding: "30px 28px",
+                        marginBottom: 24,
+                        boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)"
+                    }}
+                >
+                    <div
+                        style={{
+                            display: "flex",
+                            flexWrap: "wrap",
+                            justifyContent: "space-between",
+                            gap: 20,
+                            alignItems: "flex-start"
+                        }}
+                    >
+                        <div style={{ maxWidth: 540 }}>
+                            <div
+                                style={{
+                                    color: "#d4af37",
+                                    fontSize: 12,
+                                    letterSpacing: 1.2,
+                                    textTransform: "uppercase"
+                                }}
+                            >
+                                Vendor Portal
+                            </div>
+                            <h2 style={{ margin: "10px 0 8px" }}>{vendorProfile.businessName}</h2>
+                            <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
+                                Review active customer deliveries, manage package intake,
+                                and clear delivered packages from your location.
+                            </p>
+                        </div>
+
+                        <div
+                            style={{
+                                display: "grid",
+                                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                                gap: 14,
+                                flex: "1 1 320px"
+                            }}
+                        >
+                            <div
+                                style={{
+                                    background: "rgba(255, 255, 255, 0.06)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    borderRadius: 16,
+                                    padding: 16
+                                }}
+                            >
+                                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                                    Packages In Stock
+                                </div>
+                                <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+                                    {packageCountTotal}
+                                </div>
+                            </div>
+                            <div
+                                style={{
+                                    background: "rgba(255, 255, 255, 0.06)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    borderRadius: 16,
+                                    padding: 16
+                                }}
+                            >
+                                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                                    Actions
+                                </div>
+                                <div style={{ marginTop: 10 }}>
+                                    <Link to="/vendor/package-check-in">Check In Packages</Link>
+                                </div>
+                                <div style={{ marginTop: 8 }}>
+                                    <Link to="/vendor/profile">Vendor Profile</Link>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <CustomerList
-                    vendorId={vendorProfile.id}
-                    onPackagesDelivered={handlePackagesDelivered}
-                />
+
+                <div
+                    style={{
+                        background: "#fff",
+                        border: "1px solid rgba(0, 0, 0, 0.08)",
+                        borderRadius: 20,
+                        boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+                    }}
+                >
+                    <CustomerList
+                        vendorId={vendorProfile.id}
+                        onPackagesDelivered={handlePackagesDelivered}
+                    />
+                </div>
             </div>
         );
     }
 
     return (
-        <div style={{ maxWidth: 700, margin: "80px auto", textAlign: "center" }}>
-            <h2>Vendor Portal</h2>
-            <p>Vendors can sign in to view the customer list and manage their account.</p>
-            <p>
-                <Link to="/vendor/login">Vendor Login</Link>
-            </p>
-            <p>
-                <Link to="/vendor/register">Vendor Registration</Link>
-            </p>
-            {user && !vendorProfile && (
-                <p>This account is signed in, but it is not registered as a vendor.</p>
-            )}
+        <div style={{ maxWidth: 760, margin: "60px auto", padding: "0 20px" }}>
+            <div
+                style={{
+                    background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+                    color: "#f5f5f5",
+                    borderRadius: 20,
+                    padding: "28px 24px",
+                    textAlign: "center"
+                }}
+            >
+                <h2 style={{ marginTop: 0 }}>Vendor Portal</h2>
+                <p style={{ color: "#d6d6d6" }}>
+                    Vendors can sign in to review customer packages, check in new deliveries,
+                    and manage their location profile.
+                </p>
+                <p>
+                    <Link to="/vendor/login">Vendor Login</Link>
+                </p>
+                <p>
+                    <Link to="/vendor/register">Vendor Registration</Link>
+                </p>
+                {user && !vendorProfile && (
+                    <p>This account is signed in, but it is not registered as a vendor.</p>
+                )}
+            </div>
         </div>
     );
 };

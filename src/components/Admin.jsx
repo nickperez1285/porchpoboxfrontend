@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import {
@@ -19,6 +19,7 @@ const Admin = () => {
   const [error, setError] = useState("");
   const [expandedCustomerIds, setExpandedCustomerIds] = useState([]);
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
+  const [customerSortBy, setCustomerSortBy] = useState("name");
 
   const handleLogout = async () => {
     try {
@@ -126,6 +127,24 @@ const Admin = () => {
     loadAdminData();
   }, []);
 
+  const sortedCustomers = useMemo(() => {
+    const customersCopy = [...customers];
+
+    if (customerSortBy === "packageCount") {
+      return customersCopy.sort((left, right) => {
+        if ((right.packageCount || 0) !== (left.packageCount || 0)) {
+          return (right.packageCount || 0) - (left.packageCount || 0);
+        }
+
+        return (left.name || "").localeCompare(right.name || "");
+      });
+    }
+
+    return customersCopy.sort((left, right) =>
+      (left.name || "").localeCompare(right.name || "")
+    );
+  }, [customerSortBy, customers]);
+
   if (loading) {
     return (
       <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
@@ -144,16 +163,108 @@ const Admin = () => {
     );
   }
 
-  return (
-    <div style={{ maxWidth: 960, margin: "60px auto", padding: "0 20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
-        <center><h2>Admin Portal</h2></center>
+  const totalCustomerPackages = customers.reduce(
+    (sum, customer) => sum + (customer.packageCount || 0),
+    0
+  );
+  const approvedVendorCount = vendors.filter((vendor) => vendor.approved).length;
 
+  return (
+    <div style={{ maxWidth: 1180, margin: "60px auto", padding: "0 20px" }}>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+          color: "#f5f5f5",
+          borderRadius: 24,
+          padding: "30px 28px",
+          marginBottom: 24,
+          boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)"
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 20,
+            alignItems: "flex-start"
+          }}
+        >
+          <div style={{ maxWidth: 560 }}>
+            <div
+              style={{
+                color: "#d4af37",
+                fontSize: 12,
+                letterSpacing: 1.2,
+                textTransform: "uppercase"
+              }}
+            >
+              Admin Portal
+            </div>
+            <h2 style={{ margin: "10px 0 8px" }}>Customer and Vendor Oversight</h2>
+            <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
+              Review all customer and vendor records, monitor package volume,
+              and manage vendor approval status from a single dashboard.
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
+              gap: 14,
+              flex: "1 1 360px"
+            }}
+          >
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 16,
+                padding: 16
+              }}
+            >
+              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                Customers
+              </div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{customers.length}</div>
+            </div>
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 16,
+                padding: 16
+              }}
+            >
+              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                Approved Vendors
+              </div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{approvedVendorCount}</div>
+            </div>
+            <div
+              style={{
+                background: "rgba(255, 255, 255, 0.06)",
+                border: "1px solid rgba(255, 255, 255, 0.1)",
+                borderRadius: 16,
+                padding: 16
+              }}
+            >
+              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                Packages
+              </div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{totalCustomerPackages}</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <hr />
-      <button type="button" onClick={handleLogout}>
-        Logout
-      </button>
+
+      <div style={{ marginBottom: 20 }}>
+        <button type="button" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
       <div
         style={{
           display: "grid",
@@ -162,20 +273,77 @@ const Admin = () => {
           alignItems: "start"
         }}
       >
-        <section>
-          <h3>Customers</h3>
+        <section
+          style={{
+            background: "#fff",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            borderRadius: 20,
+            padding: 24,
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+          }}
+        >
+          <div style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#8a6a00",
+                letterSpacing: 1,
+                textTransform: "uppercase"
+              }}
+            >
+              Customers
+            </div>
+            <h3 style={{ margin: "8px 0 0" }}>Customer Accounts</h3>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 18 }}>
+            <button
+              type="button"
+              onClick={() => setCustomerSortBy("name")}
+              style={{
+                background: customerSortBy === "name" ? "#111" : "#f0f0f0",
+                color: customerSortBy === "name" ? "#fff" : "#111",
+                border: "1px solid #ccc",
+                borderRadius: 999,
+                padding: "8px 14px"
+              }}
+            >
+              Sort by Name
+            </button>
+            <button
+              type="button"
+              onClick={() => setCustomerSortBy("packageCount")}
+              style={{
+                background: customerSortBy === "packageCount" ? "#111" : "#f0f0f0",
+                color: customerSortBy === "packageCount" ? "#fff" : "#111",
+                border: "1px solid #ccc",
+                borderRadius: 999,
+                padding: "8px 14px"
+              }}
+            >
+              Sort by Package Count
+            </button>
+          </div>
           {customers.length === 0 ? (
             <p>No customers found.</p>
           ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {customers.map((customer) => (
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                maxHeight: 720,
+                overflowY: "auto"
+              }}
+            >
+              {sortedCustomers.map((customer) => (
                 <li
                   key={customer.id}
                   style={{
                     padding: 16,
                     border: "1px solid #ccc",
                     borderRadius: 10,
-                    marginBottom: 12
+                    marginBottom: 12,
+                    background: "#fffdf9"
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
@@ -216,12 +384,40 @@ const Admin = () => {
           )}
         </section>
 
-        <section>
-          <h3>Vendors</h3>
+        <section
+          style={{
+            background: "#fff",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            borderRadius: 20,
+            padding: 24,
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+          }}
+        >
+          <div style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#8a6a00",
+                letterSpacing: 1,
+                textTransform: "uppercase"
+              }}
+            >
+              Vendors
+            </div>
+            <h3 style={{ margin: "8px 0 0" }}>Vendor Accounts</h3>
+          </div>
           {vendors.length === 0 ? (
             <p>No vendors found.</p>
           ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+            <ul
+              style={{
+                listStyle: "none",
+                padding: 0,
+                margin: 0,
+                maxHeight: 720,
+                overflowY: "auto"
+              }}
+            >
               {vendors.map((vendor) => (
                 <li
                   key={vendor.id}

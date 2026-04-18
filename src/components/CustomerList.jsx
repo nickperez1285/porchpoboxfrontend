@@ -96,8 +96,20 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>Customers W/ Packages </h2>
+    <div style={{ padding: "24px" }}>
+      <div style={{ marginBottom: 18 }}>
+        <div
+          style={{
+            fontSize: 12,
+            color: "#8a6a00",
+            letterSpacing: 1,
+            textTransform: "uppercase"
+          }}
+        >
+          Active Deliveries
+        </div>
+        <h2 style={{ margin: "8px 0 0" }}>Customers With Packages</h2>
+      </div>
 
       {loading ? (
         <p>Loading...</p>
@@ -112,9 +124,10 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
               key={user.id}
               style={{
                 border: "1px solid #ddd",
-                borderRadius: 10,
+                borderRadius: 14,
                 padding: 16,
-                marginBottom: 12
+                marginBottom: 12,
+                background: "#fffdf9"
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>

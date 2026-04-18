@@ -39,25 +39,54 @@ const MainPage = ({ user }) => {
   };
 
   return (
-    <div style={{ heigbt: "100%" }}>
+    <div
+      style={{
+        minHeight: "100%",
+        background:
+          "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 32%), linear-gradient(180deg, #f7f3e8 0%, #f4efe3 100%)"
+      }}
+    >
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           minHeight: "85vh",
+          padding: "32px 20px 48px"
         }}
       >
-        <hr></hr>
-        {/* <div className="pricing-header p-3 pb-md-4 mx-auto text-center"> */}
-        {/* <u><h1 className="display-5 fw-bold">Porch P.O. Box </h1></u> */}
-        {/* <Link to="/customers">view customers </Link><br></br> */}
-        {/* <header> */}
-        <h3 style={{ color: "gold" }}>Welcome to Porch P.O. Box </h3>
-        {/* </header> */}
-
-        <p className="text-muted text-wrap">{/*etgagasfdsads */}</p>
-        {/* </div> */}
+        <div
+          style={{
+            width: "100%",
+            maxWidth: 1180,
+            background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+            color: "#f5f5f5",
+            borderRadius: 24,
+            padding: "32px 28px",
+            boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)",
+            marginBottom: 28
+          }}
+        >
+          <div style={{ maxWidth: 720 }}>
+            <div
+              style={{
+                color: "#d4af37",
+                fontSize: 12,
+                letterSpacing: 1.4,
+                textTransform: "uppercase"
+              }}
+            >
+              Porch P.O. Box
+            </div>
+            <h2 style={{ margin: "10px 0 12px", fontSize: "clamp(2rem, 4vw, 3.2rem)" }}>
+              Secure package receiving through local partner locations.
+            </h2>
+            <p style={{ margin: 0, color: "#d3d3d3", lineHeight: 1.6, maxWidth: 620 }}>
+              Browse active Porch P.O. Box locations, choose a monthly package plan,
+              and manage deliveries through a cleaner customer and vendor workflow.
+            </p>
+          </div>
+        </div>
 
         <div
           style={{
@@ -77,14 +106,27 @@ const MainPage = ({ user }) => {
               maxWidth: 420,
               maxHeight: 420,
               overflowY: "auto",
-              background: "#111",
-              border: "1px solid #333",
-              borderRadius: 12,
-              padding: 20,
-              color: "#f5f5f5",
+              background: "#fffdf8",
+              border: "1px solid rgba(0, 0, 0, 0.08)",
+              borderRadius: 20,
+              padding: 22,
+              color: "#181818",
+              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
             }}
           >
-            <center><h4 style={{ marginTop: 0, color: "gold" }}>Porch P.O. Boxes</h4></center>
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#8a6a00",
+                  letterSpacing: 1,
+                  textTransform: "uppercase"
+                }}
+              >
+                Active Locations
+              </div>
+              <h4 style={{ margin: "8px 0 0" }}>Porch P.O. Boxes</h4>
+            </div>
             {vendorsLoading ? (
               <p>Loading vendors...</p>
             ) : vendorsError ? (
@@ -97,12 +139,12 @@ const MainPage = ({ user }) => {
                   <li
                     key={vendor.id}
                     style={{
-                      padding: "12px 0",
-                      borderBottom: "1px solid #2c2c2c",
+                      padding: "14px 0",
+                      borderBottom: "1px solid #ece5d5",
                     }}
                   >
                     <strong>{vendor.businessName || "Unnamed vendor"}</strong>
-                    <div>
+                    <div style={{ marginTop: 4, color: "#555" }}>
                       {vendor.streetAddress || "No street address"}
                       {vendor.city ? `, ${vendor.city}` : ""}
                       {vendor.state ? `, ${vendor.state}` : ""}
@@ -114,13 +156,39 @@ const MainPage = ({ user }) => {
             )}
           </div>
 
-          <div style={{ flex: "1 1 520px", minWidth: 320, maxWidth: 720 }}>
+          <div
+            style={{
+              flex: "1 1 520px",
+              minWidth: 320,
+              maxWidth: 720,
+              background: "#fff",
+              border: "1px solid rgba(0, 0, 0, 0.08)",
+              borderRadius: 20,
+              padding: 28,
+              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+            }}
+          >
+            <div style={{ marginBottom: 18 }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#8a6a00",
+                  letterSpacing: 1,
+                  textTransform: "uppercase"
+                }}
+              >
+                Monthly Plan
+              </div>
+              <h4 style={{ margin: "8px 0 6px" }}>Checkout</h4>
+              <p style={{ margin: 0, color: "#666" }}>
+                Start a 30-day package plan. Login is required before checkout.
+              </p>
+            </div>
             <OneTimeProduct isLoggedIn={Boolean(user)} />
           </div>
         </div>
-        <br />
       </div>
-      <footer style={{ padding: '1em', background: "black" }}>
+      <footer style={{ padding: "1em", background: "#111" }}>
         <center>
           <Link
             to="/vendor"

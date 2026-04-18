@@ -33,36 +33,138 @@ const Profile = ({ user }) => {
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "80px auto", textAlign: "center" }}>
-      <h2>User Profile</h2>
-      <p>
-        <strong>Name:</strong> {user.displayName || "Not provided"}
-      </p>
-      <p>
-        <strong>Email:</strong> {user.email || "Not available"}
-      </p>
-      <p>
-        <strong>Phone:</strong> {profileData?.phoneNumber || "Not provided"}
-      </p>
-      <p>
-        <strong>Street Address:</strong> {profileData?.streetAddress || "Not provided"}
-      </p>
-      <p>
-        <strong>City:</strong> {profileData?.city || "Not provided"}
-      </p>
-      <p>
-        <strong>State:</strong> {profileData?.state || "Not provided"}
-      </p>
-      <p>
-        <strong>Zip Code:</strong> {profileData?.zipCode || "Not provided"}
-      </p>
+    <div style={{ maxWidth: 960, margin: "60px auto", padding: "0 20px" }}>
+      <div
+        style={{
+          background: "linear-gradient(135deg, #121212 0%, #1e1e1e 100%)",
+          color: "#f5f5f5",
+          borderRadius: 18,
+          padding: "28px 24px",
+          marginBottom: 24,
+          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.18)"
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 20,
+            alignItems: "flex-start"
+          }}
+        >
+          <div>
+            <p style={{ margin: 0, color: "#d4af37", letterSpacing: 1.2, textTransform: "uppercase", fontSize: 12 }}>
+              User Profile
+            </p>
+            <h2 style={{ margin: "8px 0 6px" }}>{user.displayName || profileData?.name || "Account Holder"}</h2>
+            <p style={{ margin: 0, color: "#d6d6d6" }}>
+              Manage your account details and mailing information.
+            </p>
+          </div>
 
+          <div
+            style={{
+              minWidth: 220,
+              background: "rgba(255, 255, 255, 0.06)",
+              border: "1px solid rgba(255, 255, 255, 0.1)",
+              borderRadius: 14,
+              padding: 16
+            }}
+          >
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+              Primary Email
+            </div>
+            <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
+              {user.email || "Not available"}
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
-        <Link to="/">Home</Link>
-        <button type="button" onClick={handleLogout}>
-          Logout
-        </button>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+          gap: 20
+        }}
+      >
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#fff"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Contact Information</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Name</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{user.displayName || profileData?.name || "Not provided"}</div>
+          </div>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Email</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{user.email || "Not available"}</div>
+          </div>
+          <div>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Phone</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.phoneNumber || "Not provided"}</div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#fff"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Street Address</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.streetAddress || "Not provided"}</div>
+          </div>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>City</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.city || "Not provided"}</div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+            <div>
+              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>State</div>
+              <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.state || "Not provided"}</div>
+            </div>
+            <div>
+              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Zip Code</div>
+              <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.zipCode || "Not provided"}</div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#faf7ef"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Account</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>User ID</div>
+            <div style={{ marginTop: 4, fontSize: 15, wordBreak: "break-all" }}>{user.uid}</div>
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <Link to="/">Home</Link>
+            <button type="button" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
