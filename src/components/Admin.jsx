@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { collection, getDocs, doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  serverTimestamp,
+  updateDoc
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const Admin = () => {
@@ -11,6 +17,8 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [updatingVendorId, setUpdatingVendorId] = useState("");
   const [error, setError] = useState("");
+  const [expandedCustomerIds, setExpandedCustomerIds] = useState([]);
+  const [expandedVendorIds, setExpandedVendorIds] = useState([]);
 
   const handleLogout = async () => {
     try {
@@ -45,6 +53,22 @@ const Admin = () => {
     }
   };
 
+  const toggleCustomerExpanded = (customerId) => {
+    setExpandedCustomerIds((current) =>
+      current.includes(customerId)
+        ? current.filter((id) => id !== customerId)
+        : [...current, customerId]
+    );
+  };
+
+  const toggleVendorExpanded = (vendorId) => {
+    setExpandedVendorIds((current) =>
+      current.includes(vendorId)
+        ? current.filter((id) => id !== vendorId)
+        : [...current, vendorId]
+    );
+  };
+
   useEffect(() => {
     const loadAdminData = async () => {
       try {
@@ -53,17 +77,42 @@ const Admin = () => {
           getDocs(collection(db, "vendors"))
         ]);
 
+        const vendorDocs = vendorSnapshot.docs.map((entry) => ({
+          id: entry.id,
+          ...entry.data()
+        }));
+
+        const vendorPackageSnapshots = await Promise.all(
+          vendorDocs.map((vendor) =>
+            getDocs(collection(db, "vendors", vendor.id, "packageCounts"))
+          )
+        );
+
+        const customerPackageCounts = {};
+
+        vendorPackageSnapshots.forEach((snapshot) => {
+          snapshot.docs.forEach((entry) => {
+            const packageCount = entry.data().count || 0;
+            customerPackageCounts[entry.id] =
+              (customerPackageCounts[entry.id] || 0) + packageCount;
+          });
+        });
+
         setCustomers(
-          customerSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data()
+          customerSnapshot.docs.map((entry) => ({
+            id: entry.id,
+            ...entry.data(),
+            packageCount: customerPackageCounts[entry.id] || 0
           }))
         );
 
         setVendors(
-          vendorSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data()
+          vendorDocs.map((vendor, index) => ({
+            ...vendor,
+            packageCountTotal: vendorPackageSnapshots[index].docs.reduce(
+              (sum, entry) => sum + (entry.data().count || 0),
+              0
+            )
           }))
         );
       } catch (fetchError) {
@@ -122,18 +171,45 @@ const Admin = () => {
               {customers.map((customer) => (
                 <li
                   key={customer.id}
-                  style={{ padding: 16, border: "1px solid #ccc", marginBottom: 12 }}
+                  style={{
+                    padding: 16,
+                    border: "1px solid #ccc",
+                    borderRadius: 10,
+                    marginBottom: 12
+                  }}
                 >
-                  <strong>{customer.name || "Unnamed user"}</strong>
-                  <div>Email: {customer.email || "No email"}</div>
-                  <div>Phone: {customer.phoneNumber || "No phone number"}</div>
-                  <div>
-                    Address: {customer.streetAddress || "No street address"}
-                    {customer.city ? `, ${customer.city}` : ""}
-                    {customer.state ? `, ${customer.state}` : ""}
-                    {customer.zipCode ? ` ${customer.zipCode}` : ""}
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                    <strong>{customer.name || "Unnamed user"}</strong>
+                    <div>{customer.packageCount || 0}: PKGS</div>
                   </div>
-                  <div>User ID: {customer.id}</div>
+                  <button
+                    type="button"
+                    onClick={() => toggleCustomerExpanded(customer.id)}
+                    style={{
+                      marginTop: 8,
+                      padding: 0,
+                      border: "none",
+                      background: "none",
+                      color: "#0b57d0",
+                      cursor: "pointer",
+                      textDecoration: "underline"
+                    }}
+                  >
+                    {expandedCustomerIds.includes(customer.id) ? "Hide Info" : "Info"}
+                  </button>
+                  {expandedCustomerIds.includes(customer.id) && (
+                    <div style={{ marginTop: 12 }}>
+                      <div>Email: {customer.email || "No email"}</div>
+                      <div>Phone: {customer.phoneNumber || "No phone number"}</div>
+                      <div>
+                        Address: {customer.streetAddress || "No street address"}
+                        {customer.city ? `, ${customer.city}` : ""}
+                        {customer.state ? `, ${customer.state}` : ""}
+                        {customer.zipCode ? ` ${customer.zipCode}` : ""}
+                      </div>
+                      <div>User ID: {customer.id}</div>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
@@ -152,27 +228,50 @@ const Admin = () => {
                   style={{
                     padding: 16,
                     border: "1px solid #ccc",
+                    borderRadius: 10,
                     marginBottom: 12,
                     backgroundColor: vendor.approved ? "#ffffff" : "#ffdddd"
                   }}
                 >
-                  <strong>{vendor.businessName || "Unnamed vendor"}</strong>
-                  <div>Email: {vendor.email || "No email"}</div>
-                  <div>Phone: {vendor.phoneNumber || "No phone number"}</div>
-                  <div>
-                    Status: {vendor.status === "deactivated"
-                      ? "Deactivated"
-                      : vendor.approved
-                        ? "Approved"
-                        : "Pending Review"}
+                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                    <strong>{vendor.businessName || "Unnamed vendor"}</strong>
+                    <div>{vendor.packageCountTotal || 0}: PKGS</div>
                   </div>
-                  <div>
-                    Address: {vendor.streetAddress || "No street address"}
-                    {vendor.city ? `, ${vendor.city}` : ""}
-                    {vendor.state ? `, ${vendor.state}` : ""}
-                    {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
-                  </div>
-                  <div>Vendor ID: {vendor.id}</div>
+                  <button
+                    type="button"
+                    onClick={() => toggleVendorExpanded(vendor.id)}
+                    style={{
+                      marginTop: 8,
+                      padding: 0,
+                      border: "none",
+                      background: "none",
+                      color: "#0b57d0",
+                      cursor: "pointer",
+                      textDecoration: "underline"
+                    }}
+                  >
+                    {expandedVendorIds.includes(vendor.id) ? "Hide Info" : "Info"}
+                  </button>
+                  {expandedVendorIds.includes(vendor.id) && (
+                    <div style={{ marginTop: 12 }}>
+                      <div>Email: {vendor.email || "No email"}</div>
+                      <div>Phone: {vendor.phoneNumber || "No phone number"}</div>
+                      <div>
+                        Status: {vendor.status === "deactivated"
+                          ? "Deactivated"
+                          : vendor.approved
+                            ? "Approved"
+                            : "Pending Review"}
+                      </div>
+                      <div>
+                        Address: {vendor.streetAddress || "No street address"}
+                        {vendor.city ? `, ${vendor.city}` : ""}
+                        {vendor.state ? `, ${vendor.state}` : ""}
+                        {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
+                      </div>
+                      <div>Vendor ID: {vendor.id}</div>
+                    </div>
+                  )}
                   {!vendor.approved ? (
                     <button
                       type="button"
