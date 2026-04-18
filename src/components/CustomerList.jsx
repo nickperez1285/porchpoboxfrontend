@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import { collection, getDocs } from "firebase/firestore";
 
-const CustomerList = () => {
+const CustomerList = ({ vendorId }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,11 +11,24 @@ const CustomerList = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const querySnapshot = await getDocs(collection(db, "users"));
+        const [querySnapshot, packageCountsSnapshot] = await Promise.all([
+          getDocs(collection(db, "users")),
+          vendorId
+            ? getDocs(collection(db, "vendors", vendorId, "packageCounts"))
+            : Promise.resolve({ docs: [] })
+        ]);
+
+        const packageCounts = Object.fromEntries(
+          packageCountsSnapshot.docs.map((entry) => [
+            entry.id,
+            entry.data().count || 0
+          ])
+        );
 
         const usersList = querySnapshot.docs.map((doc) => ({
           id: doc.id,
-          ...doc.data()
+          ...doc.data(),
+          packageCount: packageCounts[doc.id] || 0
         }));
 
         setUsers(usersList);
@@ -28,7 +41,7 @@ const CustomerList = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [vendorId]);
 
   return (
     <div style={{ padding: "20px" }}>
@@ -47,6 +60,7 @@ const CustomerList = () => {
               <strong>Name: {user.name || "Unnamed user"}</strong>
               <div>Email: {user.email || "No email"}</div>
               <div>Phone: {user.phoneNumber || "No phone number"}</div>
+              <div>Packages at this vendor: {user.packageCount || 0}</div>
               <div>
                 Address: {user.streetAddress || "No street address"}
                 {user.city ? `, ${user.city}` : ""}

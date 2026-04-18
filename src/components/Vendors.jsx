@@ -39,7 +39,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                         <Link to="/vendor/package-check-in">Package Check In</Link>
                     </p>
                 </div>
-                <CustomerList />
+                <CustomerList vendorId={vendorProfile.id} />
             </div>
         );
     }

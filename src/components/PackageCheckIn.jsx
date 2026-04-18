@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, doc, getDocs, increment, updateDoc } from "firebase/firestore";
+import { collection, doc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
 
@@ -76,13 +76,37 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
       });
 
       if (!response.ok) {
-        const body = await response.json().catch(() => null);
-        throw new Error(body?.message || "Package notification email failed.");
+        const responseText = await response.text();
+        let body = null;
+
+        try {
+          body = responseText ? JSON.parse(responseText) : null;
+        } catch (parseError) {
+          body = null;
+        }
+
+        throw new Error(
+          body?.message || responseText || "Package notification email failed."
+        );
       }
 
       await updateDoc(doc(db, "vendors", vendorProfile.id), {
         packageCheckInCount: increment(selectedUsers.length)
       });
+
+      await Promise.all(
+        selectedUsers.map((user) =>
+          setDoc(
+            doc(db, "vendors", vendorProfile.id, "packageCounts", user.id),
+            {
+              count: increment(1),
+              name: user.name || "Unnamed user",
+              email: user.email || ""
+            },
+            { merge: true }
+          )
+        )
+      );
 
       if (onPackagesCheckedIn) {
         await onPackagesCheckedIn();
