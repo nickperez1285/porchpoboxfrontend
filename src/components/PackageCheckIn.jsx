@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, doc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
 
@@ -95,17 +95,29 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
       });
 
       await Promise.all(
-        selectedUsers.map((user) =>
-          setDoc(
-            doc(db, "vendors", vendorProfile.id, "packageCounts", user.id),
+        selectedUsers.map(async (user) => {
+          const packageCountRef = doc(
+            db,
+            "vendors",
+            vendorProfile.id,
+            "packageCounts",
+            user.id
+          );
+          const existingCountSnapshot = await getDoc(packageCountRef);
+          const existingCount = existingCountSnapshot.exists()
+            ? existingCountSnapshot.data().count || 0
+            : 0;
+
+          return setDoc(
+            packageCountRef,
             {
-              count: increment(1),
+              count: existingCount + 1,
               name: user.name || "Unnamed user",
               email: user.email || ""
             },
             { merge: true }
-          )
-        )
+          );
+        })
       );
 
       if (onPackagesCheckedIn) {

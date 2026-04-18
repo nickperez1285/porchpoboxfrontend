@@ -57,10 +57,13 @@ const CustomerList = ({ vendorId }) => {
         <ul>
           {users.map((user) => (
             <li key={user.id}>
-              <strong>Name: {user.name || "Unnamed user"}</strong>
+              <strong >
+                <div> Name: {user.name || "Unnamed user"} </div>
+                <div style={{ float: "right" }}>{user.packageCount || 0}
+                  : PKGS</div>
+              </strong>
               <div>Email: {user.email || "No email"}</div>
               <div>Phone: {user.phoneNumber || "No phone number"}</div>
-              <div>Packages at this vendor: {user.packageCount || 0}</div>
               <div>
                 Address: {user.streetAddress || "No street address"}
                 {user.city ? `, ${user.city}` : ""}
