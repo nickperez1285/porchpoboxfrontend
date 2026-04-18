@@ -32,6 +32,10 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
         loadPackageCountTotal();
     }, [vendorProfile]);
 
+    const handlePackagesDelivered = (deliveredCount) => {
+        setPackageCountTotal((current) => Math.max(0, current - deliveredCount));
+    };
+
     if (authLoading) {
         return (
             <div style={{ maxWidth: 700, margin: "80px auto", textAlign: "center" }}>
@@ -68,7 +72,10 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                         <Link to="/vendor/package-check-in">Package Check In</Link>
                     </p>
                 </div>
-                <CustomerList vendorId={vendorProfile.id} />
+                <CustomerList
+                    vendorId={vendorProfile.id}
+                    onPackagesDelivered={handlePackagesDelivered}
+                />
             </div>
         );
     }
