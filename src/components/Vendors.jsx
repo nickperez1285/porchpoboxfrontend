@@ -34,6 +34,10 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                 <div style={{ textAlign: "center", marginBottom: 24 }}>
                     <h2>Vendor Portal</h2>
                     <p>Welcome {vendorProfile.businessName}</p>
+                    <p>Packages checked in: {vendorProfile.packageCheckInCount || 0}</p>
+                    <p>
+                        <Link to="/vendor/package-check-in">Package Check In</Link>
+                    </p>
                 </div>
                 <CustomerList />
             </div>

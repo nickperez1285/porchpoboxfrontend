@@ -14,6 +14,7 @@ import VendorProfile from "./components/VendorProfile";
 import VendorRegister from "./components/VendorRegister";
 import VendorEditProfile from "./components/VendorEditProfile";
 import VendorRegistrationPending from "./components/VendorRegistrationPending";
+import PackageCheckIn from "./components/PackageCheckIn";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
 import { auth, db } from "./firebase";
@@ -28,6 +29,25 @@ function App() {
   const [authLoading, setAuthLoading] = useState(true);
   const isAdmin = user?.uid === ADMIN_UID;
 
+  const loadVendorProfile = async (currentUser) => {
+    if (!currentUser) {
+      setVendorProfile(null);
+      return;
+    }
+
+    try {
+      const vendorDoc = await getDoc(doc(db, "vendors", currentUser.uid));
+      setVendorProfile(
+        vendorDoc.exists()
+          ? { id: vendorDoc.id, uid: currentUser.uid, ...vendorDoc.data() }
+          : null
+      );
+    } catch (error) {
+      console.error("Error loading vendor profile:", error);
+      setVendorProfile(null);
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
@@ -39,11 +59,7 @@ function App() {
       }
 
       try {
-        const vendorDoc = await getDoc(doc(db, "vendors", currentUser.uid));
-        setVendorProfile(vendorDoc.exists() ? vendorDoc.data() : null);
-      } catch (error) {
-        console.error("Error loading vendor profile:", error);
-        setVendorProfile(null);
+        await loadVendorProfile(currentUser);
       } finally {
         setAuthLoading(false);
       }
@@ -89,7 +105,13 @@ function App() {
         <Routes>
           <Route
             path="/vendor"
-            element={<Vendors user={user} vendorProfile={vendorProfile} authLoading={authLoading} />}
+            element={
+              <Vendors
+                user={user}
+                vendorProfile={vendorProfile}
+                authLoading={authLoading}
+              />
+            }
           />
           <Route
             path="/vendor/login"
@@ -114,6 +136,20 @@ function App() {
                 <VendorEditProfile user={user} vendorProfile={vendorProfile} />
               ) : (
                 <Navigate to="/vendor/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/vendor/package-check-in"
+            element={
+              user && vendorProfile && vendorProfile.approved ? (
+                <PackageCheckIn
+                  user={user}
+                  vendorProfile={vendorProfile}
+                  onPackagesCheckedIn={() => loadVendorProfile(user)}
+                />
+              ) : (
+                <Navigate to="/vendor" replace />
               )
             }
           />
