@@ -4,7 +4,7 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import OneTimeProduct from "./OneTimeProduct";
 import { db } from "../firebase";
 
-const MainPage = () => {
+const MainPage = ({ user }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
@@ -115,7 +115,7 @@ const MainPage = () => {
           </div>
 
           <div style={{ flex: "1 1 520px", minWidth: 320, maxWidth: 720 }}>
-            <OneTimeProduct />
+            <OneTimeProduct isLoggedIn={Boolean(user)} />
           </div>
         </div>
         <br />

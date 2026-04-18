@@ -1,7 +1,9 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const ProductList = () => {
+const CHECKOUT_URL = "https://buy.stripe.com/dRm8wQ5obct83Ns8Bx6kg03";
+
+const ProductList = ({ isLoggedIn }) => {
   const defaultDescription = " Get unlimited packages for 30 days ";
 
   return (
@@ -20,14 +22,23 @@ const ProductList = () => {
             <h3>$25</h3>
           </center>
         </b>
-        <Link
-          to="https://buy.stripe.com/dRm8wQ5obct83Ns8Bx6kg03
-"
-        >
-          <button type="button" className="btn btn-dark hover:btn-ouline">
-            checkout
-          </button>
-        </Link>
+        {isLoggedIn ? (
+          <a
+            href={CHECKOUT_URL}
+            target="_self"
+            rel="noreferrer"
+          >
+            <button type="button" className="btn btn-dark hover:btn-ouline">
+              checkout
+            </button>
+          </a>
+        ) : (
+          <Link to="/login">
+            <button type="button" className="btn btn-dark hover:btn-ouline">
+              checkout
+            </button>
+          </Link>
+        )}
       </div>
     </center>
   );

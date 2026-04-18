@@ -202,7 +202,7 @@ function App() {
           />
           <Route path="/quickcheckout" element={<OneTimeProduct />} />
 
-          <Route path="/" element={<MainPage />} />
+          <Route path="/" element={<MainPage user={user} />} />
           <Route path="/contact" element={<Contact />} />
 
           {/* <Route path="/one-time-product" element={<OneTimeProduct />} /> */}
