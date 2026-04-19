@@ -4,6 +4,33 @@ import { signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
+const formatDate = (value) => {
+  if (!value) {
+    return "Not available";
+  }
+
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString();
+};
+
+const getDaysLeft = (value) => {
+  if (!value) {
+    return 0;
+  }
+
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return 0;
+  }
+
+  const diff = date.getTime() - Date.now();
+  return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
+};
+
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
@@ -73,10 +100,10 @@ const Profile = ({ user }) => {
             }}
           >
             <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
-              Primary Email
+              Subscription Status
             </div>
             <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
-              {user.email || "Not available"}
+              {profileData?.status || "inactive"}
             </div>
           </div>
         </div>
@@ -150,13 +177,25 @@ const Profile = ({ user }) => {
           }}
         >
           <h3 style={{ marginTop: 0 }}>Account</h3>
-          {/* <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>User ID</div>
-            <div style={{ marginTop: 4, fontSize: 15, wordBreak: "break-all" }}>{user.uid}</div>
-          </div> */}
-          <div style={{ marginBottom: 20 }}>
+          <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
             <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Status</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.status || "inactive"}</div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscribed On</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscribedAt)}</div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Ends</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscriptionEndsAt)}</div>
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Days Left</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{getDaysLeft(profileData?.subscriptionEndsAt)}</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
             <Link to="/">Home</Link>

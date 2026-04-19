@@ -6,10 +6,24 @@ import { db } from "../firebase";
 
 const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
 
+const formatDate = (value) => {
+  if (!value) {
+    return "Not available";
+  }
+
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return "Not available";
+  }
+
+  return date.toLocaleDateString();
+};
+
 const CheckoutSuccess = ({ user }) => {
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState("Verifying payment...");
   const [error, setError] = useState("");
+  const [summary, setSummary] = useState(null);
 
   useEffect(() => {
     const applySubscription = async () => {
@@ -47,6 +61,10 @@ const CheckoutSuccess = ({ user }) => {
 
         if (currentUserData.lastCheckoutSessionId === session.id) {
           setMessage("Subscription already activated for this checkout session.");
+          setSummary({
+            subscribedAt: currentUserData.subscribedAt || null,
+            subscriptionEndsAt: currentUserData.subscriptionEndsAt || null
+          });
           return;
         }
 
@@ -70,7 +88,11 @@ const CheckoutSuccess = ({ user }) => {
           lastCheckoutSessionId: session.id
         });
 
-        setMessage("Subscription activated. Your account is now active.");
+        setMessage("Thank you. Your payment was successful.");
+        setSummary({
+          subscribedAt: Timestamp.fromDate(purchaseDate),
+          subscriptionEndsAt: Timestamp.fromDate(endDate)
+        });
       } catch (checkoutError) {
         console.error("Error activating subscription:", checkoutError);
         setError(checkoutError.message);
@@ -84,6 +106,33 @@ const CheckoutSuccess = ({ user }) => {
     <div style={{ maxWidth: 640, margin: "80px auto", textAlign: "center", padding: "0 20px" }}>
       <h2>Checkout Success</h2>
       {error ? <p style={{ color: "red" }}>{error}</p> : <p>{message}</p>}
+      {!error && summary && (
+        <div
+          style={{
+            margin: "24px auto",
+            maxWidth: 420,
+            padding: 24,
+            borderRadius: 16,
+            border: "1px solid #ddd",
+            background: "#faf7ef",
+            textAlign: "left"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Payment Summary</h3>
+          <div style={{ marginBottom: 12 }}>
+            <strong>Status:</strong> Active
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <strong>Subscription Starts:</strong> {formatDate(summary.subscribedAt)}
+          </div>
+          <div>
+            <strong>Subscription Ends:</strong> {formatDate(summary.subscriptionEndsAt)}
+          </div>
+        </div>
+      )}
+      <p>
+        <Link to="/profile">View Profile</Link>
+      </p>
       <p>
         <Link to="/">Return Home</Link>
       </p>

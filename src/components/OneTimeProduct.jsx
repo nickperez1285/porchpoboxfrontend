@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
-const PRICE_ID = "price_1SbpBkILZvvGeKMlidqPGq0J";
+const PRICE_ID = process.env.REACT_APP_STRIPE_PRICE_ID;
 
 const ProductList = ({ user }) => {
   const defaultDescription = " Get unlimited packages for 30 days ";
@@ -16,6 +16,12 @@ const ProductList = ({ user }) => {
 
     setLoading(true);
     setError("");
+
+    if (!PRICE_ID) {
+      setError("Missing REACT_APP_STRIPE_PRICE_ID in frontend environment.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/create-checkout-session`, {
