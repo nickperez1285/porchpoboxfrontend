@@ -184,7 +184,7 @@ const MainPage = ({ user }) => {
                 Start a 30-day package plan. Login is required before checkout.
               </p>
             </div>
-            <OneTimeProduct isLoggedIn={Boolean(user)} />
+            <OneTimeProduct user={user} />
           </div>
         </div>
       </div>

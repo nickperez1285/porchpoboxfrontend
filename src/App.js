@@ -18,6 +18,8 @@ import PackageCheckIn from "./components/PackageCheckIn";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
 import ForgotPassword from "./components/ForgotPassword";
+import CheckoutSuccess from "./components/CheckoutSuccess";
+import CheckoutCancel from "./components/CheckoutCancel";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -202,7 +204,9 @@ function App() {
               )
             }
           />
-          <Route path="/quickcheckout" element={<OneTimeProduct />} />
+          <Route path="/quickcheckout" element={<OneTimeProduct user={user} />} />
+          <Route path="/checkout/success" element={<CheckoutSuccess user={user} />} />
+          <Route path="/checkout/cancel" element={<CheckoutCancel />} />
 
           <Route path="/" element={<MainPage user={user} />} />
           <Route path="/contact" element={<Contact />} />

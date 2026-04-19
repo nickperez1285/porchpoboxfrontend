@@ -1,10 +1,49 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 
-const CHECKOUT_URL = "https://buy.stripe.com/dRm8wQ5obct83Ns8Bx6kg03";
+const PRICE_ID = "price_1SbpjxILNRQzIFDVtfcg2EHK";
 
-const ProductList = ({ isLoggedIn }) => {
+const ProductList = ({ user }) => {
   const defaultDescription = " Get unlimited packages for 30 days ";
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const startCheckout = async () => {
+    if (!user) {
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/create-checkout-session`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          priceId: PRICE_ID,
+          isSubscription: false,
+          userId: user.uid,
+          email: user.email
+        })
+      });
+
+      const payload = await response.json().catch(() => null);
+
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.message || "Unable to start checkout.");
+      }
+
+      window.location.assign(payload.url);
+    } catch (checkoutError) {
+      console.error("Error starting checkout:", checkoutError);
+      setError(checkoutError.message);
+      setLoading(false);
+    }
+  };
 
   return (
     <center>
@@ -22,16 +61,15 @@ const ProductList = ({ isLoggedIn }) => {
             <h3>$25</h3>
           </center>
         </b>
-        {isLoggedIn ? (
-          <a
-            href={CHECKOUT_URL}
-            target="_self"
-            rel="noreferrer"
+        {user ? (
+          <button
+            type="button"
+            className="btn btn-dark hover:btn-ouline"
+            onClick={startCheckout}
+            disabled={loading}
           >
-            <button type="button" className="btn btn-dark hover:btn-ouline">
-              checkout
-            </button>
-          </a>
+            {loading ? "Starting checkout..." : "checkout"}
+          </button>
         ) : (
           <Link to="/login">
             <button type="button" className="btn btn-dark hover:btn-ouline">
@@ -39,6 +77,7 @@ const ProductList = ({ isLoggedIn }) => {
             </button>
           </Link>
         )}
+        {error && <p style={{ color: "red", marginTop: 12 }}>{error}</p>}
       </div>
     </center>
   );

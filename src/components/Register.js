@@ -64,6 +64,9 @@ const Register = () => {
                 city: city,
                 state: state,
                 zipCode: zipCode,
+                status: "inactive",
+                subscribedAt: null,
+                subscriptionEndsAt: null,
                 createdAt: serverTimestamp()
             });
             console.log("User registered and saved!");

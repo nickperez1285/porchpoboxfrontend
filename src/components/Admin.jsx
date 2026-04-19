@@ -145,6 +145,33 @@ const Admin = () => {
     );
   }, [customerSortBy, customers]);
 
+  const formatDate = (value) => {
+    if (!value) {
+      return "Not available";
+    }
+
+    const date = value?.toDate ? value.toDate() : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return "Not available";
+    }
+
+    return date.toLocaleDateString();
+  };
+
+  const getDaysLeft = (value) => {
+    if (!value) {
+      return 0;
+    }
+
+    const date = value?.toDate ? value.toDate() : new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return 0;
+    }
+
+    const diff = date.getTime() - Date.now();
+    return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
   if (loading) {
     return (
       <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
@@ -367,6 +394,10 @@ const Admin = () => {
                   </button>
                   {expandedCustomerIds.includes(customer.id) && (
                     <div style={{ marginTop: 12 }}>
+                      <div>Status: {customer.status || "inactive"}</div>
+                      <div>Subscribed: {formatDate(customer.subscribedAt)}</div>
+                      <div>Ends: {formatDate(customer.subscriptionEndsAt)}</div>
+                      <div>Days Left: {getDaysLeft(customer.subscriptionEndsAt)}</div>
                       <div>Email: {customer.email || "No email"}</div>
                       <div>Phone: {customer.phoneNumber || "No phone number"}</div>
                       <div>
