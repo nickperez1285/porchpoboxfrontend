@@ -17,6 +17,7 @@ import VendorRegistrationPending from "./components/VendorRegistrationPending";
 import PackageCheckIn from "./components/PackageCheckIn";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
+import ForgotPassword from "./components/ForgotPassword";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -154,6 +155,7 @@ function App() {
             }
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
           <Route
             path="/profile"

@@ -4,6 +4,10 @@ import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
+import {
+  isPasswordValid,
+  passwordRequirementsText
+} from "../utils/passwordValidation";
 
 const VendorRegister = () => {
   const navigate = useNavigate();
@@ -15,6 +19,7 @@ const VendorRegister = () => {
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,6 +27,18 @@ const VendorRegister = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    if (!isPasswordValid(password)) {
+      setError(passwordRequirementsText);
+      setLoading(false);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -156,6 +173,16 @@ const VendorRegister = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+        <input
+          type="password"
+          placeholder="Retype Password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+        />
+        <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
+          {passwordRequirementsText}
+        </p>
         {error && <p style={{ color: "red" }}>{error}</p>}
         <button type="submit" disabled={loading}>
           {loading ? "Creating vendor..." : "Register Vendor"}

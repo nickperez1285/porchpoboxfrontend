@@ -150,10 +150,10 @@ const Profile = ({ user }) => {
           }}
         >
           <h3 style={{ marginTop: 0 }}>Account</h3>
-          <div style={{ marginBottom: 18 }}>
+          {/* <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>User ID</div>
             <div style={{ marginTop: 4, fontSize: 15, wordBreak: "break-all" }}>{user.uid}</div>
-          </div>
+          </div> */}
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
             <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>

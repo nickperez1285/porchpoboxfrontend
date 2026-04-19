@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import {
+    isPasswordValid,
+    passwordRequirementsText
+} from "../utils/passwordValidation";
 
 const Register = () => {
     const navigate = useNavigate();
@@ -15,6 +19,7 @@ const Register = () => {
     const [state, setState] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
 
@@ -22,6 +27,18 @@ const Register = () => {
         e.preventDefault();
         setLoading(true);
         setError("");
+
+        if (!isPasswordValid(password)) {
+            setError(passwordRequirementsText);
+            setLoading(false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            setLoading(false);
+            return;
+        }
 
         try {
             // 🔹 1. Create user in Firebase Auth
@@ -124,6 +141,17 @@ const Register = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
+                <input
+                    type="password"
+                    placeholder="Retype Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                />
+
+                <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
+                    {passwordRequirementsText}
+                </p>
 
                 {error && <p style={{ color: "red" }}>{error}</p>}
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
@@ -59,6 +59,10 @@ const Login = ({ title = "Login", redirectTo = "/" }) => {
 
                 <button type="submit">Login</button>
             </form>
+
+            <p style={{ marginTop: 16 }}>
+                <Link to="/forgot-password">Forgot Password?</Link>
+            </p>
         </div>
     );
 };
