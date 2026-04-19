@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
-const PRICE_ID = "price_1SbpjxILNRQzIFDVtfcg2EHK";
+const PRICE_ID = "price_1SbpBkILZvvGeKMlidqPGq0J";
 
 const ProductList = ({ user }) => {
   const defaultDescription = " Get unlimited packages for 30 days ";
