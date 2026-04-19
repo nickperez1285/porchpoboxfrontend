@@ -31,10 +31,19 @@ const ProductList = ({ user }) => {
         })
       });
 
-      const payload = await response.json().catch(() => null);
+      const responseText = await response.text();
+      let payload = null;
+
+      try {
+        payload = responseText ? JSON.parse(responseText) : null;
+      } catch (parseError) {
+        payload = null;
+      }
 
       if (!response.ok || !payload?.url) {
-        throw new Error(payload?.message || "Unable to start checkout.");
+        throw new Error(
+          payload?.message || responseText || "Unable to start checkout."
+        );
       }
 
       window.location.assign(payload.url);
