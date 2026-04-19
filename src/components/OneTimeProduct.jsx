@@ -25,7 +25,7 @@ const ProductList = ({ user }) => {
         },
         body: JSON.stringify({
           priceId: PRICE_ID,
-          isSubscription: false,
+          isSubscription: true,
           userId: user.uid,
           email: user.email
         })
