@@ -205,7 +205,10 @@ function App() {
             }
           />
           <Route path="/quickcheckout" element={<OneTimeProduct user={user} />} />
-          <Route path="/checkout/success" element={<CheckoutSuccess user={user} />} />
+          <Route
+            path="/checkout/success"
+            element={<CheckoutSuccess user={user} authLoading={authLoading} />}
+          />
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
 
           <Route path="/" element={<MainPage user={user} />} />

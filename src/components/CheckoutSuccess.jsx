@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Timestamp, doc, getDoc, updateDoc } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
-import { db } from "../firebase";
-
-const THIRTY_DAYS_IN_MS = 30 * 24 * 60 * 60 * 1000;
+const SESSION_CHECK_RETRY_MS = 1500;
+const SESSION_CHECK_MAX_ATTEMPTS = 3;
 
 const formatDate = (value) => {
   if (!value) {
@@ -19,7 +17,7 @@ const formatDate = (value) => {
   return date.toLocaleDateString();
 };
 
-const CheckoutSuccess = ({ user }) => {
+const CheckoutSuccess = ({ user, authLoading }) => {
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState("Verifying payment...");
   const [error, setError] = useState("");
@@ -34,64 +32,61 @@ const CheckoutSuccess = ({ user }) => {
         return;
       }
 
-      if (!user) {
-        setError("You must be logged in to activate your subscription.");
+      if (authLoading) {
         return;
       }
 
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/api/checkout-session/${sessionId}`
-        );
-        const payload = await response.json().catch(() => null);
+        let session = null;
 
-        if (!response.ok || !payload?.success) {
-          throw new Error(payload?.message || "Unable to verify checkout session.");
+        for (let attempt = 1; attempt <= SESSION_CHECK_MAX_ATTEMPTS; attempt += 1) {
+          const response = await fetch(
+            `${API_BASE_URL}/api/checkout-session/${sessionId}`
+          );
+          const payload = await response.json().catch(() => null);
+
+          if (!response.ok || !payload?.success) {
+            throw new Error(payload?.message || "Unable to verify checkout session.");
+          }
+
+          session = payload.session;
+
+          const isPaidSession = session.payment_status === "paid";
+          const isCompletedSubscription =
+            session.mode === "subscription" && session.status === "complete";
+
+          if (isPaidSession || isCompletedSubscription) {
+            break;
+          }
+
+          if (attempt < SESSION_CHECK_MAX_ATTEMPTS) {
+            await new Promise((resolve) => {
+              setTimeout(resolve, SESSION_CHECK_RETRY_MS);
+            });
+          }
         }
 
-        const session = payload.session;
+        if (!session) {
+          throw new Error("Unable to verify checkout session.");
+        }
 
-        if (session.payment_status !== "paid") {
+        const isPaidSession = session.payment_status === "paid";
+        const isCompletedSubscription =
+          session.mode === "subscription" && session.status === "complete";
+
+        if (!isPaidSession && !isCompletedSubscription) {
           throw new Error("Payment has not completed yet.");
         }
 
-        const userRef = doc(db, "users", user.uid);
-        const userSnapshot = await getDoc(userRef);
-        const currentUserData = userSnapshot.exists() ? userSnapshot.data() : {};
-
-        if (currentUserData.lastCheckoutSessionId === session.id) {
-          setMessage("Subscription already activated for this checkout session.");
-          setSummary({
-            subscribedAt: currentUserData.subscribedAt || null,
-            subscriptionEndsAt: currentUserData.subscriptionEndsAt || null
-          });
-          return;
-        }
-
-        const existingEndDateValue = userSnapshot.exists()
-          ? currentUserData.subscriptionEndsAt
-          : null;
-        const existingEndDate = existingEndDateValue?.toDate
-          ? existingEndDateValue.toDate()
-          : null;
-        const purchaseDate = new Date();
-        const extensionBaseDate =
-          existingEndDate && existingEndDate.getTime() > Date.now()
-            ? existingEndDate
-            : purchaseDate;
-        const endDate = new Date(extensionBaseDate.getTime() + THIRTY_DAYS_IN_MS);
-
-        await updateDoc(userRef, {
-          status: "active",
-          subscribedAt: Timestamp.fromDate(purchaseDate),
-          subscriptionEndsAt: Timestamp.fromDate(endDate),
-          lastCheckoutSessionId: session.id
-        });
+        const purchaseDate = new Date(session.created * 1000);
+        const endDate = new Date(
+          purchaseDate.getTime() + (30 * 24 * 60 * 60 * 1000)
+        );
 
         setMessage("Thank you. Your payment was successful.");
         setSummary({
-          subscribedAt: Timestamp.fromDate(purchaseDate),
-          subscriptionEndsAt: Timestamp.fromDate(endDate)
+          subscribedAt: purchaseDate,
+          subscriptionEndsAt: endDate
         });
       } catch (checkoutError) {
         console.error("Error activating subscription:", checkoutError);
@@ -100,11 +95,12 @@ const CheckoutSuccess = ({ user }) => {
     };
 
     applySubscription();
-  }, [searchParams, user]);
+  }, [authLoading, searchParams, user]);
 
   return (
     <div style={{ maxWidth: 640, margin: "80px auto", textAlign: "center", padding: "0 20px" }}>
       <h2>Checkout Success</h2>
+      {authLoading && <p>Restoring your session...</p>}
       {error ? <p style={{ color: "red" }}>{error}</p> : <p>{message}</p>}
       {!error && summary && (
         <div
@@ -129,6 +125,9 @@ const CheckoutSuccess = ({ user }) => {
             <strong>Subscription Ends:</strong> {formatDate(summary.subscriptionEndsAt)}
           </div>
         </div>
+      )}
+      {!error && summary && (
+        <p>Your subscription status is being activated by the backend.</p>
       )}
       <p>
         <Link to="/profile">View Profile</Link>
