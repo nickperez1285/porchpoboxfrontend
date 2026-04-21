@@ -36,6 +36,10 @@ const CheckoutSuccess = ({ user, authLoading }) => {
         return;
       }
 
+      if (!user) {
+        return;
+      }
+
       try {
         let session = null;
 
@@ -78,15 +82,31 @@ const CheckoutSuccess = ({ user, authLoading }) => {
           throw new Error("Payment has not completed yet.");
         }
 
-        const purchaseDate = new Date(session.created * 1000);
-        const endDate = new Date(
-          purchaseDate.getTime() + (30 * 24 * 60 * 60 * 1000)
+        const finalizeResponse = await fetch(
+          `${API_BASE_URL}/api/finalize-checkout-session`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              sessionId,
+              userId: user.uid
+            })
+          }
         );
+        const finalizePayload = await finalizeResponse.json().catch(() => null);
+
+        if (!finalizeResponse.ok || !finalizePayload?.success) {
+          throw new Error(
+            finalizePayload?.message || "Unable to activate subscription."
+          );
+        }
 
         setMessage("Thank you. Your payment was successful.");
         setSummary({
-          subscribedAt: purchaseDate,
-          subscriptionEndsAt: endDate
+          subscribedAt: finalizePayload.subscribedAt,
+          subscriptionEndsAt: finalizePayload.subscriptionEndsAt
         });
       } catch (checkoutError) {
         console.error("Error activating subscription:", checkoutError);
@@ -127,7 +147,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
         </div>
       )}
       {!error && summary && (
-        <p>Your subscription status is being activated by the backend.</p>
+        <p>Welcome to the Porch P.O. Box!</p>
       )}
       <p>
         <Link to="/profile">View Profile</Link>

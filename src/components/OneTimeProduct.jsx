@@ -83,7 +83,7 @@ const ProductList = ({ user }) => {
             onClick={startCheckout}
             disabled={loading}
           >
-            {loading ? "Starting checkout..." : "checkout"}
+            {loading ? "Starting sign up..." : "sign up"}
           </button>
         ) : (
           <Link to="/login">
