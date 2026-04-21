@@ -60,8 +60,9 @@ const Login = ({ title = "Login", redirectTo = "/" }) => {
                 <button type="submit">Login</button>
             </form>
 
-            <p style={{ marginTop: 16 }}>
+            <p style={{ marginTop: 16, display: "flex", justifyContent: "center", gap: 12 }}>
                 <Link to="/forgot-password">Forgot Password?</Link>
+                <Link to="/register">Create Account</Link>
             </p>
         </div>
     );

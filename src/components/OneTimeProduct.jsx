@@ -88,7 +88,7 @@ const ProductList = ({ user }) => {
         ) : (
           <Link to="/login">
             <button type="button" className="btn btn-dark hover:btn-ouline">
-              checkout
+              SIGN UP
             </button>
           </Link>
         )}

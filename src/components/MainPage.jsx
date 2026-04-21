@@ -179,7 +179,7 @@ const MainPage = ({ user }) => {
               >
                 Monthly Plan
               </div>
-              <h4 style={{ margin: "8px 0 6px" }}>Checkout</h4>
+              <h4 style={{ margin: "8px 0 6px" }}>Sign Up</h4>
               <p style={{ margin: 0, color: "#666" }}>
                 Start a 30-day package plan. Login is required before checkout.
               </p>

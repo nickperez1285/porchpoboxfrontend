@@ -34,6 +34,10 @@ const getDaysLeft = (value) => {
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
+  const hasActiveSubscription = Boolean(
+    profileData?.status === "active" &&
+    (profileData?.subscribedAt || profileData?.subscriptionEndsAt)
+  );
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -99,12 +103,25 @@ const Profile = ({ user }) => {
               padding: 16
             }}
           >
-            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
-              Subscription Status
-            </div>
-            <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
-              {profileData?.status || "inactive"}
-            </div>
+            {hasActiveSubscription ? (
+              <>
+                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                  Subscription Status
+                </div>
+                <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
+                  {profileData?.status}
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                  Primary Email
+                </div>
+                <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
+                  {user.email || "Not available"}
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -181,22 +198,26 @@ const Profile = ({ user }) => {
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
             <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
           </div>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Status</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.status || "inactive"}</div>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscribed On</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscribedAt)}</div>
-          </div>
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Ends</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscriptionEndsAt)}</div>
-          </div>
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Days Left</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{getDaysLeft(profileData?.subscriptionEndsAt)}</div>
-          </div>
+          {hasActiveSubscription && (
+            <>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Status</div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.status}</div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscribed On</div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscribedAt)}</div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Ends</div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscriptionEndsAt)}</div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Days Left</div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>{getDaysLeft(profileData?.subscriptionEndsAt)}</div>
+              </div>
+            </>
+          )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
             <Link to="/">Home</Link>
             <button type="button" onClick={handleLogout}>

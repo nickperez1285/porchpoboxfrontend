@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import MainPage from "./components/MainPage";
@@ -24,6 +24,51 @@ import { auth, db } from "./firebase";
 import "./App.css";
 
 const ADMIN_UID = "6wVTCBAw4EVHHIFWnFLL57z8qHx2";
+
+const Header = ({ authLoading, isAdmin, user, vendorProfile }) => {
+  const location = useLocation();
+  const hideAuthLinks = [
+    "/login",
+    "/vendor/login",
+    "/admin/login"
+  ].includes(location.pathname);
+  const onUserProfilePage = location.pathname === "/profile";
+  const primaryLink = onUserProfilePage
+    ? { to: "/", label: "Home" }
+    : {
+      to: user ? (vendorProfile ? "/vendor/profile" : "/profile") : "/login",
+      label: user ? (vendorProfile ? "Vendor Profile" : "Profile") : "Login"
+    };
+
+  return (
+    <header style={{ position: "relative" }}>
+      <center>
+        <Link to="/" style={{ color: "gold" }}>
+          <h1 className="header">
+            <span style={{ position: "absolute", left: "-9999px" }}>
+              Porch P.O. Box
+            </span>
+          </h1>
+        </Link>
+      </center>
+      {!authLoading && !hideAuthLinks && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            display: "flex",
+            gap: 12
+          }}
+        >
+          <Link to={primaryLink.to}>{primaryLink.label}</Link>
+          {isAdmin && <Link to="/admin">Admin</Link>}
+          {!user && <Link to="/register">Register</Link>}
+        </div>
+      )}
+    </header>
+  );
+};
 
 // import AdminCreateUser from "./components/AdminCreateUser";
 function App() {
@@ -74,34 +119,12 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        <header style={{ position: "relative" }}>
-          <center >
-            <Link to="/" style={{ color: "gold", }}>
-              <h1 className="header">
-                <span style={{ position: "absolute", left: "-9999px" }}>
-                  Porch P.O. Box
-                </span>
-              </h1>
-            </Link>
-          </center>
-          {!authLoading && (
-            <div
-              style={{
-                position: "absolute",
-                bottom: 0,
-                right: 0,
-                display: "flex",
-                gap: 12
-              }}
-            >
-              <Link to={user ? (vendorProfile ? "/vendor/profile" : "/profile") : "/login"}>
-                {user ? (vendorProfile ? "Vendor Profile" : "Profile") : "Login"}
-              </Link>
-              {isAdmin && <Link to="/admin">Admin</Link>}
-              {!user && <Link to="/register">Register</Link>}
-            </div>
-          )}
-        </header>
+        <Header
+          authLoading={authLoading}
+          isAdmin={isAdmin}
+          user={user}
+          vendorProfile={vendorProfile}
+        />
         <hr />
 
 
