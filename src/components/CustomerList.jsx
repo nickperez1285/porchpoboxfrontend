@@ -45,7 +45,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
         setUsers(usersList);
       } catch (error) {
         console.error("Error fetching users:", error);
-        setError("Unable to load customers. Check Firestore vendor read permissions.");
+        setError("Unable to load customers. Check Firestore partner read permissions.");
       } finally {
         setLoading(false);
       }
@@ -116,7 +116,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
       ) : error ? (
         <p>{error}</p>
       ) : users.length === 0 ? (
-        <p>No customers currently have packages checked in at this vendor.</p>
+        <p>No customers currently have packages checked in at this partner location.</p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {users.map((user) => (

@@ -10,6 +10,7 @@ import Register from "./components/Register";
 import Vendors from "./components/Vendors";
 import Contact from "./components/Contact";
 import Profile from "./components/Profile";
+import EditProfile from "./components/EditProfile";
 import VendorProfile from "./components/VendorProfile";
 import VendorRegister from "./components/VendorRegister";
 import VendorEditProfile from "./components/VendorEditProfile";
@@ -25,7 +26,7 @@ import "./App.css";
 
 const ADMIN_UID = "6wVTCBAw4EVHHIFWnFLL57z8qHx2";
 
-const Header = ({ authLoading, isAdmin, user, vendorProfile }) => {
+const Header = ({ authLoading, isAdmin, user, userStatus, vendorProfile }) => {
   const location = useLocation();
   const hideAuthLinks = [
     "/login",
@@ -37,7 +38,7 @@ const Header = ({ authLoading, isAdmin, user, vendorProfile }) => {
     ? { to: "/", label: "Home" }
     : {
       to: user ? (vendorProfile ? "/vendor/profile" : "/profile") : "/login",
-      label: user ? (vendorProfile ? "Vendor Profile" : "Profile") : "Login"
+      label: user ? (vendorProfile ? "Partner Profile" : "Profile") : "Login"
     };
 
   return (
@@ -73,6 +74,7 @@ const Header = ({ authLoading, isAdmin, user, vendorProfile }) => {
 // import AdminCreateUser from "./components/AdminCreateUser";
 function App() {
   const [user, setUser] = useState(null);
+  const [userStatus, setUserStatus] = useState("");
   const [vendorProfile, setVendorProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const isAdmin = user?.uid === ADMIN_UID;
@@ -101,12 +103,15 @@ function App() {
       setUser(currentUser);
 
       if (!currentUser) {
+        setUserStatus("");
         setVendorProfile(null);
         setAuthLoading(false);
         return;
       }
 
       try {
+        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+        setUserStatus(userDoc.exists() ? userDoc.data().status || "" : "");
         await loadVendorProfile(currentUser);
       } finally {
         setAuthLoading(false);
@@ -123,6 +128,7 @@ function App() {
           authLoading={authLoading}
           isAdmin={isAdmin}
           user={user}
+          userStatus={userStatus}
           vendorProfile={vendorProfile}
         />
         <hr />
@@ -141,7 +147,7 @@ function App() {
           />
           <Route
             path="/vendor/login"
-            element={<Login title="Vendor Login" redirectTo="/vendor" />}
+            element={<Login title="Partner Login" redirectTo="/vendor" />}
           />
           <Route path="/vendor/register" element={<VendorRegister />} />
           <Route path="/vendor/pending" element={<VendorRegistrationPending />} />
@@ -185,6 +191,10 @@ function App() {
           <Route
             path="/profile"
             element={user ? <Profile user={user} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/profile/edit"
+            element={user ? <EditProfile user={user} /> : <Navigate to="/login" replace />}
           />
           {/* <Route path="/admin/create-user" element={<AdminCreateUser />} /> */}
           <Route
@@ -234,7 +244,7 @@ function App() {
           />
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
 
-          <Route path="/" element={<MainPage user={user} />} />
+          <Route path="/" element={<MainPage user={user} userStatus={userStatus} />} />
           <Route path="/contact" element={<Contact />} />
 
           {/* <Route path="/one-time-product" element={<OneTimeProduct />} /> */}

@@ -1,15 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { RegPage } from "./RegFormPrimitives";
 
 const VendorRegistrationPending = () => {
   return (
-    <div style={{ maxWidth: 720, margin: "100px auto", textAlign: "center", padding: "0 20px" }}>
-      <h2>Vendor Registration Received</h2>
-      <p>Your registration information has been received and your request to become a vendor is being reviewed.</p>
-      <p>
-        <Link to="/vendor/login">Vendor Login</Link>
+    <RegPage
+      title="Application received"
+      subtitle="Your details are on file. We will email you when your partner account has been reviewed."
+    >
+      <p className="reg-body-centered">
+        You can return to partner login anytime. You will not be able to access the partner
+        dashboard until your application is approved.
       </p>
-    </div>
+      <div className="reg-actions">
+        <Link to="/vendor/login" className="reg-btn-primary">
+          Partner login
+        </Link>
+      </div>
+    </RegPage>
   );
 };
 

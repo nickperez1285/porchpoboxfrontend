@@ -4,18 +4,20 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import OneTimeProduct from "./OneTimeProduct";
 import { db } from "../firebase";
 
-const MainPage = ({ user }) => {
+const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
-
+  const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
+  const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
   useEffect(() => {
+    setMainPageTitle("Secure package receiving through local partner locations.");
+    setMainPageMessage("Have your packages delivered to your desired Porch P.O. Box locations and left in the care and watchful eyes of a trusted and secure Porch P.O. Box partner.");
     fetchActiveVendors();
   }, []);
 
   const fetchActiveVendors = async () => {
     setVendorsLoading(true);
-    setVendorsError("");
     try {
       const vendorSnapshot = await getDocs(
         query(collection(db, "vendors"), where("approved", "==", true))
@@ -79,11 +81,10 @@ const MainPage = ({ user }) => {
               Porch P.O. Box
             </div>
             <h2 style={{ margin: "10px 0 12px", fontSize: "clamp(2rem, 4vw, 3.2rem)" }}>
-              Secure package receiving through local partner locations.
+              {mainPageTitle}
             </h2>
             <p style={{ margin: 0, color: "#d3d3d3", lineHeight: 1.6, maxWidth: 620 }}>
-              Browse active Porch P.O. Box locations, choose a monthly package plan,
-              and manage deliveries through a cleaner customer and vendor workflow.
+              {mainPageMessage}
             </p>
           </div>
         </div>
@@ -128,11 +129,11 @@ const MainPage = ({ user }) => {
               <h4 style={{ margin: "8px 0 0" }}>Porch P.O. Boxes</h4>
             </div>
             {vendorsLoading ? (
-              <p>Loading vendors...</p>
+              <p>Loading partners...</p>
             ) : vendorsError ? (
               <p>{vendorsError}</p>
             ) : activeVendors.length === 0 ? (
-              <p>No active vendors listed yet.</p>
+              <p>No active partners listed yet.</p>
             ) : (
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {activeVendors.map((vendor) => (
@@ -143,7 +144,7 @@ const MainPage = ({ user }) => {
                       borderBottom: "1px solid #ece5d5",
                     }}
                   >
-                    <strong>{vendor.businessName || "Unnamed vendor"}</strong>
+                    <strong>{vendor.businessName || "Unnamed partner"}</strong>
                     <div style={{ marginTop: 4, color: "#555" }}>
                       {vendor.streetAddress || "No street address"}
                       {vendor.city ? `, ${vendor.city}` : ""}
@@ -177,15 +178,51 @@ const MainPage = ({ user }) => {
                   textTransform: "uppercase"
                 }}
               >
-                Monthly Plan
+                {user && userStatus === "active" ? "Member Access" : "Monthly Plan"}
               </div>
-              <h4 style={{ margin: "8px 0 6px" }}>Sign Up</h4>
+              <h4 style={{ margin: "8px 0 6px" }}>
+                {user && userStatus === "active" ? "Welcome to PorchPOBox!" : "Sign Up"}
+              </h4>
               <p style={{ margin: 0, color: "#666" }}>
-                Start a 30-day package plan. Login is required before checkout.
+                {user && userStatus === "active"
+                  ? "Your subscription is active. You can continue using Porch P.O. Box services."
+                  : "Sign up for a 30-day package plan  and start receiving your packages today.!"}
               </p>
             </div>
-            <OneTimeProduct user={user} />
+            {user && userStatus === "active" ? null : <OneTimeProduct user={user} />}
           </div>
+        </div>
+
+        <div
+          className="Referral"
+          style={{
+            width: "100%",
+            maxWidth: 1180,
+            marginTop: 24,
+            background: "linear-gradient(135deg, #f3e1a2 0%, #e8c95d 100%)",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            borderRadius: 20,
+            padding: "24px 28px",
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              color: "#6a4a00",
+              letterSpacing: 1,
+              textTransform: "uppercase"
+            }}
+          >
+            Referrals
+          </div>
+          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
+            Invite a partner. Earn a free month.
+          </h4>
+          <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
+            Refer a new partner location to Porch P.O. Box and receive one free month
+            of service when they join.
+          </p>
         </div>
       </div>
       <footer style={{ padding: "1em", background: "#111" }}>
@@ -194,7 +231,7 @@ const MainPage = ({ user }) => {
             to="/vendor"
             style={{ display: "inline-block", paddingRight: 10 }}
           >
-            Vendors
+            Partners
           </Link>
           <></>
           <Link to="/contact">Contact </Link>

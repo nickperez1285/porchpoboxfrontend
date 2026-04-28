@@ -39,8 +39,8 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
     if (authLoading) {
         return (
             <div style={{ maxWidth: 700, margin: "80px auto", textAlign: "center" }}>
-                <h2>Vendor Portal</h2>
-                <p>Loading vendor access...</p>
+                <h2>Partner Portal</h2>
+                <p>Loading partner access...</p>
             </div>
         );
     }
@@ -58,14 +58,14 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                             textAlign: "center"
                         }}
                     >
-                        <h2 style={{ marginTop: 0 }}>Vendor Portal</h2>
+                        <h2 style={{ marginTop: 0 }}>Partner Portal</h2>
                         <p style={{ color: "#d6d6d6" }}>
                             {vendorProfile.status === "deactivated"
-                                ? "Your vendor account has been deactivated. Please contact Porch P.O. Box for assistance."
-                                : "Your registration information has been received and your request to become a vendor is being reviewed."}
+                                ? "Your partner account has been deactivated. Please contact Porch P.O. Box for assistance."
+                                : "Your registration information has been received and your request to become a partner is being reviewed."}
                         </p>
                         <p style={{ marginBottom: 0 }}>
-                            <Link to="/vendor/profile">Vendor Profile</Link>
+                            <Link to="/vendor/profile">Partner Profile</Link>
                         </p>
                     </div>
                 </div>
@@ -102,7 +102,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                                     textTransform: "uppercase"
                                 }}
                             >
-                                Vendor Portal
+                                Partner Portal
                             </div>
                             <h2 style={{ margin: "10px 0 8px" }}>{vendorProfile.businessName}</h2>
                             <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
@@ -149,7 +149,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                                     <Link to="/vendor/package-check-in">Check In Packages</Link>
                                 </div>
                                 <div style={{ marginTop: 8 }}>
-                                    <Link to="/vendor/profile">Vendor Profile</Link>
+                                    <Link to="/vendor/profile">Partner Profile</Link>
                                 </div>
                             </div>
                         </div>
@@ -184,19 +184,19 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                     textAlign: "center"
                 }}
             >
-                <h2 style={{ marginTop: 0 }}>Vendor Portal</h2>
+                <h2 style={{ marginTop: 0 }}>Partner Portal</h2>
                 <p style={{ color: "#d6d6d6" }}>
-                    Vendors can sign in to review customer packages, check in new deliveries,
+                    Partners can sign in to review customer packages, check in new deliveries,
                     and manage their location profile.
                 </p>
                 <p>
-                    <Link to="/vendor/login">Vendor Login</Link>
+                    <Link to="/vendor/login">Partner Login</Link>
                 </p>
                 <p>
-                    <Link to="/vendor/register">Vendor Registration</Link>
+                    <Link to="/vendor/register">Partner Registration</Link>
                 </p>
                 {user && !vendorProfile && (
-                    <p>This account is signed in, but it is not registered as a vendor.</p>
+                    <p>This account is signed in, but it is not registered as a partner.</p>
                 )}
             </div>
         </div>

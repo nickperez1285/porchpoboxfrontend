@@ -48,7 +48,7 @@ const Admin = () => {
       );
     } catch (updateError) {
       console.error("Error updating vendor status:", updateError);
-      setError(`Unable to ${approved ? "approve" : "deactivate"} vendor.`);
+      setError(`Unable to ${approved ? "approve" : "deactivate"} partner.`);
     } finally {
       setUpdatingVendorId("");
     }
@@ -118,7 +118,7 @@ const Admin = () => {
         );
       } catch (fetchError) {
         console.error("Error loading admin data:", fetchError);
-        setError("Unable to load admin data. Firestore rules must allow your admin UID to read users and vendors.");
+        setError("Unable to load admin data. Firestore rules must allow your admin UID to read users and partners.");
       } finally {
         setLoading(false);
       }
@@ -176,7 +176,7 @@ const Admin = () => {
     return (
       <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
         <h2>Admin</h2>
-        <p>Loading customers and vendors...</p>
+        <p>Loading customers and partners...</p>
       </div>
     );
   }
@@ -228,10 +228,10 @@ const Admin = () => {
             >
               Admin Portal
             </div>
-            <h2 style={{ margin: "10px 0 8px" }}>Customer and Vendor Oversight</h2>
+            <h2 style={{ margin: "10px 0 8px" }}>Customer and Partner Oversight</h2>
             <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
-              Review all customer and vendor records, monitor package volume,
-              and manage vendor approval status from a single dashboard.
+              Review all customer and partner records, monitor package volume,
+              and manage partner approval status from a single dashboard.
             </p>
           </div>
 
@@ -265,7 +265,7 @@ const Admin = () => {
               }}
             >
               <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
-                Approved Vendors
+                Approved Partners
               </div>
               <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{approvedVendorCount}</div>
             </div>
@@ -433,12 +433,12 @@ const Admin = () => {
                 textTransform: "uppercase"
               }}
             >
-              Vendors
+              Partners
             </div>
-            <h3 style={{ margin: "8px 0 0" }}>Vendor Accounts</h3>
+            <h3 style={{ margin: "8px 0 0" }}>Partner Accounts</h3>
           </div>
           {vendors.length === 0 ? (
-            <p>No vendors found.</p>
+            <p>No partners found.</p>
           ) : (
             <ul
               style={{
@@ -461,7 +461,7 @@ const Admin = () => {
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <strong>{vendor.businessName || "Unnamed vendor"}</strong>
+                    <strong>{vendor.businessName || "Unnamed partner"}</strong>
                     <div>{vendor.packageCountTotal || 0}: PKGS</div>
                   </div>
                   <button
@@ -496,7 +496,8 @@ const Admin = () => {
                         {vendor.state ? `, ${vendor.state}` : ""}
                         {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
                       </div>
-                      <div>Vendor ID: {vendor.id}</div>
+                      <div>Store Hours: {vendor.storeHours || "Not provided"}</div>
+                      <div>Partner ID: {vendor.id}</div>
                     </div>
                   )}
                   {!vendor.approved ? (

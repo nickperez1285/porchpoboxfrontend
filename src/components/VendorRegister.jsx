@@ -8,6 +8,10 @@ import {
   isPasswordValid,
   passwordRequirementsText
 } from "../utils/passwordValidation";
+import StoreHoursScrollPicker, {
+  DEFAULT_STORE_HOURS
+} from "./StoreHoursScrollPicker";
+import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
 const VendorRegister = () => {
   const navigate = useNavigate();
@@ -18,6 +22,7 @@ const VendorRegister = () => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
+  const [storeHours, setStoreHours] = useState(DEFAULT_STORE_HOURS);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -61,41 +66,47 @@ const VendorRegister = () => {
         city,
         state,
         zipCode,
+        storeHours,
         approved: false,
         status: "pending",
         createdAt: serverTimestamp()
       });
 
       try {
-        const notificationResponse = await fetch(`${API_BASE_URL}/api/notifications/vendor-registration`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            business_name: businessName,
-            businessName,
-            vendor_email: email,
-            email,
-            phone_number: phoneNumber,
-            phoneNumber,
-            street_address: streetAddress,
-            streetAddress,
-            city,
-            state,
-            zip_code: zipCode,
-            zipCode
-          })
-        });
+        const notificationResponse = await fetch(
+          `${API_BASE_URL}/api/notifications/vendor-registration`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              business_name: businessName,
+              businessName,
+              vendor_email: email,
+              email,
+              phone_number: phoneNumber,
+              phoneNumber,
+              street_address: streetAddress,
+              streetAddress,
+              city,
+              state,
+              zip_code: zipCode,
+              zipCode,
+              store_hours: storeHours,
+              storeHours
+            })
+          }
+        );
 
         if (!notificationResponse.ok) {
           const errorBody = await notificationResponse.json().catch(() => null);
           throw new Error(
-            errorBody?.message || "Vendor notification email failed."
+            errorBody?.message || "Partner notification email failed."
           );
         }
       } catch (emailError) {
-        console.error("Vendor notification email failed:", emailError);
+        console.error("Partner notification email failed:", emailError);
         setError(emailError.message);
         setLoading(false);
         return;
@@ -111,84 +122,119 @@ const VendorRegister = () => {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "80px auto", textAlign: "center" }}>
-      <h2>Vendor Registration</h2>
-      <form
-        onSubmit={handleRegister}
-        style={{ display: "flex", flexDirection: "column", gap: 10 }}
-      >
-        <input
+    <RegPage
+      title="Partner registration"
+      subtitle="Tell us about your business. We will review your application before you can sign in."
+    >
+      <form className="reg-form" onSubmit={handleRegister} noValidate>
+        <p className="reg-section-label">Business</p>
+        <RegField
+          id="vendor-business"
+          label="Business name"
           type="text"
-          placeholder="Business Name"
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           required
+          autoComplete="organization"
+          placeholder="Your business name"
         />
-        <input
-          type="text"
-          placeholder="Phone Number"
+        <RegField
+          id="vendor-phone"
+          label="Business phone"
+          type="tel"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
           required
+          autoComplete="tel"
+          placeholder="(555) 555-0100"
         />
-        <input
+        <RegField
+          id="vendor-email"
+          label="Email"
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          autoComplete="email"
+          placeholder="contact@yourbusiness.com"
         />
-        <input
+
+        <hr className="reg-divider" />
+        <p className="reg-section-label">Location</p>
+        <RegField
+          id="vendor-street"
+          label="Street address"
           type="text"
-          placeholder="Street Address"
           value={streetAddress}
           onChange={(e) => setStreetAddress(e.target.value)}
           required
+          autoComplete="street-address"
         />
-        <input
+        <RegField
+          id="vendor-city"
+          label="City"
           type="text"
-          placeholder="City"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           required
+          autoComplete="address-level2"
         />
-        <input
-          type="text"
-          placeholder="State"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Zip Code"
-          value={zipCode}
-          onChange={(e) => setZipCode(e.target.value)}
-          required
-        />
-        <input
+        <div className="reg-row-2">
+          <RegField
+            id="vendor-state"
+            label="State"
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            required
+            autoComplete="address-level1"
+            placeholder="ST"
+          />
+          <RegField
+            id="vendor-zip"
+            label="ZIP code"
+            type="text"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            required
+            autoComplete="postal-code"
+          />
+        </div>
+
+        <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
+
+        <hr className="reg-divider" />
+        <p className="reg-section-label">Password</p>
+        <RegField
+          id="vendor-password"
+          label="Password"
           type="password"
-          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          autoComplete="new-password"
         />
-        <input
+        <RegField
+          id="vendor-confirm-password"
+          label="Confirm password"
           type="password"
-          placeholder="Retype Password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
+          autoComplete="new-password"
         />
-        <p style={{ margin: 0, fontSize: 13, color: "#666" }}>
-          {passwordRequirementsText}
-        </p>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating vendor..." : "Register Vendor"}
-        </button>
+
+        <p className="reg-hint">{passwordRequirementsText}</p>
+
+        <RegAlert variant="error">{error}</RegAlert>
+
+        <div className="reg-actions">
+          <button type="submit" className="reg-btn-primary" disabled={loading}>
+            {loading ? "Creating partner…" : "Submit application"}
+          </button>
+        </div>
       </form>
-    </div>
+    </RegPage>
   );
 };
 

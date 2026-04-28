@@ -38,10 +38,10 @@ const VendorProfile = ({ user, vendorProfile }) => {
         >
           <div>
             <p style={{ margin: 0, color: "#d4af37", letterSpacing: 1.2, textTransform: "uppercase", fontSize: 12 }}>
-              Vendor Profile
+              Partner Profile
             </p>
             <h2 style={{ margin: "8px 0 6px" }}>
-              {vendorProfile.businessName || "Vendor Account"}
+              {vendorProfile.businessName || "Partner Account"}
             </h2>
             <p style={{ margin: 0, color: "#d6d6d6" }}>
               Manage your location details and account contact information.
@@ -110,6 +110,10 @@ const VendorProfile = ({ user, vendorProfile }) => {
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>City</div>
             <div style={{ marginTop: 4, fontSize: 18 }}>{vendorProfile.city || "Not provided"}</div>
           </div>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Store Hours</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>{vendorProfile.storeHours || "Not provided"}</div>
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div>
               <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>State</div>
@@ -132,16 +136,16 @@ const VendorProfile = ({ user, vendorProfile }) => {
         >
           <h3 style={{ marginTop: 0 }}>Account</h3>
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Vendor ID</div>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Partner ID</div>
             <div style={{ marginTop: 4, fontSize: 15, wordBreak: "break-all" }}>{user.uid}</div>
           </div>
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>Approved Vendor</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>Approved Partner</div>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link to="/vendor">Vendor Portal</Link>
-            <Link to="/vendor/profile/edit">Edit Email / Address</Link>
+            <Link to="/vendor">Partner Portal</Link>
+            <Link to="/vendor/profile/edit">Edit</Link>
             <button type="button" onClick={handleLogout}>
               Logout
             </button>

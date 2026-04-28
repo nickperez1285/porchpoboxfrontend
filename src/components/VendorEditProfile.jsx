@@ -3,14 +3,23 @@ import { Link, useNavigate } from "react-router-dom";
 import { updateEmail } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import StoreHoursScrollPicker, {
+  DEFAULT_STORE_HOURS
+} from "./StoreHoursScrollPicker";
+import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
 const VendorEditProfile = ({ user, vendorProfile }) => {
   const navigate = useNavigate();
   const [email, setEmail] = useState(user.email || vendorProfile.email || "");
-  const [streetAddress, setStreetAddress] = useState(vendorProfile.streetAddress || "");
+  const [streetAddress, setStreetAddress] = useState(
+    vendorProfile.streetAddress || ""
+  );
   const [city, setCity] = useState(vendorProfile.city || "");
   const [state, setState] = useState(vendorProfile.state || "");
   const [zipCode, setZipCode] = useState(vendorProfile.zipCode || "");
+  const [storeHours, setStoreHours] = useState(
+    vendorProfile.storeHours || DEFAULT_STORE_HOURS
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -31,10 +40,11 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
         streetAddress,
         city,
         state,
-        zipCode
+        zipCode,
+        storeHours
       });
 
-      setSuccess("Vendor profile updated.");
+      setSuccess("Partner profile updated.");
       navigate("/vendor/profile");
     } catch (err) {
       console.error("Error updating vendor profile:", err);
@@ -45,57 +55,78 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "80px auto", textAlign: "center" }}>
-      <h2>Edit Vendor Profile</h2>
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: 10 }}
-      >
-        <input
+    <RegPage
+      title="Edit partner profile"
+      subtitle="Update your public contact details and store hours."
+    >
+      <form className="reg-form" onSubmit={handleSubmit} noValidate>
+        <p className="reg-section-label">Contact</p>
+        <RegField
+          id="edit-vendor-email"
+          label="Email"
           type="email"
-          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          autoComplete="email"
         />
-        <input
+
+        <hr className="reg-divider" />
+        <p className="reg-section-label">Location</p>
+        <RegField
+          id="edit-vendor-street"
+          label="Street address"
           type="text"
-          placeholder="Street Address"
           value={streetAddress}
           onChange={(e) => setStreetAddress(e.target.value)}
           required
+          autoComplete="street-address"
         />
-        <input
+        <RegField
+          id="edit-vendor-city"
+          label="City"
           type="text"
-          placeholder="City"
           value={city}
           onChange={(e) => setCity(e.target.value)}
           required
+          autoComplete="address-level2"
         />
-        <input
-          type="text"
-          placeholder="State"
-          value={state}
-          onChange={(e) => setState(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Zip Code"
-          value={zipCode}
-          onChange={(e) => setZipCode(e.target.value)}
-          required
-        />
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        {success && <p style={{ color: "green" }}>{success}</p>}
-        <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
-          <button type="submit" disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
+        <div className="reg-row-2">
+          <RegField
+            id="edit-vendor-state"
+            label="State"
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value)}
+            required
+            autoComplete="address-level1"
+          />
+          <RegField
+            id="edit-vendor-zip"
+            label="ZIP code"
+            type="text"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            required
+            autoComplete="postal-code"
+          />
+        </div>
+
+        <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
+
+        <RegAlert variant="error">{error}</RegAlert>
+        <RegAlert variant="success">{success}</RegAlert>
+
+        <div className="reg-actions">
+          <button type="submit" className="reg-btn-primary" disabled={loading}>
+            {loading ? "Saving…" : "Save changes"}
           </button>
-          <Link to="/vendor/profile">Cancel</Link>
+          <Link to="/vendor/profile" className="reg-btn-secondary">
+            Cancel
+          </Link>
         </div>
       </form>
-    </div>
+    </RegPage>
   );
 };
 
