@@ -24,7 +24,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
         const [querySnapshot, packageCountsSnapshot] = await Promise.all([
           getDocs(collection(db, "users")),
           vendorId
-            ? getDocs(collection(db, "vendors", vendorId, "packageCounts"))
+            ? getDocs(collection(db, "partners", vendorId, "packageCounts"))
             : Promise.resolve({ docs: [] })
         ]);
 
@@ -88,7 +88,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
     try {
       if (shouldKeepRedStatus) {
         await setDoc(
-          doc(db, "vendors", vendorId, "packageCounts", user.id),
+          doc(db, "partners", vendorId, "packageCounts", user.id),
           {
             count: 0,
             holdForResubscribe: true
@@ -96,9 +96,9 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
           { merge: true }
         );
       } else {
-        await deleteDoc(doc(db, "vendors", vendorId, "packageCounts", user.id));
+        await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
       }
-      await updateDoc(doc(db, "vendors", vendorId), {
+      await updateDoc(doc(db, "partners", vendorId), {
         packageCheckInCount: increment(-user.packageCount)
       });
 

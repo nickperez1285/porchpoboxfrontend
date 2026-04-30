@@ -36,9 +36,9 @@ const Login = ({ title = "Login", redirectTo = "/" }) => {
                 email,
                 password
             );
-            const vendorDoc = await getDoc(doc(db, "vendors", credential.user.uid));
+            const vendorDoc = await getDoc(doc(db, "partners", credential.user.uid));
             if (vendorDoc.exists()) {
-                navigate("/vendor");
+                navigate("/partner");
                 return;
             }
             navigate(redirectTo);

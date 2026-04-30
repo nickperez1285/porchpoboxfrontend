@@ -4,7 +4,7 @@ import { collection, doc, getDoc, getDocs, increment, setDoc, updateDoc } from "
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
 
-const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
+const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +67,7 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          vendorName: vendorProfile.businessName,
+          vendorName: partnerProfile.businessName,
           recipients: selectedUsers.map((user) => ({
             name: user.name || "Customer",
             email: user.email
@@ -90,7 +90,7 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
         );
       }
 
-      await updateDoc(doc(db, "vendors", vendorProfile.id), {
+      await updateDoc(doc(db, "partners", partnerProfile.id), {
         packageCheckInCount: increment(selectedUsers.length)
       });
 
@@ -98,8 +98,8 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
         selectedUsers.map(async (user) => {
           const packageCountRef = doc(
             db,
-            "vendors",
-            vendorProfile.id,
+            "partners",
+            partnerProfile.id,
             "packageCounts",
             user.id
           );
@@ -124,7 +124,7 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
         await onPackagesCheckedIn();
       }
 
-      navigate("/vendor");
+      navigate("/partner");
     } catch (submitError) {
       console.error("Error checking in packages:", submitError);
       setError(submitError.message);
@@ -192,7 +192,7 @@ const PackageCheckIn = ({ vendorProfile, onPackagesCheckedIn }) => {
         >
           Check In Packages
         </button>
-        <button type="button" onClick={() => navigate("/vendor")} disabled={submitting}>
+        <button type="button" onClick={() => navigate("/partner")} disabled={submitting}>
           Cancel
         </button>
       </div>

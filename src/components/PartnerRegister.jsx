@@ -13,7 +13,7 @@ import StoreHoursScrollPicker, {
 } from "./StoreHoursScrollPicker";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
-const VendorRegister = () => {
+const PartnerRegister = () => {
   const navigate = useNavigate();
   const [businessName, setBusinessName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -65,7 +65,7 @@ const VendorRegister = () => {
         displayName: businessName
       });
 
-      await setDoc(doc(db, "vendors", user.uid), {
+      await setDoc(doc(db, "partners", user.uid), {
         businessName,
         phoneNumber,
         email,
@@ -122,7 +122,7 @@ const VendorRegister = () => {
         return;
       }
 
-      navigate("/vendor/pending");
+      navigate("/partner/pending");
     } catch (err) {
       console.error(err);
       setError(err.message);
@@ -261,4 +261,4 @@ const VendorRegister = () => {
   );
 };
 
-export default VendorRegister;
+export default PartnerRegister;

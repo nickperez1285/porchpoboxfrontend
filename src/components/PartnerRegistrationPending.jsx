@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { RegPage } from "./RegFormPrimitives";
 
-const VendorRegistrationPending = () => {
+const PartnerRegistrationPending = () => {
   return (
     <RegPage
       title="Application received"
@@ -13,7 +13,7 @@ const VendorRegistrationPending = () => {
         dashboard until your application is approved.
       </p>
       <div className="reg-actions">
-        <Link to="/vendor/login" className="reg-btn-primary">
+        <Link to="/partner/login" className="reg-btn-primary">
           Partner login
         </Link>
       </div>
@@ -21,4 +21,4 @@ const VendorRegistrationPending = () => {
   );
 };
 
-export default VendorRegistrationPending;
+export default PartnerRegistrationPending;

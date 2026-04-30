@@ -4,19 +4,19 @@ import { collection, getDocs } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import { db } from "../firebase";
 
-const Vendors = ({ user, vendorProfile, authLoading }) => {
+const Partners = ({ user, partnerProfile, authLoading }) => {
     const [packageCountTotal, setPackageCountTotal] = useState(0);
 
     useEffect(() => {
         const loadPackageCountTotal = async () => {
-            if (!vendorProfile?.id || !vendorProfile.approved) {
+            if (!partnerProfile?.id || !partnerProfile.approved) {
                 setPackageCountTotal(0);
                 return;
             }
 
             try {
                 const snapshot = await getDocs(
-                    collection(db, "vendors", vendorProfile.id, "packageCounts")
+                    collection(db, "partners", partnerProfile.id, "packageCounts")
                 );
                 const total = snapshot.docs.reduce(
                     (sum, entry) => sum + (entry.data().count || 0),
@@ -30,7 +30,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
         };
 
         loadPackageCountTotal();
-    }, [vendorProfile]);
+    }, [partnerProfile]);
 
     const handlePackagesDelivered = (deliveredCount) => {
         setPackageCountTotal((current) => Math.max(0, current - deliveredCount));
@@ -45,8 +45,8 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
         );
     }
 
-    if (user && vendorProfile) {
-        if (!vendorProfile.approved) {
+    if (user && partnerProfile) {
+        if (!partnerProfile.approved) {
             return (
                 <div style={{ maxWidth: 760, margin: "60px auto", padding: "0 20px" }}>
                     <div
@@ -60,12 +60,12 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                     >
                         <h2 style={{ marginTop: 0 }}>Partner Portal</h2>
                         <p style={{ color: "#d6d6d6" }}>
-                            {vendorProfile.status === "deactivated"
+                            {partnerProfile.status === "deactivated"
                                 ? "Your partner account has been deactivated. Please contact Porch P.O. Box for assistance."
                                 : "Your registration information has been received and your request to become a partner is being reviewed."}
                         </p>
                         <p style={{ marginBottom: 0 }}>
-                            <Link to="/vendor/profile">Partner Profile</Link>
+                            <Link to="/partner/profile">Partner Profile</Link>
                         </p>
                     </div>
                 </div>
@@ -104,7 +104,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                             >
                                 Partner Portal
                             </div>
-                            <h2 style={{ margin: "10px 0 8px" }}>{vendorProfile.businessName}</h2>
+                            <h2 style={{ margin: "10px 0 8px" }}>{partnerProfile.businessName}</h2>
                             <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
                                 Review active customer deliveries, manage package intake,
                                 and clear delivered packages from your location.
@@ -146,10 +146,10 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                                     Actions
                                 </div>
                                 <div style={{ marginTop: 10 }}>
-                                    <Link to="/vendor/package-check-in">Check In Packages</Link>
+                                    <Link to="/partner/package-check-in">Check In Packages</Link>
                                 </div>
                                 <div style={{ marginTop: 8 }}>
-                                    <Link to="/vendor/profile">Partner Profile</Link>
+                                    <Link to="/partner/profile">Partner Profile</Link>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +165,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                     }}
                 >
                     <CustomerList
-                        vendorId={vendorProfile.id}
+                        vendorId={partnerProfile.id}
                         onPackagesDelivered={handlePackagesDelivered}
                     />
                 </div>
@@ -190,12 +190,12 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                     and manage their location profile.
                 </p>
                 <p>
-                    <Link to="/vendor/login">Partner Login</Link>
+                    <Link to="/partner/login">Partner Login</Link>
                 </p>
                 <p>
-                    <Link to="/vendor/register">Become a Partner</Link>
+                    <Link to="/partner/register">Become a Partner</Link>
                 </p>
-                {user && !vendorProfile && (
+                {user && !partnerProfile && (
                     <p>This account is signed in, but it is not registered as a partner.</p>
                 )}
             </div>
@@ -203,4 +203,4 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
     );
 };
 
-export default Vendors;
+export default Partners;

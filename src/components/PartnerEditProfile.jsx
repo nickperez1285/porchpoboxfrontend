@@ -8,17 +8,17 @@ import StoreHoursScrollPicker, {
 } from "./StoreHoursScrollPicker";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
-const VendorEditProfile = ({ user, vendorProfile }) => {
+const PartnerEditProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState(user.email || vendorProfile.email || "");
+  const [email, setEmail] = useState(user.email || partnerProfile.email || "");
   const [streetAddress, setStreetAddress] = useState(
-    vendorProfile.streetAddress || ""
+    partnerProfile.streetAddress || ""
   );
-  const [city, setCity] = useState(vendorProfile.city || "");
-  const [state, setState] = useState(vendorProfile.state || "");
-  const [zipCode, setZipCode] = useState(vendorProfile.zipCode || "");
+  const [city, setCity] = useState(partnerProfile.city || "");
+  const [state, setState] = useState(partnerProfile.state || "");
+  const [zipCode, setZipCode] = useState(partnerProfile.zipCode || "");
   const [storeHours, setStoreHours] = useState(
-    vendorProfile.storeHours || DEFAULT_STORE_HOURS
+    partnerProfile.storeHours || DEFAULT_STORE_HOURS
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -35,7 +35,7 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
         await updateEmail(auth.currentUser, email);
       }
 
-      await updateDoc(doc(db, "vendors", user.uid), {
+      await updateDoc(doc(db, "partners", user.uid), {
         email,
         streetAddress,
         city,
@@ -45,9 +45,9 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
       });
 
       setSuccess("Partner profile updated.");
-      navigate("/vendor/profile");
+      navigate("/partner/profile");
     } catch (err) {
-      console.error("Error updating vendor profile:", err);
+      console.error("Error updating partner profile:", err);
       setError(err.message);
     } finally {
       setLoading(false);
@@ -121,7 +121,7 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
           <button type="submit" className="reg-btn-primary" disabled={loading}>
             {loading ? "Saving…" : "Save changes"}
           </button>
-          <Link to="/vendor/profile" className="reg-btn-secondary">
+          <Link to="/partner/profile" className="reg-btn-secondary">
             Cancel
           </Link>
         </div>
@@ -130,4 +130,4 @@ const VendorEditProfile = ({ user, vendorProfile }) => {
   );
 };
 
-export default VendorEditProfile;
+export default PartnerEditProfile;

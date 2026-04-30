@@ -20,7 +20,7 @@ const MainPage = ({ user, userStatus }) => {
     setVendorsLoading(true);
     try {
       const vendorSnapshot = await getDocs(
-        query(collection(db, "vendors"), where("approved", "==", true))
+        query(collection(db, "partners"), where("approved", "==", true))
       );
       setActiveVendors(
         vendorSnapshot.docs
@@ -260,7 +260,7 @@ const MainPage = ({ user, userStatus }) => {
       <footer style={{ padding: "1em", background: "#111" }}>
         <center>
           <Link
-            to="/vendor"
+            to="/partner"
             style={{ display: "inline-block", paddingRight: 10 }}
           >
             Partners

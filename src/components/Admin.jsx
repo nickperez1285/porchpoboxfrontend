@@ -33,7 +33,7 @@ const Admin = () => {
   const updateVendorApproval = async (vendorId, approved) => {
     setUpdatingVendorId(vendorId);
     try {
-      await updateDoc(doc(db, "vendors", vendorId), {
+      await updateDoc(doc(db, "partners", vendorId), {
         approved,
         status: approved ? "approved" : "deactivated",
         approvedAt: approved ? serverTimestamp() : null
@@ -75,7 +75,7 @@ const Admin = () => {
       try {
         const [customerSnapshot, vendorSnapshot] = await Promise.all([
           getDocs(collection(db, "users")),
-          getDocs(collection(db, "vendors"))
+          getDocs(collection(db, "partners"))
         ]);
 
         const vendorDocs = vendorSnapshot.docs.map((entry) => ({
@@ -85,7 +85,7 @@ const Admin = () => {
 
         const vendorPackageSnapshots = await Promise.all(
           vendorDocs.map((vendor) =>
-            getDocs(collection(db, "vendors", vendor.id, "packageCounts"))
+            getDocs(collection(db, "partners", vendor.id, "packageCounts"))
           )
         );
 

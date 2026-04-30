@@ -7,14 +7,14 @@ import Customers from "./components/CustomerList";
 import OneTimeProduct from "./components/OneTimeProduct";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Vendors from "./components/Vendors";
+import Partners from "./components/Partners";
 import Contact from "./components/Contact";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
-import VendorProfile from "./components/VendorProfile";
-import VendorRegister from "./components/VendorRegister";
-import VendorEditProfile from "./components/VendorEditProfile";
-import VendorRegistrationPending from "./components/VendorRegistrationPending";
+import PartnerProfile from "./components/PartnerProfile";
+import PartnerRegister from "./components/PartnerRegister";
+import PartnerEditProfile from "./components/PartnerEditProfile";
+import PartnerRegistrationPending from "./components/PartnerRegistrationPending";
 import PackageCheckIn from "./components/PackageCheckIn";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
@@ -28,10 +28,11 @@ import "./App.css";
 
 const ADMIN_UID = "6wVTCBAw4EVHHIFWnFLL57z8qHx2";
 
-const Header = ({ authLoading, isAdmin, user, userStatus, vendorProfile }) => {
+const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   const location = useLocation();
   const hideAuthLinks = [
     "/login",
+    "/partner/login",
     "/vendor/login",
     "/admin/login"
   ].includes(location.pathname);
@@ -39,8 +40,8 @@ const Header = ({ authLoading, isAdmin, user, userStatus, vendorProfile }) => {
   const primaryLink = onCustomerProfilePage
     ? { to: "/", label: "Home" }
     : {
-      to: user ? (vendorProfile ? "/vendor" : "/profile") : "/login",
-      label: user ? (vendorProfile ? "Partner Portal" : "Profile") : "Login"
+      to: user ? (partnerProfile ? "/partner" : "/profile") : "/login",
+      label: user ? (partnerProfile ? "Partner Portal" : "Profile") : "Login"
     };
 
   return (
@@ -77,26 +78,26 @@ const Header = ({ authLoading, isAdmin, user, userStatus, vendorProfile }) => {
 function App() {
   const [user, setUser] = useState(null);
   const [userStatus, setUserStatus] = useState("");
-  const [vendorProfile, setVendorProfile] = useState(null);
+  const [partnerProfile, setPartnerProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const isAdmin = user?.uid === ADMIN_UID;
 
-  const loadVendorProfile = async (currentUser) => {
+  const loadPartnerProfile = async (currentUser) => {
     if (!currentUser) {
-      setVendorProfile(null);
+      setPartnerProfile(null);
       return;
     }
 
     try {
-      const vendorDoc = await getDoc(doc(db, "vendors", currentUser.uid));
-      setVendorProfile(
-        vendorDoc.exists()
-          ? { id: vendorDoc.id, uid: currentUser.uid, ...vendorDoc.data() }
+      const partnerDoc = await getDoc(doc(db, "partners", currentUser.uid));
+      setPartnerProfile(
+        partnerDoc.exists()
+          ? { id: partnerDoc.id, uid: currentUser.uid, ...partnerDoc.data() }
           : null
       );
     } catch (error) {
-      console.error("Error loading vendor profile:", error);
-      setVendorProfile(null);
+      console.error("Error loading partner profile:", error);
+      setPartnerProfile(null);
     }
   };
 
@@ -106,7 +107,7 @@ function App() {
 
       if (!currentUser) {
         setUserStatus("");
-        setVendorProfile(null);
+        setPartnerProfile(null);
         setAuthLoading(false);
         return;
       }
@@ -114,7 +115,7 @@ function App() {
       try {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         setUserStatus(userDoc.exists() ? userDoc.data().status || "" : "");
-        await loadVendorProfile(currentUser);
+        await loadPartnerProfile(currentUser);
       } finally {
         setAuthLoading(false);
       }
@@ -131,59 +132,66 @@ function App() {
           isAdmin={isAdmin}
           user={user}
           userStatus={userStatus}
-          vendorProfile={vendorProfile}
+          partnerProfile={partnerProfile}
         />
         <hr />
 
 
         <Routes>
+          <Route path="/vendor" element={<Navigate to="/partner" replace />} />
+          <Route path="/vendor/login" element={<Navigate to="/partner/login" replace />} />
+          <Route path="/vendor/register" element={<Navigate to="/partner/register" replace />} />
+          <Route path="/vendor/pending" element={<Navigate to="/partner/pending" replace />} />
+          <Route path="/vendor/profile" element={<Navigate to="/partner/profile" replace />} />
+          <Route path="/vendor/profile/edit" element={<Navigate to="/partner/profile/edit" replace />} />
+          <Route path="/vendor/package-check-in" element={<Navigate to="/partner/package-check-in" replace />} />
           <Route
-            path="/vendor"
+            path="/partner"
             element={
-              <Vendors
+              <Partners
                 user={user}
-                vendorProfile={vendorProfile}
+                partnerProfile={partnerProfile}
                 authLoading={authLoading}
               />
             }
           />
           <Route
-            path="/vendor/login"
-            element={<Login title="Partner Login" redirectTo="/vendor" />}
+            path="/partner/login"
+            element={<Login title="Partner Login" redirectTo="/partner" />}
           />
-          <Route path="/vendor/register" element={<VendorRegister />} />
-          <Route path="/vendor/pending" element={<VendorRegistrationPending />} />
+          <Route path="/partner/register" element={<PartnerRegister />} />
+          <Route path="/partner/pending" element={<PartnerRegistrationPending />} />
           <Route
-            path="/vendor/profile"
+            path="/partner/profile"
             element={
-              user && vendorProfile ? (
-                <VendorProfile user={user} vendorProfile={vendorProfile} />
+              user && partnerProfile ? (
+                <PartnerProfile user={user} partnerProfile={partnerProfile} />
               ) : (
-                <Navigate to="/vendor/login" replace />
+                <Navigate to="/partner/login" replace />
               )
             }
           />
           <Route
-            path="/vendor/profile/edit"
+            path="/partner/profile/edit"
             element={
-              user && vendorProfile ? (
-                <VendorEditProfile user={user} vendorProfile={vendorProfile} />
+              user && partnerProfile ? (
+                <PartnerEditProfile user={user} partnerProfile={partnerProfile} />
               ) : (
-                <Navigate to="/vendor/login" replace />
+                <Navigate to="/partner/login" replace />
               )
             }
           />
           <Route
-            path="/vendor/package-check-in"
+            path="/partner/package-check-in"
             element={
-              user && vendorProfile && vendorProfile.approved ? (
+              user && partnerProfile && partnerProfile.approved ? (
                 <PackageCheckIn
                   user={user}
-                  vendorProfile={vendorProfile}
-                  onPackagesCheckedIn={() => loadVendorProfile(user)}
+                  partnerProfile={partnerProfile}
+                  onPackagesCheckedIn={() => loadPartnerProfile(user)}
                 />
               ) : (
-                <Navigate to="/vendor" replace />
+                <Navigate to="/partner" replace />
               )
             }
           />
@@ -202,10 +210,10 @@ function App() {
           <Route
             path="/customers"
             element={
-              user && ((vendorProfile && vendorProfile.approved) || isAdmin) ? (
+              user && ((partnerProfile && partnerProfile.approved) || isAdmin) ? (
                 <Customers />
               ) : (
-                <Navigate to="/vendor" replace />
+                <Navigate to="/partner" replace />
               )
             }
           />

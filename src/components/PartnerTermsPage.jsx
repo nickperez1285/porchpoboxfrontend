@@ -27,7 +27,7 @@ const PartnerTermsPage = () => {
         <li>Your partner membership may be cancelled at any time for any reason.</li>
       </ol>
       <p style={{ marginTop: 24 }}>
-        <Link to="/vendor/register">Back to partner registration</Link>
+        <Link to="/partner/register">Back to partner registration</Link>
       </p>
     </div>
   );
