@@ -90,12 +90,24 @@ const Admin = () => {
         );
 
         const customerPackageCounts = {};
+        const customerPackageLocations = {};
 
-        vendorPackageSnapshots.forEach((snapshot) => {
+        vendorPackageSnapshots.forEach((snapshot, vendorIndex) => {
+          const vendor = vendorDocs[vendorIndex];
+          const locationName =
+            vendor?.businessName || vendor?.streetAddress || "Unnamed partner";
           snapshot.docs.forEach((entry) => {
             const packageCount = entry.data().count || 0;
             customerPackageCounts[entry.id] =
               (customerPackageCounts[entry.id] || 0) + packageCount;
+            if (packageCount > 0) {
+              if (!customerPackageLocations[entry.id]) {
+                customerPackageLocations[entry.id] = [];
+              }
+              if (!customerPackageLocations[entry.id].includes(locationName)) {
+                customerPackageLocations[entry.id].push(locationName);
+              }
+            }
           });
         });
 
@@ -103,7 +115,8 @@ const Admin = () => {
           customerSnapshot.docs.map((entry) => ({
             id: entry.id,
             ...entry.data(),
-            packageCount: customerPackageCounts[entry.id] || 0
+            packageCount: customerPackageCounts[entry.id] || 0,
+            packageLocations: customerPackageLocations[entry.id] || []
           }))
         );
 
@@ -170,6 +183,21 @@ const Admin = () => {
 
     const diff = date.getTime() - Date.now();
     return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
+  };
+
+  const getCustomerBackgroundColor = (customer) => {
+    const isActive = customer.status === "active";
+    const packageCount = customer.packageCount || 0;
+
+    if (!isActive && packageCount > 1) {
+      return "#ffd9d9";
+    }
+
+    if (!isActive && packageCount === 1) {
+      return "#fff6bf";
+    }
+
+    return "#ffffff";
   };
 
   if (loading) {
@@ -370,7 +398,7 @@ const Admin = () => {
                     border: "1px solid #ccc",
                     borderRadius: 10,
                     marginBottom: 12,
-                    background: "#fffdf9"
+                    background: getCustomerBackgroundColor(customer)
                   }}
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
@@ -400,6 +428,11 @@ const Admin = () => {
                       <div>Days Left: {getDaysLeft(customer.subscriptionEndsAt)}</div>
                       <div>Email: {customer.email || "No email"}</div>
                       <div>Phone: {customer.phoneNumber || "No phone number"}</div>
+                      <div>
+                        Checked In At: {customer.packageLocations?.length
+                          ? customer.packageLocations.join(", ")
+                          : "No checked-in location"}
+                      </div>
                       <div>
                         Address: {customer.streetAddress || "No street address"}
                         {customer.city ? `, ${customer.city}` : ""}

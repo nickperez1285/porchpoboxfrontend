@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 
 
 const Login = ({ title = "Login", redirectTo = "/" }) => {
@@ -30,7 +31,16 @@ const Login = ({ title = "Login", redirectTo = "/" }) => {
         setError("");
 
         try {
-            await signInWithEmailAndPassword(auth, email, password);
+            const credential = await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+            const vendorDoc = await getDoc(doc(db, "vendors", credential.user.uid));
+            if (vendorDoc.exists()) {
+                navigate("/vendor");
+                return;
+            }
             navigate(redirectTo);
         } catch (err) {
             setError(err.message);

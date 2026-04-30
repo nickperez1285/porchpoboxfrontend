@@ -21,6 +21,8 @@ import AdminLogin from "./components/AdminLogin";
 import ForgotPassword from "./components/ForgotPassword";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import CheckoutCancel from "./components/CheckoutCancel";
+import UserTermsPage from "./components/UserTermsPage";
+import PartnerTermsPage from "./components/PartnerTermsPage";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -33,12 +35,12 @@ const Header = ({ authLoading, isAdmin, user, userStatus, vendorProfile }) => {
     "/vendor/login",
     "/admin/login"
   ].includes(location.pathname);
-  const onUserProfilePage = location.pathname === "/profile";
-  const primaryLink = onUserProfilePage
+  const onCustomerProfilePage = location.pathname === "/profile";
+  const primaryLink = onCustomerProfilePage
     ? { to: "/", label: "Home" }
     : {
-      to: user ? (vendorProfile ? "/vendor/profile" : "/profile") : "/login",
-      label: user ? (vendorProfile ? "Partner Profile" : "Profile") : "Login"
+      to: user ? (vendorProfile ? "/vendor" : "/profile") : "/login",
+      label: user ? (vendorProfile ? "Partner Portal" : "Profile") : "Login"
     };
 
   return (
@@ -243,6 +245,8 @@ function App() {
             element={<CheckoutSuccess user={user} authLoading={authLoading} />}
           />
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+          <Route path="/terms/user" element={<UserTermsPage />} />
+          <Route path="/terms/partner" element={<PartnerTermsPage />} />
 
           <Route path="/" element={<MainPage user={user} userStatus={userStatus} />} />
           <Route path="/contact" element={<Contact />} />

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -21,6 +21,7 @@ const Register = () => {
   const [zipCode, setZipCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -37,6 +38,12 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError("You must agree to the terms and conditions before creating an account.");
       setLoading(false);
       return;
     }
@@ -65,6 +72,9 @@ const Register = () => {
         status: "inactive",
         subscribedAt: null,
         subscriptionEndsAt: null,
+        termsAccepted: true,
+        termsAcceptedAt: serverTimestamp(),
+        termsVersion: "2026-04-28-user-v1",
         createdAt: serverTimestamp()
       });
 
@@ -184,6 +194,19 @@ const Register = () => {
         />
 
         <p className="reg-hint">{passwordRequirementsText}</p>
+        <p className="reg-hint">
+          Review terms: <Link to="/terms/user">User Terms and Conditions</Link>
+        </p>
+        <label className="reg-terms-checkbox-row" htmlFor="register-terms-agree">
+          <input
+            id="register-terms-agree"
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            required
+          />
+          <span>I agree to the terms and conditions.</span>
+        </label>
 
         <RegAlert variant="error">{error}</RegAlert>
 

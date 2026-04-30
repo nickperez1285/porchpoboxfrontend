@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
@@ -25,6 +25,7 @@ const VendorRegister = () => {
   const [storeHours, setStoreHours] = useState(DEFAULT_STORE_HOURS);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -41,6 +42,12 @@ const VendorRegister = () => {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
+    if (!termsAccepted) {
+      setError("You must agree to the terms and conditions before creating an account.");
       setLoading(false);
       return;
     }
@@ -69,6 +76,9 @@ const VendorRegister = () => {
         storeHours,
         approved: false,
         status: "pending",
+        termsAccepted: true,
+        termsAcceptedAt: serverTimestamp(),
+        termsVersion: "2026-04-28-partner-v1",
         createdAt: serverTimestamp()
       });
 
@@ -123,7 +133,7 @@ const VendorRegister = () => {
 
   return (
     <RegPage
-      title="Partner registration"
+      title="Become a partner"
       subtitle="Tell us about your business. We will review your application before you can sign in."
     >
       <form className="reg-form" onSubmit={handleRegister} noValidate>
@@ -225,6 +235,19 @@ const VendorRegister = () => {
         />
 
         <p className="reg-hint">{passwordRequirementsText}</p>
+        <p className="reg-hint">
+          Review terms: <Link to="/terms/partner">Partner Terms and Conditions</Link>
+        </p>
+        <label className="reg-terms-checkbox-row" htmlFor="vendor-register-terms-agree">
+          <input
+            id="vendor-register-terms-agree"
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            required
+          />
+          <span>I agree to the terms and conditions.</span>
+        </label>
 
         <RegAlert variant="error">{error}</RegAlert>
 

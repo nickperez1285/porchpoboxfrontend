@@ -194,6 +194,37 @@ const MainPage = ({ user, userStatus }) => {
         </div>
 
         <div
+          className="Promotion"
+          style={{
+            width: "100%",
+            maxWidth: 1180,
+            marginTop: 24,
+            background: "linear-gradient(135deg, #d6ecff 0%, #9ed0ff 100%)",
+            border: "1px solid rgba(0, 0, 0, 0.08)",
+            borderRadius: 20,
+            padding: "24px 28px",
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              color: "#0b3f66",
+              letterSpacing: 1,
+              textTransform: "uppercase"
+            }}
+          >
+            Promotion
+          </div>
+          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
+            Try Porch P.O. Box for free!
+          </h4>
+          <p style={{ margin: 0, color: "#0d3555", lineHeight: 1.6 }}>
+            Sign up today and get your first package delivered to a Porch P.O. Box
+            for free.
+          </p>
+        </div>
+        <div
           className="Referral"
           style={{
             width: "100%",
@@ -224,6 +255,7 @@ const MainPage = ({ user, userStatus }) => {
             of service when they join.
           </p>
         </div>
+
       </div>
       <footer style={{ padding: "1em", background: "#111" }}>
         <center>

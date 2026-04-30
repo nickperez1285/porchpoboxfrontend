@@ -7,6 +7,7 @@ import {
   doc,
   getDocs,
   increment,
+  setDoc,
   updateDoc
 } from "firebase/firestore";
 
@@ -30,7 +31,10 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
         const packageCounts = Object.fromEntries(
           packageCountsSnapshot.docs.map((entry) => [
             entry.id,
-            entry.data().count || 0
+            {
+              count: entry.data().count || 0,
+              holdForResubscribe: Boolean(entry.data().holdForResubscribe)
+            }
           ])
         );
 
@@ -38,9 +42,10 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
           .map((doc) => ({
             id: doc.id,
             ...doc.data(),
-            packageCount: packageCounts[doc.id] || 0
+            packageCount: packageCounts[doc.id]?.count || 0,
+            holdForResubscribe: packageCounts[doc.id]?.holdForResubscribe || false
           }))
-          .filter((user) => user.packageCount > 0);
+          .filter((user) => user.packageCount > 0 || user.holdForResubscribe);
 
         setUsers(usersList);
       } catch (error) {
@@ -67,7 +72,12 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
       return;
     }
 
-    const confirmed = window.confirm("Would you like to mark packages as delivered?");
+    const shouldKeepRedStatus = user.status !== "active" && (user.packageCount || 0) > 1;
+    const confirmed = window.confirm(
+      shouldKeepRedStatus
+        ? "Would you like to mark packages as delivered?\n\nReminder: this customer is inactive and will not be able to use Porch P.O. Box again until they subscribe and make payment."
+        : "Would you like to mark packages as delivered?"
+    );
     if (!confirmed) {
       return;
     }
@@ -76,12 +86,35 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
     setError("");
 
     try {
-      await deleteDoc(doc(db, "vendors", vendorId, "packageCounts", user.id));
+      if (shouldKeepRedStatus) {
+        await setDoc(
+          doc(db, "vendors", vendorId, "packageCounts", user.id),
+          {
+            count: 0,
+            holdForResubscribe: true
+          },
+          { merge: true }
+        );
+      } else {
+        await deleteDoc(doc(db, "vendors", vendorId, "packageCounts", user.id));
+      }
       await updateDoc(doc(db, "vendors", vendorId), {
         packageCheckInCount: increment(-user.packageCount)
       });
 
-      setUsers((current) => current.filter((entry) => entry.id !== user.id));
+      setUsers((current) =>
+        current
+          .map((entry) =>
+            entry.id === user.id
+              ? {
+                  ...entry,
+                  packageCount: 0,
+                  holdForResubscribe: shouldKeepRedStatus || entry.holdForResubscribe
+                }
+              : entry
+          )
+          .filter((entry) => entry.packageCount > 0 || entry.holdForResubscribe)
+      );
       setExpandedUserIds((current) => current.filter((id) => id !== user.id));
 
       if (onPackagesDelivered) {
@@ -93,6 +126,21 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
     } finally {
       setDeliveringUserId("");
     }
+  };
+
+  const getCustomerBackgroundColor = (user) => {
+    const isActive = user.status === "active";
+    const packageCount = user.packageCount || 0;
+
+    if (!isActive && (packageCount > 1 || user.holdForResubscribe)) {
+      return "#ffd9d9";
+    }
+
+    if (!isActive && packageCount === 1) {
+      return "#fff6bf";
+    }
+
+    return "#ffffff";
   };
 
   return (
@@ -127,7 +175,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
                 borderRadius: 14,
                 padding: 16,
                 marginBottom: 12,
-                background: "#fffdf9"
+                background: getCustomerBackgroundColor(user)
               }}
             >
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
@@ -160,6 +208,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
 
               {expandedUserIds.includes(user.id) && (
                 <div style={{ marginTop: 12 }}>
+                  <div>Subscription Status: {user.status || "inactive"}</div>
                   <div>Email: {user.email || "No email"}</div>
                   <div>Phone: {user.phoneNumber || "No phone number"}</div>
                   <div>

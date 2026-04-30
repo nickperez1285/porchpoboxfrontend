@@ -193,7 +193,7 @@ const Vendors = ({ user, vendorProfile, authLoading }) => {
                     <Link to="/vendor/login">Partner Login</Link>
                 </p>
                 <p>
-                    <Link to="/vendor/register">Partner Registration</Link>
+                    <Link to="/vendor/register">Become a Partner</Link>
                 </p>
                 {user && !vendorProfile && (
                     <p>This account is signed in, but it is not registered as a partner.</p>
