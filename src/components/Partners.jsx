@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import CustomerList from "./CustomerList";
+import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
 
 const Partners = ({ user, partnerProfile, authLoading }) => {
@@ -164,6 +165,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                         boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
                     }}
                 >
+                    <PartnerStatusLegend />
                     <CustomerList
                         vendorId={partnerProfile.id}
                         onPackagesDelivered={handlePackagesDelivered}

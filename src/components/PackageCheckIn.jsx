@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, doc, getDoc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
+import PartnerStatusLegend from "./PartnerStatusLegend";
 
 const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const navigate = useNavigate();
@@ -47,6 +48,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     );
   }, [search, users]);
 
+  const getNormalizedPackageQuantity = (userId) =>
+    Math.max(1, Number(packageQuantities[userId]) || 1);
+
   const toggleSelection = (userId) => {
     setSelectedUserIds((current) =>
       current.includes(userId)
@@ -55,23 +59,27 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     );
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: current[userId] || 1
+      [userId]: current[userId] ?? "1"
     }));
   };
 
   const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
   const totalSelectedPackages = selectedUsers.reduce(
-    (sum, user) => sum + Math.max(1, Number(packageQuantities[user.id]) || 1),
+    (sum, user) => sum + getNormalizedPackageQuantity(user.id),
     0
   );
 
   const updatePackageQuantity = (userId, nextValue) => {
-    const parsedValue = Number(nextValue);
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: Number.isFinite(parsedValue) && parsedValue > 0
-        ? Math.floor(parsedValue)
-        : 1
+      [userId]: nextValue
+    }));
+  };
+
+  const finalizePackageQuantity = (userId) => {
+    setPackageQuantities((current) => ({
+      ...current,
+      [userId]: String(getNormalizedPackageQuantity(userId))
     }));
   };
 
@@ -90,7 +98,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           recipients: selectedUsers.map((user) => ({
             name: user.name || "Customer",
             email: user.email,
-            packageCount: Math.max(1, Number(packageQuantities[user.id]) || 1)
+            packageCount: getNormalizedPackageQuantity(user.id)
           }))
         })
       });
@@ -116,7 +124,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
 
       await Promise.all(
         selectedUsers.map(async (user) => {
-          const packageQuantity = Math.max(1, Number(packageQuantities[user.id]) || 1);
+          const packageQuantity = getNormalizedPackageQuantity(user.id);
           const packageCountRef = doc(
             db,
             "partners",
@@ -158,6 +166,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     <div style={{ maxWidth: 900, margin: "60px auto", padding: "0 20px" }}>
       <h2>Package Check In</h2>
       <p>Selected packages: {totalSelectedPackages}</p>
+      <PartnerStatusLegend />
 
       <input
         type="text"
@@ -198,8 +207,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                       type="number"
                       min="1"
                       step="1"
-                      value={packageQuantities[user.id] || 1}
+                      value={packageQuantities[user.id] ?? "1"}
                       onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
+                      onBlur={() => finalizePackageQuantity(user.id)}
                       style={{ width: 72, padding: 8 }}
                       aria-label={`Package count for ${user.name || "user"}`}
                     />
