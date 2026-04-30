@@ -10,6 +10,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [packageQuantities, setPackageQuantities] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -52,9 +53,27 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         ? current.filter((id) => id !== userId)
         : [...current, userId]
     );
+    setPackageQuantities((current) => ({
+      ...current,
+      [userId]: current[userId] || 1
+    }));
   };
 
   const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
+  const totalSelectedPackages = selectedUsers.reduce(
+    (sum, user) => sum + Math.max(1, Number(packageQuantities[user.id]) || 1),
+    0
+  );
+
+  const updatePackageQuantity = (userId, nextValue) => {
+    const parsedValue = Number(nextValue);
+    setPackageQuantities((current) => ({
+      ...current,
+      [userId]: Number.isFinite(parsedValue) && parsedValue > 0
+        ? Math.floor(parsedValue)
+        : 1
+    }));
+  };
 
   const handleCheckIn = async () => {
     setSubmitting(true);
@@ -70,7 +89,8 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           vendorName: partnerProfile.businessName,
           recipients: selectedUsers.map((user) => ({
             name: user.name || "Customer",
-            email: user.email
+            email: user.email,
+            packageCount: Math.max(1, Number(packageQuantities[user.id]) || 1)
           }))
         })
       });
@@ -91,11 +111,12 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       }
 
       await updateDoc(doc(db, "partners", partnerProfile.id), {
-        packageCheckInCount: increment(selectedUsers.length)
+        packageCheckInCount: increment(totalSelectedPackages)
       });
 
       await Promise.all(
         selectedUsers.map(async (user) => {
+          const packageQuantity = Math.max(1, Number(packageQuantities[user.id]) || 1);
           const packageCountRef = doc(
             db,
             "partners",
@@ -111,7 +132,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           return setDoc(
             packageCountRef,
             {
-              count: existingCount + 1,
+              count: existingCount + packageQuantity,
               name: user.name || "Unnamed user",
               email: user.email || ""
             },
@@ -136,7 +157,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   return (
     <div style={{ maxWidth: 900, margin: "60px auto", padding: "0 20px" }}>
       <h2>Package Check In</h2>
-      <p>Selected packages: {selectedUserIds.length}</p>
+      <p>Selected packages: {totalSelectedPackages}</p>
 
       <input
         type="text"
@@ -172,11 +193,22 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     <strong>{user.name || "Unnamed user"}</strong>
                     <div>{user.email || "No email"}</div>
                   </div>
-                  <input
-                    type="checkbox"
-                    checked={selectedUserIds.includes(user.id)}
-                    onChange={() => toggleSelection(user.id)}
-                  />
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <input
+                      type="number"
+                      min="1"
+                      step="1"
+                      value={packageQuantities[user.id] || 1}
+                      onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
+                      style={{ width: 72, padding: 8 }}
+                      aria-label={`Package count for ${user.name || "user"}`}
+                    />
+                    <input
+                      type="checkbox"
+                      checked={selectedUserIds.includes(user.id)}
+                      onChange={() => toggleSelection(user.id)}
+                    />
+                  </div>
                 </li>
               ))}
             </ul>
@@ -188,7 +220,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         <button
           type="button"
           onClick={() => setShowConfirm(true)}
-          disabled={selectedUserIds.length === 0 || submitting}
+          disabled={totalSelectedPackages === 0 || submitting}
         >
           Check In Packages
         </button>
@@ -210,7 +242,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           }}
         >
           <div style={{ background: "#fff", padding: 24, borderRadius: 12, maxWidth: 420, width: "100%" }}>
-            <p>You are about to check in {selectedUserIds.length} packages.</p>
+            <p>You are about to check in {totalSelectedPackages} packages.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
               <button type="button" onClick={() => setShowConfirm(false)} disabled={submitting}>
                 Cancel
