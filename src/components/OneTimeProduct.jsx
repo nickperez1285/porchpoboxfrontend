@@ -138,26 +138,27 @@ const ProductList = ({ user }) => {
           );
         })}
       </div>
-
-      <div style={{ marginTop: 18 }}>
-        {user ? (
-          <button
-            type="button"
-            className="btn btn-dark hover:btn-ouline"
-            onClick={startCheckout}
-            disabled={Boolean(loadingPlanId)}
-          >
-            {loadingPlanId ? "Starting sign up..." : `Sign Up For ${selectedPlan?.label || "Plan"}`}
-          </button>
-        ) : (
-          <Link to="/login">
-            <button type="button" className="btn btn-dark hover:btn-ouline">
-              SIGN UP
+      <center>
+        <div style={{ marginTop: 18 }}>
+          {user ? (
+            <button
+              type="button"
+              className="btn btn-dark hover:btn-ouline"
+              onClick={startCheckout}
+              disabled={Boolean(loadingPlanId)}
+            >
+              {loadingPlanId ? "Starting sign up..." : `Sign Up For ${selectedPlan?.label || "Plan"}`}
             </button>
-          </Link>
-        )}
-        {error && <p style={{ color: "red", marginTop: 12 }}>{error}</p>}
-      </div>
+          ) : (
+            <Link to="/login">
+              <button type="button" className="btn btn-dark hover:btn-ouline">
+                SIGN UP
+              </button>
+            </Link>
+          )}
+          {error && <p style={{ color: "red", marginTop: 12 }}>{error}</p>}
+        </div>
+      </center>
     </div>
   );
 };
