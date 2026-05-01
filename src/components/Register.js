@@ -79,7 +79,7 @@ const Register = () => {
       });
 
       try {
-        await fetch("/api/notifications/user-welcome", {
+        const welcomeResponse = await fetch("/api/notifications/user-welcome", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -89,6 +89,14 @@ const Register = () => {
             email
           })
         });
+
+        if (!welcomeResponse.ok) {
+          const errorBody = await welcomeResponse.json().catch(() => null);
+          console.error(
+            "Welcome email failed:",
+            errorBody?.message || `HTTP ${welcomeResponse.status}`
+          );
+        }
       } catch (emailError) {
         console.error("Welcome email failed:", emailError);
       }
