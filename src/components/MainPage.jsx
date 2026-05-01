@@ -178,7 +178,7 @@ const MainPage = ({ user, userStatus }) => {
                   textTransform: "uppercase"
                 }}
               >
-                {user && userStatus === "active" ? "Member Access" : "Monthly Plan"}
+                {user && userStatus === "active" ? "Member Access" : "Subscription Plans"}
               </div>
               <h4 style={{ margin: "8px 0 6px" }}>
                 {user && userStatus === "active" ? "Welcome to PorchPOBox!" : "Sign Up"}
@@ -186,7 +186,7 @@ const MainPage = ({ user, userStatus }) => {
               <p style={{ margin: 0, color: "#666" }}>
                 {user && userStatus === "active"
                   ? "Your subscription is active. You can continue using Porch P.O. Box services."
-                  : "Sign up for a 30-day package plan  and start receiving your packages today.!"}
+                  : "Choose the subscription term that fits your delivery needs and start receiving your packages today."}
               </p>
             </div>
             {user && userStatus === "active" ? null : <OneTimeProduct user={user} />}
