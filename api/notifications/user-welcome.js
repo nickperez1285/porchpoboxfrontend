@@ -31,8 +31,8 @@ const sendEmail = async ({ to, replyTo, subject, text }) => {
     const errorBody = await response.json().catch(() => null);
     throw new Error(
       errorBody?.message ||
-        errorBody?.error?.message ||
-        `Resend API request failed with status ${response.status}`
+      errorBody?.error?.message ||
+      `Resend API request failed with status ${response.status}`
     );
   }
 };
@@ -57,11 +57,11 @@ module.exports = async (req, res) => {
       text: [
         `Hello ${name || "there"},`,
         "",
-        "Welcome to Porch P.O. Box.",
+        "Welcome to Porch P.O. Box!",
         "",
-        "Your account has been created successfully. We invite you to try the service for the first time for free.",
+        "Your account has been created successfully!  Try the service now to get your first package free or subscribe now and get unlimited access.",
         "",
-        "Sign in anytime to get started.",
+
         "",
         "Porch P.O. Box"
       ].join("\n")

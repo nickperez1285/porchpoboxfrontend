@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import MainPage from "./components/MainPage";
 import Customers from "./components/CustomerList";
@@ -30,6 +30,10 @@ const ADMIN_UID = "6wVTCBAw4EVHHIFWnFLL57z8qHx2";
 
 const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   const location = useLocation();
+  const linkStyle = {
+    textDecoration: "none",
+    color: "inherit"
+  };
   const hideAuthLinks = [
     "/login",
     "/partner/login",
@@ -44,10 +48,18 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
       label: user ? (partnerProfile ? "Partner Portal" : "Profile") : "Login"
     };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
+
   return (
     <header style={{ position: "relative" }}>
       <center>
-        <Link to="/" style={{ color: "gold" }}>
+        <Link to="/" style={{ ...linkStyle, color: "gold" }}>
           <h1 className="header">
             <span style={{ position: "absolute", left: "-9999px" }}>
               Porch P.O. Box
@@ -65,9 +77,27 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
             gap: 12
           }}
         >
-          <Link to={primaryLink.to}>{primaryLink.label}</Link>
-          {isAdmin && <Link to="/admin">Admin</Link>}
-          {!user && <Link to="/register">Register</Link>}
+          <Link to={primaryLink.to} style={linkStyle}>{primaryLink.label}</Link>
+          {isAdmin && <Link to="/admin" style={linkStyle}>Admin</Link>}
+          {!user && <Link to="/register" style={linkStyle}>Register</Link>}
+          {user && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{
+                background: "none",
+                border: "none",
+                padding: 0,
+                margin: 0,
+                cursor: "pointer",
+                font: "inherit",
+                color: "inherit",
+                textDecoration: "none"
+              }}
+            >
+              Logout
+            </button>
+          )}
         </div>
       )}
     </header>

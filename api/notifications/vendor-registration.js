@@ -32,8 +32,8 @@ const sendEmail = async ({ to, replyTo, subject, text }) => {
     const errorBody = await response.json().catch(() => null);
     throw new Error(
       errorBody?.message ||
-        errorBody?.error?.message ||
-        `Resend API request failed with status ${response.status}`
+      errorBody?.error?.message ||
+      `Resend API request failed with status ${response.status}`
     );
   }
 };
@@ -70,9 +70,9 @@ module.exports = async (req, res) => {
     await sendEmail({
       to: adminInbox,
       replyTo: email,
-      subject: `New Vendor Registration: ${businessName}`,
+      subject: `New Partner Registration: ${businessName}`,
       text: [
-        "A new vendor has registered.",
+        "A new partner is requesting to be registered.",
         "",
         `Business Name: ${businessName}`,
         `Email: ${email}`,
@@ -83,7 +83,7 @@ module.exports = async (req, res) => {
         `Zip Code: ${zipCode}`
       ].join("\n")
     });
-
+    eee
     await sendEmail({
       to: email,
       replyTo: adminInbox,
@@ -91,7 +91,7 @@ module.exports = async (req, res) => {
       text: [
         `Hello ${businessName},`,
         "",
-        "Your registration information has been received and your request to become a vendor is being reviewed.",
+        "Your registration information has been received and your request to become a partner is being reviewed.",
         "",
         "We will contact you once the review is complete.",
         "",

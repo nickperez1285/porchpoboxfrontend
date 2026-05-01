@@ -25,6 +25,31 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const sendWelcomeEmail = async ({ name: userName, email: userEmail }) => {
+    try {
+      const welcomeResponse = await fetch("/api/notifications/user-welcome", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          name: userName,
+          email: userEmail
+        })
+      });
+
+      if (!welcomeResponse.ok) {
+        const errorBody = await welcomeResponse.json().catch(() => null);
+        console.error(
+          "Welcome email failed:",
+          errorBody?.message || `HTTP ${welcomeResponse.status}`
+        );
+      }
+    } catch (emailError) {
+      console.error("Welcome email failed:", emailError);
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -61,6 +86,11 @@ const Register = () => {
         displayName: name
       });
 
+      await sendWelcomeEmail({
+        name,
+        email
+      });
+
       await setDoc(doc(db, "users", user.uid), {
         name: name,
         phoneNumber: phoneNumber,
@@ -77,29 +107,6 @@ const Register = () => {
         termsVersion: "2026-04-28-user-v1",
         createdAt: serverTimestamp()
       });
-
-      try {
-        const welcomeResponse = await fetch("/api/notifications/user-welcome", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            name,
-            email
-          })
-        });
-
-        if (!welcomeResponse.ok) {
-          const errorBody = await welcomeResponse.json().catch(() => null);
-          console.error(
-            "Welcome email failed:",
-            errorBody?.message || `HTTP ${welcomeResponse.status}`
-          );
-        }
-      } catch (emailError) {
-        console.error("Welcome email failed:", emailError);
-      }
 
       navigate("/");
     } catch (err) {
