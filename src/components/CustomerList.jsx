@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import {
+  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -11,7 +12,7 @@ import {
   updateDoc
 } from "firebase/firestore";
 
-const CustomerList = ({ vendorId, onPackagesDelivered }) => {
+const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -86,6 +87,16 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
     setError("");
 
     try {
+      const userDocUpdates = {
+        deliveredPackageCount: increment(user.packageCount)
+      };
+
+      if (partnerLocationName) {
+        userDocUpdates.deliveredPickupLocations = arrayUnion(partnerLocationName);
+      }
+
+      await updateDoc(doc(db, "users", user.id), userDocUpdates);
+
       if (shouldKeepRedStatus) {
         await setDoc(
           doc(db, "partners", vendorId, "packageCounts", user.id),
@@ -107,10 +118,10 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
           .map((entry) =>
             entry.id === user.id
               ? {
-                  ...entry,
-                  packageCount: 0,
-                  holdForResubscribe: shouldKeepRedStatus || entry.holdForResubscribe
-                }
+                ...entry,
+                packageCount: 0,
+                holdForResubscribe: shouldKeepRedStatus || entry.holdForResubscribe
+              }
               : entry
           )
           .filter((entry) => entry.packageCount > 0 || entry.holdForResubscribe)
@@ -156,7 +167,7 @@ const CustomerList = ({ vendorId, onPackagesDelivered }) => {
         >
           Active Deliveries
         </div>
-        <h2 style={{ margin: "8px 0 0" }}>Customers With Packages</h2>
+        <h2 style={{ margin: "8px 0 0" }}> Packages Checked In</h2>
       </div>
 
       {loading ? (

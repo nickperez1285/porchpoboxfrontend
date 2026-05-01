@@ -7,11 +7,11 @@ const legendItems = [
   },
   {
     color: "#fff6bf",
-    label: "User is utilizing 1st time promo"
+    label: "User is trial period"
   },
   {
     color: "#ffd9d9",
-    label: "User needs to pay for subscription to continue using service"
+    label: "User requires payment"
   }
 ];
 

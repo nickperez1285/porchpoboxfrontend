@@ -167,8 +167,13 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                 >
                     <PartnerStatusLegend />
                     <CustomerList
-                        vendorId={partnerProfile.id}
-                        onPackagesDelivered={handlePackagesDelivered}
+                      vendorId={partnerProfile.id}
+                      partnerLocationName={
+                        partnerProfile.businessName ||
+                        partnerProfile.streetAddress ||
+                        "Unnamed partner"
+                      }
+                      onPackagesDelivered={handlePackagesDelivered}
                     />
                 </div>
             </div>

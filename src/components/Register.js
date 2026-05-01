@@ -78,6 +78,21 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
+      try {
+        await fetch("/api/notifications/user-welcome", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name,
+            email
+          })
+        });
+      } catch (emailError) {
+        console.error("Welcome email failed:", emailError);
+      }
+
       navigate("/");
     } catch (err) {
       console.error(err);
