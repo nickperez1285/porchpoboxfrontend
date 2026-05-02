@@ -76,7 +76,6 @@ const Register = () => {
 
       // Create new user profile with Google information
       const displayName = user.displayName || "";
-      const nameParts = displayName.split(" ");
       
       await setDoc(userDocRef, {
         name: displayName,
