@@ -186,7 +186,7 @@ const MainPage = ({ user, userStatus }) => {
               <p style={{ margin: 0, color: "#666" }}>
                 {user && userStatus === "active"
                   ? "Your subscription is active. You can continue using Porch P.O. Box services."
-                  : "Choose the subscription term that fits your delivery needs and start receiving your packages today."}
+                  : "Select the subscription term that fits your delivery needs and start receiving your packages today!"}
               </p>
             </div>
             {user && userStatus === "active" ? null : <OneTimeProduct user={user} />}

@@ -15,14 +15,14 @@ const PLAN_CONFIG = [
     envVar: "REACT_APP_STRIPE_PRICE_ID_SEMIANNUAL",
     label: "6 Months",
     price: "$100",
-    description: "Best value for longer-term package pickup"
+    description: "Pay for 5 months and get a 6 month free"
   },
   {
     id: "yearly",
     envVar: "REACT_APP_STRIPE_PRICE_ID_YEARLY",
     label: "1 Year",
     price: "$200",
-    description: "Full-year access for regular customers"
+    description: "Pay for 10 months and get 2 months FREE for a full year of  access! "
   }
 ];
 
@@ -93,7 +93,7 @@ const ProductList = ({ user }) => {
   };
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <div
         style={{
           display: "grid",
@@ -138,27 +138,38 @@ const ProductList = ({ user }) => {
           );
         })}
       </div>
-      <center>
-        <div style={{ marginTop: 18 }}>
-          {user ? (
-            <button
-              type="button"
-              className="btn btn-dark hover:btn-ouline"
-              onClick={startCheckout}
-              disabled={Boolean(loadingPlanId)}
-            >
-              {loadingPlanId ? "Starting sign up..." : `Sign Up For ${selectedPlan?.label || "Plan"}`}
+      <div
+        style={{
+          marginTop: 18,
+          width: "100%",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center"
+        }}
+      >
+        {user ? (
+          <button
+            type="button"
+            className="btn btn-dark hover:btn-ouline"
+            onClick={startCheckout}
+            disabled={Boolean(loadingPlanId)}
+          >
+            {loadingPlanId ? "Starting sign up..." : `Sign Up For ${selectedPlan?.label || "Plan"}`}
+          </button>
+        ) : (
+          <Link to="/login" style={{ display: "inline-flex" }}>
+            <button type="button" className="btn btn-dark hover:btn-ouline">
+              SIGN UP
             </button>
-          ) : (
-            <Link to="/login">
-              <button type="button" className="btn btn-dark hover:btn-ouline">
-                SIGN UP
-              </button>
-            </Link>
-          )}
-          {error && <p style={{ color: "red", marginTop: 12 }}>{error}</p>}
-        </div>
-      </center>
+          </Link>
+        )}
+        {error && (
+          <p style={{ color: "red", marginTop: 12, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
+            {error}
+          </p>
+        )}
+      </div>
     </div>
   );
 };
