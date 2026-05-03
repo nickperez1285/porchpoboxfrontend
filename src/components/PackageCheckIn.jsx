@@ -234,10 +234,6 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                 >
                   <div>
                     <strong>{user.name || "Unnamed user"}</strong>
-                    <div>{user.email || "No email"}</div>
-                    <div style={{ fontSize: "0.9em", color: "#666" }}>
-                      Received: {user.totalReceived}, Picked Up: {user.totalPickedUp}
-                    </div>
                     <button
                       onClick={() => toggleExpanded(user.id)}
                       style={{
