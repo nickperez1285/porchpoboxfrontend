@@ -15,6 +15,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [expandedUserIds, setExpandedUserIds] = useState([]);
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -65,6 +66,14 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       `${user.name || ""} ${user.email || ""}`.toLowerCase().includes(term)
     );
   }, [search, users]);
+
+  const toggleExpanded = (userId) => {
+    setExpandedUserIds((current) =>
+      current.includes(userId)
+        ? current.filter((id) => id !== userId)
+        : [...current, userId]
+    );
+  };
 
   const getNormalizedPackageQuantity = (userId) =>
     Math.max(1, Number(packageQuantities[userId]) || 1);
@@ -216,10 +225,6 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                 <li
                   key={user.id}
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 12,
                     borderBottom: "1px solid #eee",
                     background: getCustomerBackgroundColor(user),
                     borderRadius: 12,
@@ -233,8 +238,35 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     <div style={{ fontSize: "0.9em", color: "#666" }}>
                       Received: {user.totalReceived}, Picked Up: {user.totalPickedUp}
                     </div>
+                    <button
+                      onClick={() => toggleExpanded(user.id)}
+                      style={{
+                        marginTop: 4,
+                        padding: "4px 8px",
+                        background: "#f0f0f0",
+                        border: "1px solid #ccc",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        fontSize: "0.8em"
+                      }}
+                    >
+                      {expandedUserIds.includes(user.id) ? "Hide INFO" : "INFO"}
+                    </button>
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  {expandedUserIds.includes(user.id) && (
+                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #eee", fontSize: "0.9em", background: "#f9f9f9", padding: 8, borderRadius: 4 }}>
+                      <div><strong>Contact Information:</strong></div>
+                      <div>Email: {user.email || "Not provided"}</div>
+                      <div>Phone: {user.phone || "Not provided"}</div>
+                      <div>Address: {user.address || "Not provided"}</div>
+                      <div style={{ marginTop: 8 }}><strong>Check-in History:</strong></div>
+                      <div>Total Packages Received: {user.totalReceived}</div>
+                      <div>Total Packages Picked Up: {user.totalPickedUp}</div>
+                      <div>Current Packages Waiting: {user.packageCount}</div>
+                      <div>Status: {user.status || "Unknown"}</div>
+                    </div>
+                  )}
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
                     <input
                       type="number"
                       min="1"
