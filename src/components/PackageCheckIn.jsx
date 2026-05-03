@@ -199,7 +199,6 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     alignItems: "center",
                     justifyContent: "space-between",
                     gap: 12,
-                    padding: "10px 0",
                     borderBottom: "1px solid #eee",
                     background: getCustomerBackgroundColor(user),
                     borderRadius: 12,
