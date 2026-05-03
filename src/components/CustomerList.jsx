@@ -33,7 +33,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           packageCountsSnapshot.docs.map((entry) => [
             entry.id,
             {
-              count: entry.data().count || 0,
+              count: Number(entry.data().count) || 0,
               holdForResubscribe: Boolean(entry.data().holdForResubscribe)
             }
           ])
@@ -73,7 +73,12 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       return;
     }
 
-    const shouldKeepRedStatus = user.status !== "active" && (user.packageCount || 0) > 1;
+    const packageCount = Number(user.packageCount) || 0;
+    if (packageCount === 0) {
+      return;
+    }
+
+    const shouldKeepRedStatus = user.status !== "active" && packageCount > 1;
     const confirmed = window.confirm(
       shouldKeepRedStatus
         ? "Would you like to mark packages as delivered?\n\nReminder: this customer is inactive and will not be able to use Porch P.O. Box again until they subscribe and make payment."
@@ -88,7 +93,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
 
     try {
       const userDocUpdates = {
-        deliveredPackageCount: increment(user.packageCount)
+        deliveredPackageCount: increment(packageCount)
       };
 
       if (partnerLocationName) {
@@ -109,8 +114,9 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       } else {
         await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
       }
+
       await updateDoc(doc(db, "partners", vendorId), {
-        packageCheckInCount: increment(-user.packageCount)
+        packageCheckInCount: increment(-packageCount)
       });
 
       setUsers((current) =>
@@ -120,7 +126,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
               ? {
                 ...entry,
                 packageCount: 0,
-                holdForResubscribe: shouldKeepRedStatus || entry.holdForResubscribe
+                holdForResubscribe: shouldKeepRedStatus && entry.status !== "active"
               }
               : entry
           )
@@ -129,11 +135,12 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       setExpandedUserIds((current) => current.filter((id) => id !== user.id));
 
       if (onPackagesDelivered) {
-        onPackagesDelivered(user.packageCount);
+        onPackagesDelivered(packageCount);
       }
     } catch (deliveryError) {
       console.error("Error marking packages as delivered:", deliveryError);
-      setError("Unable to mark packages as delivered.");
+      const errorDetail = deliveryError?.message || String(deliveryError);
+      setError(`Unable to mark packages as delivered. ${errorDetail}`);
     } finally {
       setDeliveringUserId("");
     }

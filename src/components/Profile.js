@@ -36,7 +36,7 @@ const Profile = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
   const hasActiveSubscription = Boolean(
     profileData?.status === "active" &&
-    (profileData?.subscribedAt || profileData?.subscriptionEndsAt)
+    (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
   );
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Profile = ({ user }) => {
           borderRadius: 18,
           padding: "28px 24px",
           marginBottom: 24,
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.18)"
+          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.18)",
         }}
       >
         <div
@@ -81,14 +81,24 @@ const Profile = ({ user }) => {
             flexWrap: "wrap",
             justifyContent: "space-between",
             gap: 20,
-            alignItems: "flex-start"
+            alignItems: "flex-start",
           }}
         >
           <div>
-            <p style={{ margin: 0, color: "#d4af37", letterSpacing: 1.2, textTransform: "uppercase", fontSize: 12 }}>
+            <p
+              style={{
+                margin: 0,
+                color: "#d4af37",
+                letterSpacing: 1.2,
+                textTransform: "uppercase",
+                fontSize: 12,
+              }}
+            >
               User Profile
             </p>
-            <h2 style={{ margin: "8px 0 6px" }}>{user.displayName || profileData?.name || "Account Holder"}</h2>
+            <h2 style={{ margin: "8px 0 6px" }}>
+              {user.displayName || profileData?.name || "Account Holder"}
+            </h2>
             <p style={{ margin: 0, color: "#d6d6d6" }}>
               Manage your account details and mailing information.
             </p>
@@ -100,12 +110,19 @@ const Profile = ({ user }) => {
               background: "rgba(255, 255, 255, 0.06)",
               border: "1px solid rgba(255, 255, 255, 0.1)",
               borderRadius: 14,
-              padding: 16
+              padding: 16,
             }}
           >
             {hasActiveSubscription ? (
               <>
-                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    color: "#c8c8c8",
+                  }}
+                >
                   Subscription Status
                 </div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
@@ -114,7 +131,14 @@ const Profile = ({ user }) => {
               </>
             ) : (
               <>
-                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    textTransform: "uppercase",
+                    letterSpacing: 1,
+                    color: "#c8c8c8",
+                  }}
+                >
                   Primary Email
                 </div>
                 <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
@@ -130,7 +154,7 @@ const Profile = ({ user }) => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 20
+          gap: 20,
         }}
       >
         <div
@@ -138,96 +162,229 @@ const Profile = ({ user }) => {
             border: "1px solid #ddd",
             borderRadius: 16,
             padding: 24,
-            background: "#fff"
+            background: "#fff",
           }}
         >
           <h3 style={{ marginTop: 0 }}>Contact Information</h3>
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Name</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{user.displayName || profileData?.name || "Not provided"}</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Name
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {user.displayName || profileData?.name || "Not provided"}
+            </div>
           </div>
           <div style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Email</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{user.email || "Not available"}</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Email
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {user.email || "Not available"}
+            </div>
           </div>
           <div>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Phone</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.phoneNumber || "Not provided"}</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Phone
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {profileData?.phoneNumber || "Not provided"}
+            </div>
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <Link to="/profile/edit">Edit</Link>
           </div>
         </div>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: 16,
-          padding: 24,
-          background: "#fff"
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Street Address</div>
-          <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.streetAddress || "Not provided"}</div>
-        </div>
-        <div style={{ marginBottom: 18 }}>
-          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>City</div>
-          <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.city || "Not provided"}</div>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-          <div>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>State</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.state || "Not provided"}</div>
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#fff",
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Street Address
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {profileData?.streetAddress || "Not provided"}
+            </div>
           </div>
-          <div>
-            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Zip Code</div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.zipCode || "Not provided"}</div>
+          <div style={{ marginBottom: 18 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              City
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {profileData?.city || "Not provided"}
+            </div>
+          </div>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#666",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.8,
+                }}
+              >
+                State
+              </div>
+              <div style={{ marginTop: 4, fontSize: 18 }}>
+                {profileData?.state || "Not provided"}
+              </div>
+            </div>
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#666",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.8,
+                }}
+              >
+                Zip Code
+              </div>
+              <div style={{ marginTop: 4, fontSize: 18 }}>
+                {profileData?.zipCode || "Not provided"}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: 16,
-          padding: 24,
-          background: "#faf7ef"
-        }}
-      >
-        <h3 style={{ marginTop: 0 }}>Account</h3>
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
-          <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
-        </div>
-        {hasActiveSubscription && (
-          <>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Status</div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>{profileData?.status}</div>
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#faf7ef",
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Account</h3>
+          <div style={{ marginBottom: 16 }}>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Account Type
             </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscribed On</div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscribedAt)}</div>
-            </div>
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Subscription Ends</div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>{formatDate(profileData?.subscriptionEndsAt)}</div>
-            </div>
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Days Left</div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>{getDaysLeft(profileData?.subscriptionEndsAt)}</div>
-            </div>
-          </>
-        )}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-          <Link to="/">Home</Link>
-          <Link to="/profile/edit">Edit</Link>
-          <button type="button" onClick={handleLogout}>
-            Logout
-          </button>
+            <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
+          </div>
+          {hasActiveSubscription && (
+            <>
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#666",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                  }}
+                >
+                  Subscription Status
+                </div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>
+                  {profileData?.status}
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#666",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                  }}
+                >
+                  Subscribed On
+                </div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>
+                  {formatDate(profileData?.subscribedAt)}
+                </div>
+              </div>
+              <div style={{ marginBottom: 16 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#666",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                  }}
+                >
+                  Subscription Ends
+                </div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>
+                  {formatDate(profileData?.subscriptionEndsAt)}
+                </div>
+              </div>
+              <div style={{ marginBottom: 20 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#666",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                  }}
+                >
+                  Days Left
+                </div>
+                <div style={{ marginTop: 4, fontSize: 18 }}>
+                  {getDaysLeft(profileData?.subscriptionEndsAt)}
+                </div>
+              </div>
+            </>
+          )}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <button type="button" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>
-    </div >
   );
 };
 
