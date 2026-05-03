@@ -83,6 +83,11 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     }));
   };
 
+  const getCustomerBackgroundColor = (user) => {
+    const isActive = user.status === "active";
+    return isActive ? "#ffffff" : "#ffd9d9";
+  };
+
   const handleCheckIn = async () => {
     setSubmitting(true);
     setError("");
@@ -195,7 +200,11 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     justifyContent: "space-between",
                     gap: 12,
                     padding: "10px 0",
-                    borderBottom: "1px solid #eee"
+                    borderBottom: "1px solid #eee",
+                    background: getCustomerBackgroundColor(user),
+                    borderRadius: 12,
+                    padding: 16,
+                    marginBottom: 8
                   }}
                 >
                   <div>
