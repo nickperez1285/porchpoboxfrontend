@@ -33,6 +33,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
             entry.id,
             {
               count: Number(entry.data().count) || 0,
+              totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
+              totalPickedUp: Number(entry.data().totalPickedUp) || 0,
               holdForResubscribe: Boolean(entry.data().holdForResubscribe)
             }
           ])
@@ -43,6 +45,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
             id: doc.id,
             ...doc.data(),
             packageCount: packageCounts[doc.id]?.count || 0,
+            totalReceived: packageCounts[doc.id]?.totalReceived || 0,
+            totalPickedUp: packageCounts[doc.id]?.totalPickedUp || 0,
             holdForResubscribe: packageCounts[doc.id]?.holdForResubscribe || false
           }))
           .filter(
@@ -95,6 +99,11 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     setError("");
 
     try {
+      const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
+      await updateDoc(packageCountRef, {
+        totalPickedUp: increment(packageCount)
+      });
+
       if (shouldKeepRedStatus) {
         await setDoc(
           doc(db, "partners", vendorId, "packageCounts", user.id),

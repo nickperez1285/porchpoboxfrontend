@@ -19,11 +19,29 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   useEffect(() => {
     const loadUsers = async () => {
       try {
-        const snapshot = await getDocs(collection(db, "users"));
+        const [usersSnapshot, packageCountsSnapshot] = await Promise.all([
+          getDocs(collection(db, "users")),
+          getDocs(collection(db, "partners", partnerProfile.id, "packageCounts"))
+        ]);
+
+        const packageCounts = Object.fromEntries(
+          packageCountsSnapshot.docs.map((entry) => [
+            entry.id,
+            {
+              count: Number(entry.data().count) || 0,
+              totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
+              totalPickedUp: Number(entry.data().totalPickedUp) || 0
+            }
+          ])
+        );
+
         setUsers(
-          snapshot.docs.map((entry) => ({
+          usersSnapshot.docs.map((entry) => ({
             id: entry.id,
-            ...entry.data()
+            ...entry.data(),
+            packageCount: packageCounts[entry.id]?.count || 0,
+            totalReceived: packageCounts[entry.id]?.totalReceived || 0,
+            totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0
           }))
         );
       } catch (loadError) {
@@ -35,7 +53,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     };
 
     loadUsers();
-  }, []);
+  }, [partnerProfile.id]);
 
   const filteredUsers = useMemo(() => {
     const term = search.trim().toLowerCase();
@@ -137,15 +155,18 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             "packageCounts",
             user.id
           );
-          const existingCountSnapshot = await getDoc(packageCountRef);
-          const existingCount = existingCountSnapshot.exists()
-            ? existingCountSnapshot.data().count || 0
-            : 0;
+          const existingSnapshot = await getDoc(packageCountRef);
+          const existingData = existingSnapshot.exists() ? existingSnapshot.data() : {};
+          const currentCount = Number(existingData.count) || 0;
+          const currentTotalReceived = Number(existingData.totalReceived) || currentCount;
+          const currentTotalPickedUp = Number(existingData.totalPickedUp) || 0;
 
           return setDoc(
             packageCountRef,
             {
-              count: existingCount + packageQuantity,
+              count: currentCount + packageQuantity,
+              totalReceived: currentTotalReceived + packageQuantity,
+              totalPickedUp: currentTotalPickedUp,
               name: user.name || "Unnamed user",
               email: user.email || ""
             },
@@ -209,6 +230,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                   <div>
                     <strong>{user.name || "Unnamed user"}</strong>
                     <div>{user.email || "No email"}</div>
+                    <div style={{ fontSize: "0.9em", color: "#666" }}>
+                      Received: {user.totalReceived}, Picked Up: {user.totalPickedUp}
+                    </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <input
