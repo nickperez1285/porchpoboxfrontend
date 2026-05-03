@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import {
-  arrayUnion,
   collection,
   deleteDoc,
   doc,
@@ -92,16 +91,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     setError("");
 
     try {
-      const userDocUpdates = {
-        deliveredPackageCount: increment(packageCount)
-      };
-
-      if (partnerLocationName) {
-        userDocUpdates.deliveredPickupLocations = arrayUnion(partnerLocationName);
-      }
-
-      await updateDoc(doc(db, "users", user.id), userDocUpdates);
-
       if (shouldKeepRedStatus) {
         await setDoc(
           doc(db, "partners", vendorId, "packageCounts", user.id),
