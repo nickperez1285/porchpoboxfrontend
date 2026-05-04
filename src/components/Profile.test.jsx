@@ -3,7 +3,17 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { within } from "@testing-library/dom";
 import { MemoryRouter } from "react-router-dom";
 import Profile from "./Profile";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  collectionGroup,
+  doc,
+  documentId,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where
+} from "firebase/firestore";
 
 const mockNavigate = jest.fn();
 
@@ -18,9 +28,14 @@ jest.mock("firebase/auth", () => ({
 
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
+  collectionGroup: jest.fn(),
   doc: jest.fn(),
+  documentId: jest.fn(),
   getDoc: jest.fn(),
-  getDocs: jest.fn()
+  getDocs: jest.fn(),
+  onSnapshot: jest.fn(),
+  query: jest.fn(),
+  where: jest.fn()
 }));
 
 jest.mock("react-router-dom", () => {
@@ -42,9 +57,15 @@ describe("Profile", () => {
     collection.mockImplementation((...segments) =>
       segments.map((segment) => (typeof segment === "string" ? segment : "mock-db")).join("/")
     );
+    collectionGroup.mockImplementation((...segments) =>
+      segments.map((segment) => (typeof segment === "string" ? segment : "mock-db")).join("/")
+    );
     doc.mockImplementation((...segments) =>
       segments.map((segment) => (typeof segment === "string" ? segment : "mock-db")).join("/")
     );
+    documentId.mockReturnValue("document-id");
+    where.mockImplementation((...args) => ({ type: "where", args }));
+    query.mockImplementation((target, ...clauses) => ({ target, clauses }));
   });
 
   it("shows package history when the preserved partner package doc has zero current count", async () => {
@@ -64,16 +85,31 @@ describe("Profile", () => {
             businessName: "Main Street Partner"
           })
         ]
-      })
-      .mockResolvedValueOnce({
+      });
+
+    onSnapshot.mockImplementation((target, onNext) => {
+      onNext({
         docs: [
-          createDoc("user-1", {
-            count: 0,
-            totalReceived: 1,
-            totalPickedUp: 1
-          })
+          {
+            id: "user-1",
+            data: () => ({
+              count: 0,
+              totalReceived: 1,
+              totalPickedUp: 1
+            }),
+            ref: {
+              parent: {
+                parent: {
+                  path: "partners/partner-1"
+                }
+              }
+            }
+          }
         ]
       });
+
+      return jest.fn();
+    });
 
     render(
       <MemoryRouter>
@@ -99,8 +135,14 @@ describe("Profile", () => {
 
     await waitFor(() => {
       expect(getDocs).toHaveBeenCalledWith(expect.stringContaining("partners"));
-      expect(getDocs).toHaveBeenCalledWith(
-        expect.stringContaining("partners/partner-1/packageCounts")
+      expect(collectionGroup).toHaveBeenCalledWith(expect.anything(), "packageCounts");
+      expect(where).toHaveBeenCalledWith("document-id", "==", "user-1");
+      expect(onSnapshot).toHaveBeenCalledWith(
+        expect.objectContaining({
+          target: expect.stringContaining("packageCounts")
+        }),
+        expect.any(Function),
+        expect.any(Function)
       );
     });
   });

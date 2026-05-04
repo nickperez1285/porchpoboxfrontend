@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { doc, getDoc, getDocs, collection } from "firebase/firestore";
+import {
+  collection,
+  collectionGroup,
+  doc,
+  documentId,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  where
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const formatDate = (value) => {
@@ -93,49 +103,64 @@ const Profile = ({ user }) => {
       setPackagesLoading(true);
       try {
         const partnersSnapshot = await getDocs(collection(db, "partners"));
-        const partnersList = partnersSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const partnersById = Object.fromEntries(
+          partnersSnapshot.docs.map((entry) => [
+            entry.id,
+            {
+              id: entry.id,
+              ...entry.data()
+            }
+          ])
+        );
 
-        const allPackages = [];
+        const userPackageHistoryQuery = query(
+          collectionGroup(db, "packageCounts"),
+          where(documentId(), "==", user.uid)
+        );
 
-        const packagePromises = partnersList.map(async (partner) => {
-          try {
-            const packageCountsSnapshot = await getDocs(
-              collection(db, "partners", partner.id, "packageCounts")
-            );
+        return onSnapshot(
+          userPackageHistoryQuery,
+          (snapshot) => {
+            const allPackages = snapshot.docs.map((entry) => {
+              const data = entry.data();
+              const parentPathSegments = entry.ref.parent.parent?.path?.split("/") || [];
+              const partnerId = parentPathSegments[parentPathSegments.length - 1] || "";
+              const partner = partnersById[partnerId];
 
-            const userPackageDoc = packageCountsSnapshot.docs.find(
-              (doc) => doc.id === user.uid
-            );
-
-            if (userPackageDoc) {
-              const data = userPackageDoc.data();
-              allPackages.push({
-                partnerName: partner.businessName || "Unknown Partner",
-                partnerId: partner.id,
+              return {
+                partnerName: partner?.businessName || "Unknown Partner",
+                partnerId,
                 totalReceived: Number(data.totalReceived) || 0,
                 totalPickedUp: Number(data.totalPickedUp) || 0,
                 currentWaiting: Number(data.count) || 0
-              });
-            }
-          } catch (error) {
-            console.error(`Error loading packages for partner ${partner.id}:`, error);
-          }
-        });
+              };
+            });
 
-        await Promise.all(packagePromises);
-        setPackageHistory(allPackages);
+            setPackageHistory(allPackages);
+            setPackagesLoading(false);
+          },
+          (error) => {
+            console.error("Error loading package history:", error);
+            setPackagesLoading(false);
+          }
+        );
       } catch (error) {
         console.error("Error loading package history:", error);
-      } finally {
         setPackagesLoading(false);
       }
     };
 
     loadProfile();
-    loadPackageHistory();
+    let unsubscribePromise = Promise.resolve(() => {});
+    unsubscribePromise = Promise.resolve(loadPackageHistory());
+
+    return () => {
+      unsubscribePromise.then((unsubscribe) => {
+        if (typeof unsubscribe === "function") {
+          unsubscribe();
+        }
+      });
+    };
   }, [user.uid]);
 
   const handleLogout = async () => {
