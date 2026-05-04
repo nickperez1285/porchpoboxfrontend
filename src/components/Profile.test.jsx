@@ -7,6 +7,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot
 } from "firebase/firestore";
 
@@ -25,6 +26,7 @@ jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
   doc: jest.fn(),
   getDoc: jest.fn(),
+  getDocs: jest.fn(),
   onSnapshot: jest.fn()
 }));
 
@@ -62,18 +64,29 @@ describe("Profile", () => {
       })
     });
 
+    getDocs.mockResolvedValue({
+      docs: [
+        createDoc("partner-1", {
+          businessName: "Main Street Partner"
+        })
+      ]
+    });
+
     onSnapshot.mockImplementation((target, onNext) => {
-      onNext({
-        docs: [
-          createDoc("partner-1", {
-            partnerId: "partner-1",
-            partnerName: "Main Street Partner",
-            currentWaiting: 0,
+      if (String(target).includes("partners/partner-1/packageCounts/user-1")) {
+        onNext({
+          exists: () => true,
+          data: () => ({
+            count: 0,
             totalReceived: 1,
             totalPickedUp: 1
           })
-        ]
-      });
+        });
+      } else {
+        onNext({
+          docs: []
+        });
+      }
 
       return jest.fn();
     });
@@ -101,8 +114,14 @@ describe("Profile", () => {
     expect(within(waiting).getByText("0")).toBeInTheDocument();
 
     await waitFor(() => {
+      expect(getDocs).toHaveBeenCalledWith(expect.stringContaining("partners"));
       expect(onSnapshot).toHaveBeenCalledWith(
         expect.stringContaining("users/user-1/packageHistory"),
+        expect.any(Function),
+        expect.any(Function)
+      );
+      expect(onSnapshot).toHaveBeenCalledWith(
+        expect.stringContaining("partners/partner-1/packageCounts/user-1"),
         expect.any(Function),
         expect.any(Function)
       );

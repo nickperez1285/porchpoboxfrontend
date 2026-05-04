@@ -5,6 +5,7 @@ import {
   collection,
   doc,
   getDoc,
+  getDocs,
   onSnapshot
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -100,35 +101,117 @@ const Profile = ({ user }) => {
       setPackagesLoading(true);
 
       try {
-        return onSnapshot(
+        const partnersSnapshot = await getDocs(collection(db, "partners"));
+        if (isCancelled) {
+          return () => {};
+        }
+
+        const partnersList = partnersSnapshot.docs.map((entry) => ({
+          id: entry.id,
+          ...entry.data()
+        }));
+        const partnerHistoryMap = new Map();
+        const userHistoryMap = new Map();
+        const initializedPartnerIds = new Set();
+        let userHistoryInitialized = false;
+
+        const syncPackageHistory = () => {
+          const nextHistory = [];
+
+          partnersList.forEach((partner) => {
+            const userOwnedHistory = userHistoryMap.get(partner.id);
+            const partnerOwnedHistory = partnerHistoryMap.get(partner.id);
+            const historyEntry = userOwnedHistory || partnerOwnedHistory;
+
+            if (historyEntry) {
+              nextHistory.push({
+                partnerId: partner.id,
+                partnerName:
+                  historyEntry.partnerName || partner.businessName || "Unknown Partner",
+                totalReceived: Number(historyEntry.totalReceived) || 0,
+                totalPickedUp: Number(historyEntry.totalPickedUp) || 0,
+                currentWaiting: Number(historyEntry.currentWaiting) || 0
+              });
+            }
+          });
+
+          setPackageHistory(nextHistory);
+          if (initializedPartnerIds.size === partnersList.length && userHistoryInitialized) {
+            setPackagesLoading(false);
+          }
+        };
+
+        const partnerUnsubscribes = partnersList.map((partner) =>
+          onSnapshot(
+            doc(db, "partners", partner.id, "packageCounts", user.uid),
+            (snapshot) => {
+              if (snapshot.exists()) {
+                const data = snapshot.data();
+                partnerHistoryMap.set(partner.id, {
+                  partnerName: partner.businessName || "Unknown Partner",
+                  totalReceived: Number(data.totalReceived) || 0,
+                  totalPickedUp: Number(data.totalPickedUp) || 0,
+                  currentWaiting: Number(data.count) || 0
+                });
+              } else {
+                partnerHistoryMap.delete(partner.id);
+              }
+
+              initializedPartnerIds.add(partner.id);
+              if (!isCancelled) {
+                syncPackageHistory();
+              }
+            },
+            (error) => {
+              console.error(`Error loading packages for partner ${partner.id}:`, error);
+              initializedPartnerIds.add(partner.id);
+              if (!isCancelled) {
+                syncPackageHistory();
+              }
+            }
+          )
+        );
+
+        const userHistoryUnsubscribe = onSnapshot(
           collection(db, "users", user.uid, "packageHistory"),
           (snapshot) => {
-            if (isCancelled) {
-              return;
-            }
+            userHistoryMap.clear();
 
-            const nextHistory = snapshot.docs.map((entry) => {
+            snapshot.docs.forEach((entry) => {
               const data = entry.data();
-
-              return {
-                partnerId: data.partnerId || entry.id,
+              userHistoryMap.set(data.partnerId || entry.id, {
                 partnerName: data.partnerName || "Unknown Partner",
                 totalReceived: Number(data.totalReceived) || 0,
                 totalPickedUp: Number(data.totalPickedUp) || 0,
                 currentWaiting: Number(data.currentWaiting) || 0
-              };
+              });
             });
 
-            setPackageHistory(nextHistory);
-            setPackagesLoading(false);
+            userHistoryInitialized = true;
+            if (!isCancelled) {
+              syncPackageHistory();
+            }
           },
           (error) => {
             console.error("Error loading package history:", error);
+            userHistoryInitialized = true;
             if (!isCancelled) {
-              setPackagesLoading(false);
+              syncPackageHistory();
             }
           }
         );
+
+        return () => {
+          partnerUnsubscribes.forEach((unsubscribe) => {
+            if (typeof unsubscribe === "function") {
+              unsubscribe();
+            }
+          });
+
+          if (typeof userHistoryUnsubscribe === "function") {
+            userHistoryUnsubscribe();
+          }
+        };
       } catch (error) {
         console.error("Error loading package history:", error);
         setPackagesLoading(false);
