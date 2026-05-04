@@ -122,7 +122,9 @@ const Profile = ({ user }) => {
                   historyEntry.partnerName || partner.businessName || "Unknown Partner",
                 totalReceived: Number(historyEntry.totalReceived) || 0,
                 totalPickedUp: Number(historyEntry.totalPickedUp) || 0,
-                currentWaiting: Number(historyEntry.currentWaiting) || 0
+                currentWaiting: partnerOwnedHistory
+                  ? Number(partnerOwnedHistory.currentWaiting) || 0
+                  : Number(historyEntry.currentWaiting) || 0
               });
             }
           });
