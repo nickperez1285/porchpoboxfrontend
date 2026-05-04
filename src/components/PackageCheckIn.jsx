@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, doc, getDoc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
 import PartnerStatusLegend from "./PartnerStatusLegend";
@@ -161,45 +161,6 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           body?.message || responseText || "Package notification email failed."
         );
       }
-
-      // Update partner's total package check-in count
-      const updatePartnerPromise = updateDoc(doc(db, "partners", partnerProfile.id), {
-        packageCheckInCount: increment(totalSelectedPackages)
-      });
-
-      // Update each user's package counts
-      const updatePackageCountsPromise = Promise.all(
-        selectedUsers.map(async (user) => {
-          const packageQuantity = getNormalizedPackageQuantity(user.id);
-          const packageCountRef = doc(
-            db,
-            "partners",
-            partnerProfile.id,
-            "packageCounts",
-            user.id
-          );
-          const existingSnapshot = await getDoc(packageCountRef);
-          const existingData = existingSnapshot.exists() ? existingSnapshot.data() : {};
-          const currentCount = Number(existingData.count) || 0;
-          const currentTotalReceived = Number(existingData.totalReceived) || currentCount;
-          const currentTotalPickedUp = Number(existingData.totalPickedUp) || 0;
-
-          return setDoc(
-            packageCountRef,
-            {
-              count: currentCount + packageQuantity,
-              totalReceived: currentTotalReceived + packageQuantity,
-              totalPickedUp: currentTotalPickedUp,
-              name: user.name || "Unnamed user",
-              email: user.email || ""
-            },
-            { merge: true }
-          );
-        })
-      );
-
-      // Wait for all updates to complete
-      await Promise.all([updatePartnerPromise, updatePackageCountsPromise]);
 
       if (onPackagesCheckedIn) {
         await onPackagesCheckedIn();
