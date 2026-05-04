@@ -3,15 +3,15 @@ import React from "react";
 const legendItems = [
   {
     color: "#ffffff",
-    label: "Subscription paid and active"
+    label: "Paid up or new users (never used service)"
   },
   {
     color: "#fff6bf",
-    label: "User is trial period"
+    label: "Received one package"
   },
   {
     color: "#ffd9d9",
-    label: "User requires payment"
+    label: "Not paid up and received more than one package"
   }
 ];
 

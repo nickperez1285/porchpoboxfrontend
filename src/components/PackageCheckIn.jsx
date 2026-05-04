@@ -111,8 +111,16 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   };
 
   const getCustomerBackgroundColor = (user) => {
-    const isActive = user.status === "active";
-    return isActive ? "#ffffff" : "#ffd9d9";
+    const isPaidUp = user.status === "active";
+    const totalReceived = user.totalReceived || 0;
+
+    if (isPaidUp || totalReceived === 0) {
+      return "#ffffff"; // White: paid up or new/never used
+    } else if (totalReceived === 1) {
+      return "#fff6bf"; // Yellow: received one package
+    } else {
+      return "#ffd9d9"; // Red: not paid up and received more than one
+    }
   };
 
   const handleCheckIn = async () => {
@@ -225,6 +233,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                 <li
                   key={user.id}
                   style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                     borderBottom: "1px solid #eee",
                     background: getCustomerBackgroundColor(user),
                     borderRadius: 12,
@@ -232,12 +243,15 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     marginBottom: 8
                   }}
                 >
-                  <div>
+                  <div style={{ position: "relative", flex: 1 }}>
                     <strong>{user.name || "Unnamed user"}</strong>
                     <button
                       onClick={() => toggleExpanded(user.id)}
                       style={{
-                        marginTop: 4,
+                        position: "absolute",
+                        bottom: 0,
+                        left: "50%",
+                        transform: "translateX(-50%)",
                         padding: "4px 8px",
                         background: "#f0f0f0",
                         border: "1px solid #ccc",
@@ -250,7 +264,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     </button>
                   </div>
                   {expandedUserIds.includes(user.id) && (
-                    <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #eee", fontSize: "0.9em", background: "#f9f9f9", padding: 8, borderRadius: 4 }}>
+                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, marginTop: 8, paddingTop: 8, borderTop: "1px solid #eee", fontSize: "0.9em", background: "#f9f9f9", padding: 8, borderRadius: 4, zIndex: 1 }}>
                       <div><strong>Contact Information:</strong></div>
                       <div>Email: {user.email || "Not provided"}</div>
                       <div>Phone: {user.phone || "Not provided"}</div>
@@ -262,7 +276,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                       <div>Status: {user.status || "Unknown"}</div>
                     </div>
                   )}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <input
                       type="number"
                       min="1"
@@ -270,7 +284,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                       value={packageQuantities[user.id] ?? "1"}
                       onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
                       onBlur={() => finalizePackageQuantity(user.id)}
-                      style={{ width: 72, padding: 8 }}
+                      style={{ width: 40, padding: 8 }}
                       aria-label={`Package count for ${user.name || "user"}`}
                     />
                     <input
