@@ -77,79 +77,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     );
   };
 
-  const handleMarkDelivered = async (user) => {
-    if (!vendorId || !user.packageCount) {
-      return;
-    }
-
-    const packageCount = Number(user.packageCount) || 0;
-    if (packageCount === 0) {
-      return;
-    }
-
-    const shouldKeepRedStatus = user.status !== "active" && packageCount > 1;
-    const confirmed = window.confirm(
-      shouldKeepRedStatus
-        ? "Would you like to mark packages as delivered?\n\nReminder: this customer is inactive and will not be able to use Porch P.O. Box again until they subscribe and make payment."
-        : "Would you like to mark packages as delivered?"
-    );
-    if (!confirmed) {
-      return;
-    }
-
-    setDeliveringUserId(user.id);
-    setError("");
-
-    try {
-      const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
-      await updateDoc(packageCountRef, {
-        totalPickedUp: increment(packageCount)
-      });
-
-      if (shouldKeepRedStatus) {
-        await setDoc(
-          doc(db, "partners", vendorId, "packageCounts", user.id),
-          {
-            count: 0,
-            holdForResubscribe: true
-          },
-          { merge: true }
-        );
-      } else {
-        await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
-      }
-
-      await updateDoc(doc(db, "partners", vendorId), {
-        packageCheckInCount: increment(-packageCount)
-      });
-
-      setUsers((current) =>
-        current
-          .map((entry) =>
-            entry.id === user.id
-              ? {
-                ...entry,
-                packageCount: 0,
-                holdForResubscribe: shouldKeepRedStatus && entry.status !== "active"
-              }
-              : entry
-          )
-          .filter((entry) => entry.packageCount > 0 || entry.holdForResubscribe)
-      );
-      setExpandedUserIds((current) => current.filter((id) => id !== user.id));
-
-      if (onPackagesDelivered) {
-        onPackagesDelivered(packageCount);
-      }
-    } catch (deliveryError) {
-      console.error("Error marking packages as delivered:", deliveryError);
-      const errorDetail = deliveryError?.message || String(deliveryError);
-      setError(`Unable to mark packages as delivered. ${errorDetail}`);
-    } finally {
-      setDeliveringUserId("");
-    }
-  };
-
   const handleDeliverSelected = async () => {
     if (selectedUserIds.length === 0) {
       return;
@@ -314,23 +241,25 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
         >
           Active Deliveries
         </div>
-        <h2 style={{ margin: "8px 0 16px" }}> Packages Checked In</h2>
-        <button
-          type="button"
-          onClick={() => handleDeliverSelected()}
-          disabled={selectedUserIds.length === 0 || deliveringUserId}
-          style={{
-            padding: "8px 16px",
-            background: selectedUserIds.length === 0 ? "#ccc" : "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: 4,
-            cursor: selectedUserIds.length === 0 ? "not-allowed" : "pointer",
-            marginBottom: 16
-          }}
-        >
-          {deliveringUserId ? "Delivering..." : `Deliver Selected (${selectedUserIds.length})`}
-        </button>
+        <h2 style={{ margin: "8px 0 0" }}> Packages Checked In</h2>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => handleDeliverSelected()}
+        disabled={selectedUserIds.length === 0 || deliveringUserId}
+        style={{
+          padding: "8px 16px",
+          background: selectedUserIds.length === 0 ? "#ccc" : "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: selectedUserIds.length === 0 ? "not-allowed" : "pointer",
+          marginBottom: 16
+        }}
+      >
+        {deliveringUserId ? "Delivering..." : `Deliver Selected (${selectedUserIds.length})`}
+      </button>
 
       {loading ? (
         <p>Loading...</p>
