@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
 import { db } from "../firebase";
+
+// Fix default marker icons broken by webpack
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png")
+});
 
 const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
@@ -27,12 +38,33 @@ const MainPage = ({ user, userStatus }) => {
       const vendorSnapshot = await getDocs(
         query(collection(db, "partners"), where("approved", "==", true)),
       );
-      setActiveVendors(
-        vendorSnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        })),
+      const vendors = vendorSnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      // Geocode each vendor address
+      const withCoords = await Promise.all(
+        vendors.map(async (vendor) => {
+          const address = [vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
+            .filter(Boolean)
+            .join(", ");
+          if (!address) return vendor;
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
+              { headers: { "Accept-Language": "en" } }
+            );
+            const data = await res.json();
+            if (data[0]) {
+              return { ...vendor, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            }
+          } catch (_) {}
+          return vendor;
+        })
       );
+
+      setActiveVendors(withCoords);
     } catch (error) {
       console.error("Error loading active vendors:", error);
       setActiveVendors([]);
@@ -122,86 +154,110 @@ const MainPage = ({ user, userStatus }) => {
             justifyContent: "center",
           }}
         >
-          <div
-            style={{
-              flex: "1 1 320px",
-              minWidth: 280,
-              maxWidth: 420,
-              maxHeight: 420,
-              overflowY: "auto",
-              background: "#fffdf8",
-              border: "1px solid rgba(0, 0, 0, 0.08)",
-              borderRadius: 20,
-              padding: 22,
-              color: "#181818",
-              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <div style={{ marginBottom: 18 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#8a6a00",
-                  letterSpacing: 1,
-                  textTransform: "uppercase",
-                }}
-              >
-                Active Locations
+          {/* Active locations list + map side by side */}
+          <div style={{ flex: "1 1 320px", minWidth: 280, maxWidth: 720, display: "flex", flexWrap: "wrap", gap: 16 }}>
+            <div
+              style={{
+                flex: "1 1 220px",
+                maxHeight: 420,
+                overflowY: "auto",
+                background: "#fffdf8",
+                border: "1px solid rgba(0, 0, 0, 0.08)",
+                borderRadius: 20,
+                padding: 22,
+                color: "#181818",
+                boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
+              }}
+            >
+              <div style={{ marginBottom: 18 }}>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "#8a6a00",
+                    letterSpacing: 1,
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Active Locations
+                </div>
+                <h4 style={{ margin: "8px 0 0" }}>Porch P.O. Boxes</h4>
               </div>
-              <h4 style={{ margin: "8px 0 0" }}>Porch P.O. Boxes</h4>
-            </div>
-            {vendorsLoading ? (
-              <p>Loading partners...</p>
-            ) : vendorsError ? (
-              <p>{vendorsError}</p>
-            ) : activeVendors.length === 0 ? (
-              <p>No active partners listed yet.</p>
-            ) : (
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {activeVendors.map((vendor) => (
-                  <li
-                    key={vendor.id}
-                    style={{
-                      padding: "14px 0",
-                      borderBottom: "1px solid #ece5d5",
-                    }}
-                  >
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+              {vendorsLoading ? (
+                <p>Loading partners...</p>
+              ) : vendorsError ? (
+                <p>{vendorsError}</p>
+              ) : activeVendors.length === 0 ? (
+                <p>No active partners listed yet.</p>
+              ) : (
+                <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
+                  {activeVendors.map((vendor) => (
+                    <li
+                      key={vendor.id}
+                      style={{
+                        padding: "14px 0",
+                        borderBottom: "1px solid #ece5d5",
+                      }}
                     >
-                      <strong>
-                        {vendor.businessName || "Unnamed partner"}
-                      </strong>
-                      <button
-                        type="button"
-                        onClick={() => toggleVendorExpanded(vendor.id)}
-                        style={{
-                          padding: 0,
-                          border: "none",
-                          background: "none",
-                          color: "#0b57d0",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                          fontSize: "0.9em",
-                        }}
-                      >
-                        {expandedVendorIds.includes(vendor.id)
-                          ? "Hide Info"
-                          : "Info"}
-                      </button>
-                    </div>
-                    {expandedVendorIds.includes(vendor.id) && (
-                      <div style={{ marginTop: 8, color: "#555" }}>
-                        <div>
-                          Store Hours: {vendor.storeHours || "Not provided"}
-                        </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                        <button
+                          type="button"
+                          onClick={() => toggleVendorExpanded(vendor.id)}
+                          style={{
+                            padding: 0,
+                            border: "none",
+                            background: "none",
+                            color: "#0b57d0",
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                            fontSize: "0.9em",
+                          }}
+                        >
+                          {expandedVendorIds.includes(vendor.id) ? "Hide Info" : "Info"}
+                        </button>
                       </div>
-                    )}
-                  </li>
-                ))}
-              </ul>
+                      {expandedVendorIds.includes(vendor.id) && (
+                        <div style={{ marginTop: 8, color: "#555" }}>
+                          <div>Store Hours: {vendor.storeHours || "Not provided"}</div>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
+            {/* Map */}
+            {!vendorsLoading && activeVendors.some((v) => v.lat) && (
+              <div style={{ flex: "1 1 220px", minHeight: 300, borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 28px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)" }}>
+                <MapContainer
+                  center={[
+                    activeVendors.filter((v) => v.lat).reduce((s, v) => s + v.lat, 0) / activeVendors.filter((v) => v.lat).length,
+                    activeVendors.filter((v) => v.lat).reduce((s, v) => s + v.lng, 0) / activeVendors.filter((v) => v.lat).length
+                  ]}
+                  zoom={12}
+                  style={{ height: "100%", minHeight: 300 }}
+                  scrollWheelZoom={false}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  />
+                  {activeVendors.filter((v) => v.lat).map((vendor) => (
+                    <Marker key={vendor.id} position={[vendor.lat, vendor.lng]}>
+                      <Popup>
+                        <strong>{vendor.businessName || "Partner"}</strong><br />
+                        {vendor.streetAddress}{vendor.city ? `, ${vendor.city}` : ""}<br />
+                        {vendor.storeHours || ""}
+                      </Popup>
+                    </Marker>
+                  ))}
+                </MapContainer>
+              </div>
             )}
           </div>
+
+          </div> {/* end locations + map wrapper */}
 
           <div
             style={{
