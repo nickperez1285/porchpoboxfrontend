@@ -4,7 +4,6 @@ import { db } from "../firebase";
 import API_BASE_URL from "../config/api";
 import {
   collection,
-  deleteDoc,
   doc,
   getDocs,
   increment,
@@ -141,18 +140,14 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
 
           const remainingCount = user.packageCount - packageCount;
           if (remainingCount <= 0) {
-            if (user.status !== "active" && user.packageCount > 1) {
-              await setDoc(
-                doc(db, "partners", vendorId, "packageCounts", user.id),
-                {
-                  count: 0,
-                  holdForResubscribe: true
-                },
-                { merge: true }
-              );
-            } else {
-              await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
-            }
+            await setDoc(
+              packageCountRef,
+              {
+                count: 0,
+                holdForResubscribe: user.status !== "active" && user.packageCount > 1
+              },
+              { merge: true }
+            );
           } else {
             await updateDoc(packageCountRef, {
               count: increment(-packageCount)
