@@ -8,6 +8,7 @@ import {
   serverTimestamp,
   updateDoc
 } from "firebase/firestore";
+import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
 
 const Admin = () => {
@@ -33,11 +34,44 @@ const Admin = () => {
   const updateVendorApproval = async (vendorId, approved) => {
     setUpdatingVendorId(vendorId);
     try {
+      const vendor = vendors.find((entry) => entry.id === vendorId);
+
       await updateDoc(doc(db, "partners", vendorId), {
         approved,
         status: approved ? "approved" : "deactivated",
         approvedAt: approved ? serverTimestamp() : null
       });
+
+      if (approved && vendor && !vendor.approved) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/notifications/partner-approved`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              businessName: vendor.businessName,
+              email: vendor.email,
+              streetAddress: vendor.streetAddress,
+              city: vendor.city,
+              state: vendor.state,
+              zipCode: vendor.zipCode
+            })
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.json().catch(() => null);
+            console.error(
+              "Partner approval email failed:",
+              errorBody?.message || `HTTP ${response.status}`
+            );
+            setError("Partner approved, but the welcome email could not be sent.");
+          }
+        } catch (emailError) {
+          console.error("Partner approval email failed:", emailError);
+          setError("Partner approved, but the welcome email could not be sent.");
+        }
+      }
 
       setVendors((currentVendors) =>
         currentVendors.map((vendor) =>
