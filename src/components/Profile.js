@@ -3,14 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import {
   collection,
-  collectionGroup,
   doc,
-  documentId,
   getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  where
+  onSnapshot
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
@@ -88,10 +83,12 @@ const Profile = ({ user }) => {
   const statusInfo = profileData?.status ? getStatusDisplay(profileData.status) : null;
 
   useEffect(() => {
+    let isCancelled = false;
+
     const loadProfile = async () => {
       try {
         const profileSnapshot = await getDoc(doc(db, "users", user.uid));
-        if (profileSnapshot.exists()) {
+        if (!isCancelled && profileSnapshot.exists()) {
           setProfileData(profileSnapshot.data());
         }
       } catch (error) {
@@ -99,67 +96,56 @@ const Profile = ({ user }) => {
       }
     };
 
-    const loadPackageHistory = async () => {
+    const subscribeToPackageHistory = async () => {
       setPackagesLoading(true);
+
       try {
-        const partnersSnapshot = await getDocs(collection(db, "partners"));
-        const partnersById = Object.fromEntries(
-          partnersSnapshot.docs.map((entry) => [
-            entry.id,
-            {
-              id: entry.id,
-              ...entry.data()
-            }
-          ])
-        );
-
-        const userPackageHistoryQuery = query(
-          collectionGroup(db, "packageCounts"),
-          where(documentId(), "==", user.uid)
-        );
-
         return onSnapshot(
-          userPackageHistoryQuery,
+          collection(db, "users", user.uid, "packageHistory"),
           (snapshot) => {
-            const allPackages = snapshot.docs.map((entry) => {
+            if (isCancelled) {
+              return;
+            }
+
+            const nextHistory = snapshot.docs.map((entry) => {
               const data = entry.data();
-              const parentPathSegments = entry.ref.parent.parent?.path?.split("/") || [];
-              const partnerId = parentPathSegments[parentPathSegments.length - 1] || "";
-              const partner = partnersById[partnerId];
 
               return {
-                partnerName: partner?.businessName || "Unknown Partner",
-                partnerId,
+                partnerId: data.partnerId || entry.id,
+                partnerName: data.partnerName || "Unknown Partner",
                 totalReceived: Number(data.totalReceived) || 0,
                 totalPickedUp: Number(data.totalPickedUp) || 0,
-                currentWaiting: Number(data.count) || 0
+                currentWaiting: Number(data.currentWaiting) || 0
               };
             });
 
-            setPackageHistory(allPackages);
+            setPackageHistory(nextHistory);
             setPackagesLoading(false);
           },
           (error) => {
             console.error("Error loading package history:", error);
-            setPackagesLoading(false);
+            if (!isCancelled) {
+              setPackagesLoading(false);
+            }
           }
         );
       } catch (error) {
         console.error("Error loading package history:", error);
         setPackagesLoading(false);
+        return () => {};
       }
     };
 
     loadProfile();
-    let unsubscribePromise = Promise.resolve(() => {});
-    unsubscribePromise = Promise.resolve(loadPackageHistory());
+    let unsubscribePackageHistory = () => {};
+
+    subscribeToPackageHistory().then((unsubscribe) => {
+      unsubscribePackageHistory = unsubscribe;
+    });
 
     return () => {
-      unsubscribePromise.then((unsubscribe) => {
-        if (typeof unsubscribe === "function") {
-          unsubscribe();
-        }
-      });
+      isCancelled = true;
+      unsubscribePackageHistory();
     };
   }, [user.uid]);
 

@@ -111,7 +111,11 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           headers: {
             "Content-Type": "application/json"
           },
-          body: JSON.stringify({ recipients: deliveryPayload })
+          body: JSON.stringify({
+            partnerId: vendorId,
+            partnerName: partnerLocationName,
+            recipients: deliveryPayload
+          })
         });
 
         if (!response.ok) {

@@ -104,7 +104,12 @@ describe("CustomerList", () => {
       expect(fetch).toHaveBeenCalledWith(
         "http://localhost:3001/api/notifications/package-delivery",
         expect.objectContaining({
-          method: "POST"
+          method: "POST",
+          body: JSON.stringify({
+            partnerId: "partner-1",
+            partnerName: "Main Street",
+            recipients: [{ id: "user-1", packageCount: 1 }]
+          })
         })
       );
     });
