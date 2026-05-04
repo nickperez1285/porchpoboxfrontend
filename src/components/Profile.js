@@ -317,7 +317,13 @@ const Profile = ({ user }) => {
                   {statusInfo.label}
                 </div>
                 <div style={{ marginTop: 4, fontSize: 14, color: "#666" }}>
-                  {statusInfo.description}
+                  {profileData?.status === "inactive" || profileData?.status === "canceled" ? (
+                    <Link to="/plans" style={{ color: statusInfo.color, fontWeight: 600 }}>
+                      {statusInfo.description} — View Plans →
+                    </Link>
+                  ) : (
+                    statusInfo.description
+                  )}
                 </div>
               </>
             ) : (

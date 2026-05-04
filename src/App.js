@@ -24,6 +24,7 @@ import CheckoutCancel from "./components/CheckoutCancel";
 import UserTermsPage from "./components/UserTermsPage";
 import PartnerTermsPage from "./components/PartnerTermsPage";
 import ReferralForm from "./components/ReferralForm";
+import PlansPage from "./components/PlansPage";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -290,6 +291,7 @@ function App() {
           <Route path="/" element={<MainPage user={user} userStatus={userStatus} />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/referrals" element={<ReferralForm />} />
+          <Route path="/plans" element={<PlansPage user={user} />} />
 
           {/* <Route path="/one-time-product" element={<OneTimeProduct />} /> */}
         </Routes>
