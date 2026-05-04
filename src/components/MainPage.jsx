@@ -208,11 +208,11 @@ const MainPage = ({ user, userStatus }) => {
 
             {/* Map */}
             {!vendorsLoading && (
-              <div style={{ flex: "1 1 200px", minHeight: 300, borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 28px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)" }}>
+              <div style={{ flex: "1 1 200px", height: 420, borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 28px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)" }}>
                 <MapContainer
                   center={mapCenter}
                   zoom={mapped.length ? 12 : 4}
-                  style={{ height: "100%", minHeight: 300 }}
+                  style={{ height: "100%", width: "100%" }}
                   scrollWheelZoom={false}
                 >
                   <TileLayer
