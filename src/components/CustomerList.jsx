@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
+import API_BASE_URL from "../config/api";
 import {
   collection,
   deleteDoc,
@@ -98,20 +99,44 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     setError("");
 
     try {
+      const deliveryPayload = selectedUsers
+        .map((user) => ({
+          id: user.id,
+          packageCount: getNormalizedPackageQuantity(user.id)
+        }))
+        .filter((recipient) => recipient.packageCount > 0);
+
+      if (deliveryPayload.length > 0) {
+        const response = await fetch(`${API_BASE_URL}/api/notifications/package-delivery`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ recipients: deliveryPayload })
+        });
+
+        if (!response.ok) {
+          const responseText = await response.text();
+          let body = null;
+
+          try {
+            body = responseText ? JSON.parse(responseText) : null;
+          } catch (parseError) {
+            body = null;
+          }
+
+          throw new Error(body?.message || responseText || "Package delivery update failed.");
+        }
+      }
+
       const deliveryPromises = selectedUsers.map(async (user) => {
           const packageCount = getNormalizedPackageQuantity(user.id);
           if (packageCount === 0) return;
 
           const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
-          const userDocRef = doc(db, "users", user.id);
-          const previousDelivered = Number(user.packagesDelivered) || 0;
 
           await updateDoc(packageCountRef, {
             totalPickedUp: increment(packageCount)
-          });
-
-          await updateDoc(userDocRef, {
-            packagesDelivered: increment(packageCount)
           });
 
           const remainingCount = user.packageCount - packageCount;
@@ -131,12 +156,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           } else {
             await updateDoc(packageCountRef, {
               count: increment(-packageCount)
-            });
-          }
-
-          if (previousDelivered === 0 && user.status === "trial") {
-            await updateDoc(userDocRef, {
-              status: "inactive"
             });
           }
 
