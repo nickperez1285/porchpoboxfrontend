@@ -75,6 +75,10 @@ const Profile = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
   const [packageHistory, setPackageHistory] = useState([]);
   const [packagesLoading, setPackagesLoading] = useState(false);
+  const currentPackagesWaiting = packageHistory.reduce(
+    (sum, entry) => sum + (Number(entry.currentWaiting) || 0),
+    0
+  );
   const hasActiveSubscription = Boolean(
     profileData?.status === "active" &&
     (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
@@ -502,10 +506,10 @@ const Profile = ({ user }) => {
               }}
             >
               <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
-                Total Checked In
+                Currently Checked In
               </div>
               <div style={{ fontSize: 18, fontWeight: 600 }}>
-                {Number(profileData?.packagesCheckedIn) || 0}
+                {currentPackagesWaiting}
               </div>
             </div>
             <div

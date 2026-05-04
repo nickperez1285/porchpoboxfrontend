@@ -313,23 +313,25 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-                  <strong>{user.name || "Unnamed user"}</strong>
-                  <button
-                    type="button"
-                    onClick={() => toggleExpanded(user.id)}
-                    style={{
-                      padding: 0,
-                      border: "none",
-                      background: "none",
-                      color: "#0b57d0",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      fontSize: "0.9em"
-                    }}
-                  >
-                    {expandedUserIds.includes(user.id) ? "Hide Info" : "Info"}
-                  </button>
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <strong>{user.name || "Unnamed user"}</strong>
+                    <button
+                      type="button"
+                      onClick={() => toggleExpanded(user.id)}
+                      style={{
+                        padding: 0,
+                        border: "none",
+                        background: "none",
+                        color: "#0b57d0",
+                        cursor: "pointer",
+                        textDecoration: "underline",
+                        fontSize: "0.9em"
+                      }}
+                    >
+                      {expandedUserIds.includes(user.id) ? "Hide Info" : "Info"}
+                    </button>
+                  </div>
                 </div>
 
                     {expandedUserIds.includes(user.id) && (
@@ -350,7 +352,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                 <div style={{ display: "flex", gap: 16, flexWrap: "wrap", color: "#444", fontSize: 14 }}>
                   <div>Packages Waiting: {user.packageCount || 0}</div>
                   <div>Total Received: {user.totalReceived || 0}</div>
-                  <div>Picked Up: {user.totalPickedUp || 0}</div>
                 </div>
               </div>
 
