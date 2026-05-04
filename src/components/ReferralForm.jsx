@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 
 export default function ReferralForm() {
@@ -13,16 +14,19 @@ export default function ReferralForm() {
     setStatus("Sending...");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/notifications/referral`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${API_BASE_URL}/api/notifications/referral`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            additionalInfo,
+          }),
         },
-        body: JSON.stringify({
-          email,
-          additionalInfo
-        })
-      });
+      );
 
       const data = await response.json().catch(() => ({}));
 
@@ -41,11 +45,14 @@ export default function ReferralForm() {
   };
 
   return (
-    <div style={styles.container}>
+    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+    <div style={{ ...styles.container, flex: 1 }}>
       <form onSubmit={handleSubmit} style={styles.form}>
         <h1 style={styles.title}>Referral Form</h1>
         <p style={styles.description}>
-          Enter the referral email and any additional information to send it to Porch P.O. Box.
+          Enter the email address of your referral and add any additional
+          information to you think we should know. We will reach out to them and
+          let them know about our services. Thank you for your support!
         </p>
 
         <input
@@ -73,6 +80,13 @@ export default function ReferralForm() {
         {status && <p style={styles.status}>{status}</p>}
       </form>
     </div>
+    <footer style={{ padding: "1em", background: "#111" }}>
+      <center>
+        <Link to="/partner" style={{ display: "inline-block", paddingRight: 10, color: "inherit" }}>Partners</Link>
+        <Link to="/contact" style={{ color: "inherit" }}>Contact</Link>
+      </center>
+    </footer>
+    </div>
   );
 }
 
@@ -83,7 +97,7 @@ const styles = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    padding: "1rem"
+    padding: "1rem",
   },
   form: {
     width: "100%",
@@ -94,23 +108,23 @@ const styles = {
     boxShadow: "0 10px 25px rgba(0,0,0,0.1)",
     display: "flex",
     flexDirection: "column",
-    gap: "1rem"
+    gap: "1rem",
   },
   title: {
     textAlign: "center",
-    margin: 0
+    margin: 0,
   },
   description: {
     margin: 0,
     color: "#4b5563",
     textAlign: "center",
-    lineHeight: 1.5
+    lineHeight: 1.5,
   },
   input: {
     padding: "0.75rem",
     fontSize: "1rem",
     borderRadius: "4px",
-    border: "1px solid #ccc"
+    border: "1px solid #ccc",
   },
   button: {
     padding: "0.75rem",
@@ -119,11 +133,11 @@ const styles = {
     border: "none",
     background: "#111827",
     color: "#ffffff",
-    cursor: "pointer"
+    cursor: "pointer",
   },
   status: {
     textAlign: "center",
     fontSize: "0.9rem",
-    margin: 0
-  }
+    margin: 0,
+  },
 };

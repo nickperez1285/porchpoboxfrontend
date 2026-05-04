@@ -193,7 +193,7 @@ const MainPage = ({ user, userStatus }) => {
                     {expandedVendorIds.includes(vendor.id) && (
                       <div style={{ marginTop: 8, color: "#555" }}>
                         <div>
-                          Store Hours: {vendor.store_hours || "Not provided"}
+                          Store Hours: {vendor.storeHours || "Not provided"}
                         </div>
                       </div>
                     )}
