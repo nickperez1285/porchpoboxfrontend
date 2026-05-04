@@ -136,7 +136,7 @@ const Profile = ({ user }) => {
           });
 
           setPackageHistory(nextHistory);
-          if (initializedPartnerIds.size === partnersList.length && userHistoryInitialized) {
+          if (userHistoryInitialized) {
             setPackagesLoading(false);
           }
         };
@@ -163,7 +163,9 @@ const Profile = ({ user }) => {
               }
             },
             (error) => {
-              console.error(`Error loading packages for partner ${partner.id}:`, error);
+              if (error?.code !== "permission-denied") {
+                console.error(`Error loading packages for partner ${partner.id}:`, error);
+              }
               initializedPartnerIds.add(partner.id);
               if (!isCancelled) {
                 syncPackageHistory();
@@ -196,6 +198,7 @@ const Profile = ({ user }) => {
             console.error("Error loading package history:", error);
             userHistoryInitialized = true;
             if (!isCancelled) {
+              setPackageHistory([]);
               syncPackageHistory();
             }
           }

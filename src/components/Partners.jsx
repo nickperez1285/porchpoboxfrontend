@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
@@ -9,33 +9,26 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
     const [packageCountTotal, setPackageCountTotal] = useState(0);
 
     useEffect(() => {
-        const loadPackageCountTotal = async () => {
-            if (!partnerProfile?.id || !partnerProfile.approved) {
-                setPackageCountTotal(0);
-                return;
-            }
+        if (!partnerProfile?.id || !partnerProfile.approved) {
+            setPackageCountTotal(0);
+            return () => {};
+        }
 
-            try {
-                const snapshot = await getDocs(
-                    collection(db, "partners", partnerProfile.id, "packageCounts")
-                );
+        return onSnapshot(
+            collection(db, "partners", partnerProfile.id, "packageCounts"),
+            (snapshot) => {
                 const total = snapshot.docs.reduce(
-                    (sum, entry) => sum + (entry.data().count || 0),
+                    (sum, entry) => sum + (Number(entry.data().count) || 0),
                     0
                 );
                 setPackageCountTotal(total);
-            } catch (error) {
+            },
+            (error) => {
                 console.error("Error loading vendor package totals:", error);
                 setPackageCountTotal(0);
             }
-        };
-
-        loadPackageCountTotal();
+        );
     }, [partnerProfile]);
-
-    const handlePackagesDelivered = (deliveredCount) => {
-        setPackageCountTotal((current) => Math.max(0, current - deliveredCount));
-    };
 
     if (authLoading) {
         return (
@@ -173,7 +166,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                         partnerProfile.streetAddress ||
                         "Unnamed partner"
                       }
-                      onPackagesDelivered={handlePackagesDelivered}
                     />
                 </div>
             </div>
