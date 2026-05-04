@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
@@ -15,13 +15,10 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
         }
 
         return onSnapshot(
-            collection(db, "partners", partnerProfile.id, "packageCounts"),
+            doc(db, "partners", partnerProfile.id),
             (snapshot) => {
-                const total = snapshot.docs.reduce(
-                    (sum, entry) => sum + (Number(entry.data().count) || 0),
-                    0
-                );
-                setPackageCountTotal(total);
+                const data = snapshot.exists() ? snapshot.data() : {};
+                setPackageCountTotal(Number(data.packageCheckInCount) || 0);
             },
             (error) => {
                 console.error("Error loading vendor package totals:", error);
