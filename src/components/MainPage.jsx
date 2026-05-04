@@ -12,8 +12,12 @@ const MainPage = ({ user, userStatus }) => {
   const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
   useEffect(() => {
-    setMainPageTitle("Secure package receiving through local partner locations.");
-    setMainPageMessage("Have your packages delivered to your desired Porch P.O. Box locations and left in the care and watchful eyes of a trusted and secure Porch P.O. Box partner.");
+    setMainPageTitle(
+      "Secure package receiving through local partner locations.",
+    );
+    setMainPageMessage(
+      "Have your packages delivered to a local Porch P.O. Box and stored in the safe and secure hands of a trusted neighbor partner.",
+    );
     fetchActiveVendors();
   }, []);
 
@@ -21,21 +25,18 @@ const MainPage = ({ user, userStatus }) => {
     setVendorsLoading(true);
     try {
       const vendorSnapshot = await getDocs(
-        query(collection(db, "partners"), where("approved", "==", true))
+        query(collection(db, "partners"), where("approved", "==", true)),
       );
       setActiveVendors(
-        vendorSnapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }))
+        vendorSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })),
       );
     } catch (error) {
       console.error("Error loading active vendors:", error);
       setActiveVendors([]);
-      setVendorsError(
-        error?.message || "Unable to load active vendors."
-      );
+      setVendorsError(error?.message || "Unable to load active vendors.");
     } finally {
       setVendorsLoading(false);
     }
@@ -45,7 +46,7 @@ const MainPage = ({ user, userStatus }) => {
     setExpandedVendorIds((current) =>
       current.includes(vendorId)
         ? current.filter((id) => id !== vendorId)
-        : [...current, vendorId]
+        : [...current, vendorId],
     );
   };
 
@@ -54,7 +55,7 @@ const MainPage = ({ user, userStatus }) => {
       style={{
         minHeight: "100%",
         background:
-          "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 32%), linear-gradient(180deg, #f7f3e8 0%, #f4efe3 100%)"
+          "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 32%), linear-gradient(180deg, #f7f3e8 0%, #f4efe3 100%)",
       }}
     >
       <div
@@ -63,7 +64,7 @@ const MainPage = ({ user, userStatus }) => {
           flexDirection: "column",
           alignItems: "center",
           minHeight: "85vh",
-          padding: "32px 20px 48px"
+          padding: "32px 20px 48px",
         }}
       >
         <div
@@ -75,7 +76,7 @@ const MainPage = ({ user, userStatus }) => {
             borderRadius: 24,
             padding: "32px 28px",
             boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)",
-            marginBottom: 28
+            marginBottom: 28,
           }}
         >
           <div style={{ maxWidth: 720 }}>
@@ -84,15 +85,27 @@ const MainPage = ({ user, userStatus }) => {
                 color: "#d4af37",
                 fontSize: 12,
                 letterSpacing: 1.4,
-                textTransform: "uppercase"
+                textTransform: "uppercase",
               }}
             >
               Porch P.O. Box
             </div>
-            <h2 style={{ margin: "10px 0 12px", fontSize: "clamp(2rem, 4vw, 3.2rem)" }}>
+            <h2
+              style={{
+                margin: "10px 0 12px",
+                fontSize: "clamp(2rem, 4vw, 3.2rem)",
+              }}
+            >
               {mainPageTitle}
             </h2>
-            <p style={{ margin: 0, color: "#d3d3d3", lineHeight: 1.6, maxWidth: 620 }}>
+            <p
+              style={{
+                margin: 0,
+                color: "#d3d3d3",
+                lineHeight: 1.6,
+                maxWidth: 620,
+              }}
+            >
               {mainPageMessage}
             </p>
           </div>
@@ -121,7 +134,7 @@ const MainPage = ({ user, userStatus }) => {
               borderRadius: 20,
               padding: 22,
               color: "#181818",
-              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
             }}
           >
             <div style={{ marginBottom: 18 }}>
@@ -130,7 +143,7 @@ const MainPage = ({ user, userStatus }) => {
                   fontSize: 12,
                   color: "#8a6a00",
                   letterSpacing: 1,
-                  textTransform: "uppercase"
+                  textTransform: "uppercase",
                 }}
               >
                 Active Locations
@@ -153,8 +166,12 @@ const MainPage = ({ user, userStatus }) => {
                       borderBottom: "1px solid #ece5d5",
                     }}
                   >
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
+                      <strong>
+                        {vendor.businessName || "Unnamed partner"}
+                      </strong>
                       <button
                         type="button"
                         onClick={() => toggleVendorExpanded(vendor.id)}
@@ -165,10 +182,12 @@ const MainPage = ({ user, userStatus }) => {
                           color: "#0b57d0",
                           cursor: "pointer",
                           textDecoration: "underline",
-                          fontSize: "0.9em"
+                          fontSize: "0.9em",
                         }}
                       >
-                        {expandedVendorIds.includes(vendor.id) ? "Hide Info" : "Info"}
+                        {expandedVendorIds.includes(vendor.id)
+                          ? "Hide Info"
+                          : "Info"}
                       </button>
                     </div>
                     {expandedVendorIds.includes(vendor.id) && (
@@ -193,7 +212,7 @@ const MainPage = ({ user, userStatus }) => {
               border: "1px solid rgba(0, 0, 0, 0.08)",
               borderRadius: 20,
               padding: 28,
-              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
             }}
           >
             <div style={{ marginBottom: 18 }}>
@@ -202,13 +221,17 @@ const MainPage = ({ user, userStatus }) => {
                   fontSize: 12,
                   color: "#8a6a00",
                   letterSpacing: 1,
-                  textTransform: "uppercase"
+                  textTransform: "uppercase",
                 }}
               >
-                {user && userStatus === "active" ? "Member Access" : "Subscription Plans"}
+                {user && userStatus === "active"
+                  ? "Member Access"
+                  : "Subscription Plans"}
               </div>
               <h4 style={{ margin: "8px 0 6px" }}>
-                {user && userStatus === "active" ? "Welcome to PorchPOBox!" : "Sign Up"}
+                {user && userStatus === "active"
+                  ? "Welcome to PorchPOBox!"
+                  : "Sign Up"}
               </h4>
               <p style={{ margin: 0, color: "#666" }}>
                 {user && userStatus === "active"
@@ -216,7 +239,9 @@ const MainPage = ({ user, userStatus }) => {
                   : "Select the subscription term that fits your delivery needs and start receiving your packages today!"}
               </p>
             </div>
-            {user && userStatus === "active" ? null : <OneTimeProduct user={user} />}
+            {user && userStatus === "active" ? null : (
+              <OneTimeProduct user={user} />
+            )}
           </div>
         </div>
 
@@ -230,7 +255,7 @@ const MainPage = ({ user, userStatus }) => {
             border: "1px solid rgba(0, 0, 0, 0.08)",
             borderRadius: 20,
             padding: "24px 28px",
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
           }}
         >
           <div
@@ -238,7 +263,7 @@ const MainPage = ({ user, userStatus }) => {
               fontSize: 12,
               color: "#0b3f66",
               letterSpacing: 1,
-              textTransform: "uppercase"
+              textTransform: "uppercase",
             }}
           >
             Promotion
@@ -247,12 +272,11 @@ const MainPage = ({ user, userStatus }) => {
             Try Porch P.O. Box for free!
           </h4>
           <p style={{ margin: 0, color: "#0d3555", lineHeight: 1.6 }}>
-            Sign up today and get your first package delivered to a Porch P.O. Box
-            for free.
+            Sign up today and get your first package delivered to a Porch P.O.
+            Box for free.
           </p>
         </div>
-        <Link
-          to="/referrals"
+        <div
           className="Referral"
           style={{
             width: "100%",
@@ -263,8 +287,6 @@ const MainPage = ({ user, userStatus }) => {
             borderRadius: 20,
             padding: "24px 28px",
             boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-            textDecoration: "none",
-            display: "block"
           }}
         >
           <div
@@ -272,20 +294,22 @@ const MainPage = ({ user, userStatus }) => {
               fontSize: 12,
               color: "#6a4a00",
               letterSpacing: 1,
-              textTransform: "uppercase"
+              textTransform: "uppercase",
             }}
           >
             Referrals
           </div>
           <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
-            Invite a partner. Earn a free month.
+            Invite a partner. Earn free service for a YEAR.
           </h4>
           <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
-            Refer a new partner location to Porch P.O. Box and receive one free month
-            of service when they join.
+            Refer a new partner location to Porch P.O. Box and receive 1 whole
+            year of free service for every partner that joins our network. Help
+            us grow our secure delivery network while earning free service for
+            you or a loved one! There is no limit to the number of partners you
+            can refer .
           </p>
-        </Link>
-
+        </div>
       </div>
       <footer style={{ padding: "1em", background: "#111" }}>
         <center>
