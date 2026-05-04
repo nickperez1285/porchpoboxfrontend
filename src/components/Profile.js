@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, collection } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const formatDate = (value) => {
@@ -68,6 +68,8 @@ const getStatusDisplay = (status) => {
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
+  const [packageHistory, setPackageHistory] = useState([]);
+  const [packagesLoading, setPackagesLoading] = useState(false);
   const hasActiveSubscription = Boolean(
     profileData?.status === "active" &&
     (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
@@ -87,7 +89,53 @@ const Profile = ({ user }) => {
       }
     };
 
+    const loadPackageHistory = async () => {
+      setPackagesLoading(true);
+      try {
+        const partnersSnapshot = await getDocs(collection(db, "partners"));
+        const partnersList = partnersSnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+
+        const allPackages = [];
+
+        const packagePromises = partnersList.map(async (partner) => {
+          try {
+            const packageCountsSnapshot = await getDocs(
+              collection(db, "partners", partner.id, "packageCounts")
+            );
+
+            const userPackageDoc = packageCountsSnapshot.docs.find(
+              (doc) => doc.id === user.uid
+            );
+
+            if (userPackageDoc) {
+              const data = userPackageDoc.data();
+              allPackages.push({
+                partnerName: partner.businessName || "Unknown Partner",
+                partnerId: partner.id,
+                totalReceived: Number(data.totalReceived) || 0,
+                totalPickedUp: Number(data.totalPickedUp) || 0,
+                currentWaiting: Number(data.count) || 0
+              });
+            }
+          } catch (error) {
+            console.error(`Error loading packages for partner ${partner.id}:`, error);
+          }
+        });
+
+        await Promise.all(packagePromises);
+        setPackageHistory(allPackages);
+      } catch (error) {
+        console.error("Error loading package history:", error);
+      } finally {
+        setPackagesLoading(false);
+      }
+    };
+
     loadProfile();
+    loadPackageHistory();
   }, [user.uid]);
 
   const handleLogout = async () => {
@@ -329,6 +377,72 @@ const Profile = ({ user }) => {
               </div>
             </div>
           </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#fff",
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Package History</h3>
+          {packagesLoading ? (
+            <p style={{ color: "#666" }}>Loading package history...</p>
+          ) : packageHistory.length === 0 ? (
+            <p style={{ color: "#666" }}>No packages have been checked in yet.</p>
+          ) : (
+            <div>
+              {packageHistory.map((pkg) => (
+                <div
+                  key={pkg.partnerId}
+                  style={{
+                    marginBottom: 18,
+                    paddingBottom: 18,
+                    borderBottom: "1px solid #eee"
+                  }}
+                >
+                  <div
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 600,
+                      marginBottom: 8,
+                      color: "#333"
+                    }}
+                  >
+                    {pkg.partnerName}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+                        Total Received
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 600 }}>
+                        {pkg.totalReceived}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+                        Picked Up
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 600 }}>
+                        {pkg.totalPickedUp}
+                      </div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+                        Waiting
+                      </div>
+                      <div style={{ fontSize: 16, fontWeight: 600 }}>
+                        {pkg.currentWaiting}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         <div

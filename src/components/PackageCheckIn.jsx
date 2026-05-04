@@ -158,39 +158,57 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         );
       }
 
-      await updateDoc(doc(db, "partners", partnerProfile.id), {
+      // Update partner's total package check-in count
+      const updatePartnerPromise = updateDoc(doc(db, "partners", partnerProfile.id), {
         packageCheckInCount: increment(totalSelectedPackages)
       });
 
-      await Promise.all(
+      // Update each user's package counts
+      const updatePackageCountsPromise = Promise.all(
         selectedUsers.map(async (user) => {
-          const packageQuantity = getNormalizedPackageQuantity(user.id);
-          const packageCountRef = doc(
-            db,
-            "partners",
-            partnerProfile.id,
-            "packageCounts",
-            user.id
-          );
-          const existingSnapshot = await getDoc(packageCountRef);
-          const existingData = existingSnapshot.exists() ? existingSnapshot.data() : {};
-          const currentCount = Number(existingData.count) || 0;
-          const currentTotalReceived = Number(existingData.totalReceived) || currentCount;
-          const currentTotalPickedUp = Number(existingData.totalPickedUp) || 0;
+          try {
+            const packageQuantity = getNormalizedPackageQuantity(user.id);
+            const packageCountRef = doc(
+              db,
+              "partners",
+              partnerProfile.id,
+              "packageCounts",
+              user.id
+            );
+            const existingSnapshot = await getDoc(packageCountRef);
+            const existingData = existingSnapshot.exists() ? existingSnapshot.data() : {};
+            const currentCount = Number(existingData.count) || 0;
+            const currentTotalReceived = Number(existingData.totalReceived) || currentCount;
+            const currentTotalPickedUp = Number(existingData.totalPickedUp) || 0;
 
-          return setDoc(
-            packageCountRef,
-            {
-              count: currentCount + packageQuantity,
-              totalReceived: currentTotalReceived + packageQuantity,
-              totalPickedUp: currentTotalPickedUp,
-              name: user.name || "Unnamed user",
-              email: user.email || ""
-            },
-            { merge: true }
-          );
+            // If this is the first package for a trial user, change their status to inactive
+            if (user.status === "trial" && currentTotalReceived === 0) {
+              await updateDoc(doc(db, "users", user.id), {
+                status: "inactive"
+              });
+            }
+
+            // Update package counts
+            await setDoc(
+              packageCountRef,
+              {
+                count: currentCount + packageQuantity,
+                totalReceived: currentTotalReceived + packageQuantity,
+                totalPickedUp: currentTotalPickedUp,
+                name: user.name || "Unnamed user",
+                email: user.email || ""
+              },
+              { merge: true }
+            );
+          } catch (userError) {
+            console.error(`Error updating packages for user ${user.id}:`, userError);
+            throw new Error(`Failed to update packages for ${user.name || user.email}: ${userError.message}`);
+          }
         })
       );
+
+      // Wait for all updates to complete
+      await Promise.all([updatePartnerPromise, updatePackageCountsPromise]);
 
       if (onPackagesCheckedIn) {
         await onPackagesCheckedIn();
