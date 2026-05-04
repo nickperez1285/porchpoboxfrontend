@@ -8,6 +8,7 @@ const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
+  const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
   useEffect(() => {
@@ -38,6 +39,14 @@ const MainPage = ({ user, userStatus }) => {
     } finally {
       setVendorsLoading(false);
     }
+  };
+
+  const toggleVendorExpanded = (vendorId) => {
+    setExpandedVendorIds((current) =>
+      current.includes(vendorId)
+        ? current.filter((id) => id !== vendorId)
+        : [...current, vendorId]
+    );
   };
 
   return (
@@ -144,13 +153,31 @@ const MainPage = ({ user, userStatus }) => {
                       borderBottom: "1px solid #ece5d5",
                     }}
                   >
-                    <strong>{vendor.businessName || "Unnamed partner"}</strong>
-                    <div style={{ marginTop: 4, color: "#555" }}>
-                      {vendor.streetAddress || "No street address"}
-                      {vendor.city ? `, ${vendor.city}` : ""}
-                      {vendor.state ? `, ${vendor.state}` : ""}
-                      {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                      <button
+                        type="button"
+                        onClick={() => toggleVendorExpanded(vendor.id)}
+                        style={{
+                          padding: 0,
+                          border: "none",
+                          background: "none",
+                          color: "#0b57d0",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          fontSize: "0.9em"
+                        }}
+                      >
+                        {expandedVendorIds.includes(vendor.id) ? "Hide Info" : "Info"}
+                      </button>
                     </div>
+                    {expandedVendorIds.includes(vendor.id) && (
+                      <div style={{ marginTop: 8, color: "#555" }}>
+                        <div>
+                          Store Hours: {vendor.store_hours || "Not provided"}
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>

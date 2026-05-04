@@ -3,16 +3,17 @@ import React from "react";
 const legendItems = [
   {
     color: "#ffffff",
-    label: "Paid up or new users (never used service)"
+    label: "USubscription paid and active",
   },
   {
     color: "#fff6bf",
-    label: "Received one package"
+    label: "User is trial period and can receive one free package delivery",
   },
   {
     color: "#ffd9d9",
-    label: "Not paid up and received more than one package"
-  }
+    label:
+      "User requires payment to continue receiving deliveries (trial expired or subscription lapsed)",
+  },
 ];
 
 const PartnerStatusLegend = () => {
@@ -23,7 +24,7 @@ const PartnerStatusLegend = () => {
         border: "1px solid rgba(0, 0, 0, 0.08)",
         borderRadius: 18,
         padding: 20,
-        marginBottom: 20
+        marginBottom: 20,
       }}
     >
       <div
@@ -32,7 +33,7 @@ const PartnerStatusLegend = () => {
           color: "#8a6a00",
           letterSpacing: 1,
           textTransform: "uppercase",
-          marginBottom: 12
+          marginBottom: 12,
         }}
       >
         Customer Status Legend
@@ -41,7 +42,7 @@ const PartnerStatusLegend = () => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 12
+          gap: 12,
         }}
       >
         {legendItems.map((item) => (
@@ -50,7 +51,7 @@ const PartnerStatusLegend = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10
+              gap: 10,
             }}
           >
             <span
@@ -60,7 +61,7 @@ const PartnerStatusLegend = () => {
                 borderRadius: 999,
                 background: item.color,
                 border: "1px solid rgba(0, 0, 0, 0.18)",
-                flexShrink: 0
+                flexShrink: 0,
               }}
             />
             <span>{item.label}</span>
