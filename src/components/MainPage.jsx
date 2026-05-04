@@ -251,7 +251,8 @@ const MainPage = ({ user, userStatus }) => {
             for free.
           </p>
         </div>
-        <div
+        <Link
+          to="/referrals"
           className="Referral"
           style={{
             width: "100%",
@@ -261,7 +262,9 @@ const MainPage = ({ user, userStatus }) => {
             border: "1px solid rgba(0, 0, 0, 0.08)",
             borderRadius: 20,
             padding: "24px 28px",
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
+            textDecoration: "none",
+            display: "block"
           }}
         >
           <div
@@ -281,7 +284,7 @@ const MainPage = ({ user, userStatus }) => {
             Refer a new partner location to Porch P.O. Box and receive one free month
             of service when they join.
           </p>
-        </div>
+        </Link>
 
       </div>
       <footer style={{ padding: "1em", background: "#111" }}>
