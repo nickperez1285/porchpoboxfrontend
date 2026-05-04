@@ -332,7 +332,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                   </button>
                 </div>
 
-                {expandedUserIds.includes(user.id) && (
+                    {expandedUserIds.includes(user.id) && (
                   <div style={{ marginTop: 12 }}>
                     <div>Subscription Status: {user.status || "inactive"}</div>
                     <div>Email: {user.email || "No email"}</div>
@@ -346,9 +346,18 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                     <div>User ID: {user.id}</div>
                   </div>
                 )}
+
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", color: "#444", fontSize: 14 }}>
+                  <div>Packages Waiting: {user.packageCount || 0}</div>
+                  <div>Total Received: {user.totalReceived || 0}</div>
+                  <div>Picked Up: {user.totalPickedUp || 0}</div>
+                </div>
               </div>
 
               <div style={{ display: "flex", alignItems: "center", gap: 12, marginLeft: 16 }}>
+                <label style={{ fontSize: 12, color: "#666", whiteSpace: "nowrap" }}>
+                  Deliver now
+                </label>
                 <input
                   type="number"
                   min="1"
@@ -364,7 +373,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                     WebkitAppearance: "none",
                     appearance: "none"
                   }}
-                  aria-label={`Package count to deliver for ${user.name || "user"}`}
+                  aria-label={`Packages to deliver now for ${user.name || "user"}`}
                 />
                 <input
                   type="checkbox"
