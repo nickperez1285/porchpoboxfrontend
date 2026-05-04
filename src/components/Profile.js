@@ -31,6 +31,40 @@ const getDaysLeft = (value) => {
   return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
 };
 
+const getStatusDisplay = (status) => {
+  switch (status) {
+    case "active":
+      return {
+        label: "Paid & Active",
+        color: "#28a745",
+        bgColor: "rgba(40, 167, 69, 0.1)",
+        description: "Your subscription is active"
+      };
+    case "trial":
+      return {
+        label: "Trial Period",
+        color: "#ffc107",
+        bgColor: "rgba(255, 193, 7, 0.1)",
+        description: "You're on a trial period"
+      };
+    case "inactive":
+    case "canceled":
+      return {
+        label: "Inactive",
+        color: "#dc3545",
+        bgColor: "rgba(220, 53, 69, 0.1)",
+        description: "Subscription needed"
+      };
+    default:
+      return {
+        label: "Unknown",
+        color: "#6c757d",
+        bgColor: "rgba(108, 117, 125, 0.1)",
+        description: "Status unknown"
+      };
+  }
+};
+
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
@@ -38,6 +72,8 @@ const Profile = ({ user }) => {
     profileData?.status === "active" &&
     (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
   );
+
+  const statusInfo = profileData?.status ? getStatusDisplay(profileData.status) : null;
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -107,26 +143,30 @@ const Profile = ({ user }) => {
           <div
             style={{
               minWidth: 220,
-              background: "rgba(255, 255, 255, 0.06)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              background: statusInfo ? statusInfo.bgColor : "rgba(255, 255, 255, 0.06)",
+              border: statusInfo ? `1px solid ${statusInfo.color}40` : "1px solid rgba(255, 255, 255, 0.1)",
               borderRadius: 14,
               padding: 16,
             }}
           >
-            {hasActiveSubscription ? (
+            {statusInfo ? (
               <>
                 <div
                   style={{
                     fontSize: 12,
                     textTransform: "uppercase",
                     letterSpacing: 1,
-                    color: "#c8c8c8",
+                    color: statusInfo.color,
+                    fontWeight: 600,
                   }}
                 >
-                  Subscription Status
+                  Account Status
                 </div>
-                <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
-                  {profileData?.status}
+                <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600, color: statusInfo.color }}>
+                  {statusInfo.label}
+                </div>
+                <div style={{ marginTop: 4, fontSize: 14, color: "#666" }}>
+                  {statusInfo.description}
                 </div>
               </>
             ) : (

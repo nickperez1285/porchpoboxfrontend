@@ -284,7 +284,13 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                       value={packageQuantities[user.id] ?? "1"}
                       onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
                       onBlur={() => finalizePackageQuantity(user.id)}
-                      style={{ width: 40, padding: 8 }}
+                      style={{
+                        width: 40,
+                        padding: 8,
+                        MozAppearance: "textfield",
+                        WebkitAppearance: "none",
+                        appearance: "none"
+                      }}
                       aria-label={`Package count for ${user.name || "user"}`}
                     />
                     <input

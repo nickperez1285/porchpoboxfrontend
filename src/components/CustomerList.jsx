@@ -328,7 +328,13 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                   value={packageQuantities[user.id] ?? "1"}
                   onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
                   onBlur={() => finalizePackageQuantity(user.id)}
-                  style={{ width: 50, padding: 6 }}
+                  style={{
+                    width: 50,
+                    padding: 6,
+                    MozAppearance: "textfield",
+                    WebkitAppearance: "none",
+                    appearance: "none"
+                  }}
                   aria-label={`Package count to deliver for ${user.name || "user"}`}
                 />
                 <input
