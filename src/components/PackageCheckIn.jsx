@@ -213,39 +213,37 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     marginBottom: 8
                   }}
                 >
-                  <div style={{ position: "relative", flex: 1 }}>
-                    <strong>{user.name || "Unnamed user"}</strong>
-                    <button
-                      onClick={() => toggleExpanded(user.id)}
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                        padding: "4px 8px",
-                        background: "#f0f0f0",
-                        border: "1px solid #ccc",
-                        borderRadius: 4,
-                        cursor: "pointer",
-                        fontSize: "0.8em"
-                      }}
-                    >
-                      {expandedUserIds.includes(user.id) ? "Hide INFO" : "INFO"}
-                    </button>
-                  </div>
-                  {expandedUserIds.includes(user.id) && (
-                    <div style={{ position: "absolute", top: "100%", left: 0, right: 0, marginTop: 8, paddingTop: 8, borderTop: "1px solid #eee", fontSize: "0.9em", background: "#f9f9f9", padding: 8, borderRadius: 4, zIndex: 1 }}>
-                      <div><strong>Contact Information:</strong></div>
-                      <div>Email: {user.email || "Not provided"}</div>
-                      <div>Phone: {user.phone || "Not provided"}</div>
-                      <div>Address: {user.address || "Not provided"}</div>
-                      <div style={{ marginTop: 8 }}><strong>Check-in History:</strong></div>
-                      <div>Total Packages Received: {user.totalReceived}</div>
-                      <div>Total Packages Picked Up: {user.totalPickedUp}</div>
-                      <div>Current Packages Waiting: {user.packageCount}</div>
-                      <div>Status: {user.status || "Unknown"}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <strong>{user.name || "Unnamed user"}</strong>
+                      <button
+                        type="button"
+                        onClick={() => toggleExpanded(user.id)}
+                        style={{
+                          padding: 0,
+                          border: "none",
+                          background: "none",
+                          color: "#0b57d0",
+                          cursor: "pointer",
+                          textDecoration: "underline",
+                          fontSize: "0.9em"
+                        }}
+                      >
+                        {expandedUserIds.includes(user.id) ? "Hide Info" : "Info"}
+                      </button>
                     </div>
-                  )}
+                    {expandedUserIds.includes(user.id) && (
+                      <div style={{ marginTop: 8, fontSize: "0.9em", color: "#444" }}>
+                        <div>Email: {user.email || "Not provided"}</div>
+                        <div>Phone: {user.phoneNumber || "Not provided"}</div>
+                        <div>Address: {user.streetAddress || "Not provided"}{user.city ? `, ${user.city}` : ""}{user.state ? `, ${user.state}` : ""}{user.zipCode ? ` ${user.zipCode}` : ""}</div>
+                        <div>Total Received: {user.totalReceived}</div>
+                        <div>Total Picked Up: {user.totalPickedUp}</div>
+                        <div>Waiting: {user.packageCount}</div>
+                        <div>Status: {user.status || "Unknown"}</div>
+                      </div>
+                    )}
+                  </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                     <input
                       type="number"
