@@ -219,6 +219,7 @@ const MainPage = ({ user, userStatus }) => {
                       {expandedVendorIds.includes(vendor.id) && (
                         <div style={{ marginTop: 8, color: "#555" }}>
                           <div>Store Hours: {vendor.storeHours || "Not provided"}</div>
+                          <div>{[vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode].filter(Boolean).join(", ") || "Address not provided"}</div>
                         </div>
                       )}
                     </li>
