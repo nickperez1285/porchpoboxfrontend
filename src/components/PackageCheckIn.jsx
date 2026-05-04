@@ -40,6 +40,8 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           usersSnapshot.docs.map((entry) => ({
             id: entry.id,
             ...entry.data(),
+            packagesCheckedIn: Number(entry.data().packagesCheckedIn) || 0,
+            packagesDelivered: Number(entry.data().packagesDelivered) || 0,
             packageCount: packageCounts[entry.id]?.count || 0,
             totalReceived: packageCounts[entry.id]?.totalReceived || 0,
             totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0
@@ -181,25 +183,33 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             const currentTotalReceived = Number(existingData.totalReceived) || currentCount;
             const currentTotalPickedUp = Number(existingData.totalPickedUp) || 0;
 
-            // If this is the first package for a trial user, change their status to inactive
-            if (user.status === "trial" && currentTotalReceived === 0) {
-              await updateDoc(doc(db, "users", user.id), {
-                status: "inactive"
+            const userDocRef = doc(db, "users", user.id);
+            const existingCheckedIn = Number(user.packagesCheckedIn) || 0;
+
+            // If this is the first checked-in package for a non-active user, set them to trial
+            if (user.status !== "active" && existingCheckedIn === 0) {
+              await updateDoc(userDocRef, {
+                status: "trial"
               });
             }
 
-            // Update package counts
-            await setDoc(
-              packageCountRef,
-              {
-                count: currentCount + packageQuantity,
-                totalReceived: currentTotalReceived + packageQuantity,
-                totalPickedUp: currentTotalPickedUp,
-                name: user.name || "Unnamed user",
-                email: user.email || ""
-              },
-              { merge: true }
-            );
+            // Update package counts and user counters
+            await Promise.all([
+              setDoc(
+                packageCountRef,
+                {
+                  count: currentCount + packageQuantity,
+                  totalReceived: currentTotalReceived + packageQuantity,
+                  totalPickedUp: currentTotalPickedUp,
+                  name: user.name || "Unnamed user",
+                  email: user.email || ""
+                },
+                { merge: true }
+              ),
+              updateDoc(userDocRef, {
+                packagesCheckedIn: increment(packageQuantity)
+              })
+            ]);
           } catch (userError) {
             console.error(`Error updating packages for user ${user.id}:`, userError);
             throw new Error(`Failed to update packages for ${user.name || user.email}: ${userError.message}`);

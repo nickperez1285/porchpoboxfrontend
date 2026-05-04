@@ -46,6 +46,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           .map((doc) => ({
             id: doc.id,
             ...doc.data(),
+            packagesCheckedIn: Number(doc.data().packagesCheckedIn) || 0,
+            packagesDelivered: Number(doc.data().packagesDelivered) || 0,
             packageCount: packageCounts[doc.id]?.count || 0,
             totalReceived: packageCounts[doc.id]?.totalReceived || 0,
             totalPickedUp: packageCounts[doc.id]?.totalPickedUp || 0,
@@ -97,37 +99,49 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
 
     try {
       const deliveryPromises = selectedUsers.map(async (user) => {
-        const packageCount = getNormalizedPackageQuantity(user.id);
-        if (packageCount === 0) return;
+          const packageCount = getNormalizedPackageQuantity(user.id);
+          if (packageCount === 0) return;
 
-        const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
-        await updateDoc(packageCountRef, {
-          totalPickedUp: increment(packageCount)
-        });
+          const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
+          const userDocRef = doc(db, "users", user.id);
+          const previousDelivered = Number(user.packagesDelivered) || 0;
 
-        const remainingCount = user.packageCount - packageCount;
-        if (remainingCount <= 0) {
-          if (user.status !== "active" && user.packageCount > 1) {
-            await setDoc(
-              doc(db, "partners", vendorId, "packageCounts", user.id),
-              {
-                count: 0,
-                holdForResubscribe: true
-              },
-              { merge: true }
-            );
-          } else {
-            await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
-          }
-        } else {
           await updateDoc(packageCountRef, {
-            count: increment(-packageCount)
+            totalPickedUp: increment(packageCount)
           });
-        }
 
-        return packageCount;
-      });
+          await updateDoc(userDocRef, {
+            packagesDelivered: increment(packageCount)
+          });
 
+          const remainingCount = user.packageCount - packageCount;
+          if (remainingCount <= 0) {
+            if (user.status !== "active" && user.packageCount > 1) {
+              await setDoc(
+                doc(db, "partners", vendorId, "packageCounts", user.id),
+                {
+                  count: 0,
+                  holdForResubscribe: true
+                },
+                { merge: true }
+              );
+            } else {
+              await deleteDoc(doc(db, "partners", vendorId, "packageCounts", user.id));
+            }
+          } else {
+            await updateDoc(packageCountRef, {
+              count: increment(-packageCount)
+            });
+          }
+
+          if (previousDelivered === 0 && user.status === "trial") {
+            await updateDoc(userDocRef, {
+              status: "inactive"
+            });
+          }
+
+          return packageCount;
+        });
       await Promise.all(deliveryPromises);
 
       await updateDoc(doc(db, "partners", vendorId), {
