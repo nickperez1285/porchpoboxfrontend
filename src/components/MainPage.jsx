@@ -307,8 +307,14 @@ const MainPage = ({ user, userStatus }) => {
             year of free service for every partner that joins our network. Help
             us grow our secure delivery network while earning free service for
             you or a loved one! There is no limit to the number of partners you
-            can refer .
+            can refer.
           </p>
+          <Link
+            to="/referrals"
+            style={{ display: "inline-block", marginTop: 14, color: "#6a4a00", fontWeight: 600 }}
+          >
+            Submit a Referral →
+          </Link>
         </div>
       </div>
       <footer style={{ padding: "1em", background: "#111" }}>
