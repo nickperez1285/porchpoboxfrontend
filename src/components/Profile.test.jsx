@@ -73,7 +73,11 @@ describe("Profile", () => {
     });
 
     onSnapshot.mockImplementation((target, onNext) => {
-      if (String(target).includes("partners/partner-1/packageCounts/user-1")) {
+      if (String(target).includes("mock-db/users/user-1/packageHistory")) {
+        onNext({
+          docs: []
+        });
+      } else if (String(target).includes("partners/partner-1/packageCounts/user-1")) {
         onNext({
           exists: () => true,
           data: () => ({
@@ -84,7 +88,14 @@ describe("Profile", () => {
         });
       } else {
         onNext({
-          docs: []
+          exists: () => true,
+          data: () => ({
+            name: "Casey Customer",
+            status: "trial",
+            phoneNumber: "555-123-4567",
+            packagesCheckedIn: 1,
+            packagesDelivered: 1
+          })
         });
       }
 

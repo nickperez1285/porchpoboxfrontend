@@ -5,8 +5,8 @@ import API_BASE_URL from "../config/api";
 import {
   collection,
   doc,
-  getDocs,
   increment,
+  onSnapshot,
   setDoc,
   updateDoc
 } from "firebase/firestore";
@@ -21,54 +21,85 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
   const [packageQuantities, setPackageQuantities] = useState({});
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const [querySnapshot, packageCountsSnapshot] = await Promise.all([
-          getDocs(collection(db, "users")),
-          vendorId
-            ? getDocs(collection(db, "partners", vendorId, "packageCounts"))
-            : Promise.resolve({ docs: [] })
-        ]);
+    if (!vendorId) {
+      setUsers([]);
+      setLoading(false);
+      return () => {};
+    }
 
-        const packageCounts = Object.fromEntries(
-          packageCountsSnapshot.docs.map((entry) => [
-            entry.id,
-            {
-              count: Number(entry.data().count) || 0,
-              totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
-              totalPickedUp: Number(entry.data().totalPickedUp) || 0,
-              holdForResubscribe: Boolean(entry.data().holdForResubscribe)
-            }
-          ])
+    let usersSnapshotData = null;
+    let packageCountsSnapshotData = null;
+
+    const syncUsers = () => {
+      if (!usersSnapshotData || !packageCountsSnapshotData) {
+        return;
+      }
+
+      const packageCounts = Object.fromEntries(
+        packageCountsSnapshotData.docs.map((entry) => [
+          entry.id,
+          {
+            count: Number(entry.data().count) || 0,
+            totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
+            totalPickedUp: Number(entry.data().totalPickedUp) || 0,
+            holdForResubscribe: Boolean(entry.data().holdForResubscribe)
+          }
+        ])
+      );
+
+      const usersList = usersSnapshotData.docs
+        .map((entry) => ({
+          id: entry.id,
+          ...entry.data(),
+          packagesCheckedIn: Number(entry.data().packagesCheckedIn) || 0,
+          packagesDelivered: Number(entry.data().packagesDelivered) || 0,
+          packageCount: packageCounts[entry.id]?.count || 0,
+          totalReceived: packageCounts[entry.id]?.totalReceived || 0,
+          totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
+          holdForResubscribe: packageCounts[entry.id]?.holdForResubscribe || false
+        }))
+        .filter(
+          (user) =>
+            user.packageCount > 0 ||
+            (user.status !== "active" && user.holdForResubscribe)
         );
 
-        const usersList = querySnapshot.docs
-          .map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            packagesCheckedIn: Number(doc.data().packagesCheckedIn) || 0,
-            packagesDelivered: Number(doc.data().packagesDelivered) || 0,
-            packageCount: packageCounts[doc.id]?.count || 0,
-            totalReceived: packageCounts[doc.id]?.totalReceived || 0,
-            totalPickedUp: packageCounts[doc.id]?.totalPickedUp || 0,
-            holdForResubscribe: packageCounts[doc.id]?.holdForResubscribe || false
-          }))
-          .filter(
-            (user) =>
-              user.packageCount > 0 ||
-              (user.status !== "active" && user.holdForResubscribe)
-          );
-
-        setUsers(usersList);
-      } catch (error) {
-        console.error("Error fetching users:", error);
-        setError("Unable to load customers. Check Firestore partner read permissions.");
-      } finally {
-        setLoading(false);
-      }
+      setUsers(usersList);
+      setLoading(false);
     };
 
-    fetchUsers();
+    const unsubscribeUsers = onSnapshot(
+      collection(db, "users"),
+      (snapshot) => {
+        usersSnapshotData = snapshot;
+        setError("");
+        syncUsers();
+      },
+      (snapshotError) => {
+        console.error("Error fetching users:", snapshotError);
+        setError("Unable to load customers. Check Firestore partner read permissions.");
+        setLoading(false);
+      }
+    );
+
+    const unsubscribePackageCounts = onSnapshot(
+      collection(db, "partners", vendorId, "packageCounts"),
+      (snapshot) => {
+        packageCountsSnapshotData = snapshot;
+        setError("");
+        syncUsers();
+      },
+      (snapshotError) => {
+        console.error("Error fetching partner package counts:", snapshotError);
+        setError("Unable to load customers. Check Firestore partner read permissions.");
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      unsubscribeUsers();
+      unsubscribePackageCounts();
+    };
   }, [vendorId]);
 
   const toggleExpanded = (userId) => {
@@ -166,40 +197,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
         packageCheckInCount: increment(-totalPackages)
       });
 
-      // Refresh the user list
-      const [querySnapshot, packageCountsSnapshot] = await Promise.all([
-        getDocs(collection(db, "users")),
-        getDocs(collection(db, "partners", vendorId, "packageCounts"))
-      ]);
-
-      const packageCounts = Object.fromEntries(
-        packageCountsSnapshot.docs.map((entry) => [
-          entry.id,
-          {
-            count: Number(entry.data().count) || 0,
-            totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
-            totalPickedUp: Number(entry.data().totalPickedUp) || 0,
-            holdForResubscribe: Boolean(entry.data().holdForResubscribe)
-          }
-        ])
-      );
-
-      const usersList = querySnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-          packageCount: packageCounts[doc.id]?.count || 0,
-          totalReceived: packageCounts[doc.id]?.totalReceived || 0,
-          totalPickedUp: packageCounts[doc.id]?.totalPickedUp || 0,
-          holdForResubscribe: packageCounts[doc.id]?.holdForResubscribe || false
-        }))
-        .filter(
-          (user) =>
-            user.packageCount > 0 ||
-            (user.status !== "active" && user.holdForResubscribe)
-        );
-
-      setUsers(usersList);
       setSelectedUserIds([]);
       setPackageQuantities({});
 

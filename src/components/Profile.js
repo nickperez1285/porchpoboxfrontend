@@ -4,7 +4,6 @@ import { signOut } from "firebase/auth";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
   onSnapshot
 } from "firebase/firestore";
@@ -85,17 +84,6 @@ const Profile = ({ user }) => {
 
   useEffect(() => {
     let isCancelled = false;
-
-    const loadProfile = async () => {
-      try {
-        const profileSnapshot = await getDoc(doc(db, "users", user.uid));
-        if (!isCancelled && profileSnapshot.exists()) {
-          setProfileData(profileSnapshot.data());
-        }
-      } catch (error) {
-        console.error("Error loading user profile:", error);
-      }
-    };
 
     const subscribeToPackageHistory = async () => {
       setPackagesLoading(true);
@@ -222,7 +210,18 @@ const Profile = ({ user }) => {
       }
     };
 
-    loadProfile();
+    const unsubscribeProfile = onSnapshot(
+      doc(db, "users", user.uid),
+      (snapshot) => {
+        if (!isCancelled && snapshot.exists()) {
+          setProfileData(snapshot.data());
+        }
+      },
+      (error) => {
+        console.error("Error loading user profile:", error);
+      }
+    );
+
     let unsubscribePackageHistory = () => {};
 
     subscribeToPackageHistory().then((unsubscribe) => {
@@ -231,6 +230,7 @@ const Profile = ({ user }) => {
 
     return () => {
       isCancelled = true;
+      unsubscribeProfile();
       unsubscribePackageHistory();
     };
   }, [user.uid]);
@@ -485,10 +485,51 @@ const Profile = ({ user }) => {
           }}
         >
           <h3 style={{ marginTop: 0 }}>Package History</h3>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: 12,
+              marginBottom: 18
+            }}
+          >
+            <div
+              style={{
+                border: "1px solid #eee",
+                borderRadius: 12,
+                padding: 14,
+                background: "#fafafa"
+              }}
+            >
+              <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+                Total Checked In
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>
+                {Number(profileData?.packagesCheckedIn) || 0}
+              </div>
+            </div>
+            <div
+              style={{
+                border: "1px solid #eee",
+                borderRadius: 12,
+                padding: 14,
+                background: "#fafafa"
+              }}
+            >
+              <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
+                Total Delivered
+              </div>
+              <div style={{ fontSize: 18, fontWeight: 600 }}>
+                {Number(profileData?.packagesDelivered) || 0}
+              </div>
+            </div>
+          </div>
           {packagesLoading ? (
             <p style={{ color: "#666" }}>Loading package history...</p>
           ) : packageHistory.length === 0 ? (
-            <p style={{ color: "#666" }}>No packages have been checked in yet.</p>
+            <p style={{ color: "#666" }}>
+              Detailed partner history is not available for this account yet.
+            </p>
           ) : (
             <div>
               {packageHistory.map((pkg) => (

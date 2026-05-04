@@ -2,7 +2,14 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import CustomerList from "./CustomerList";
-import { collection, doc, getDocs, increment, setDoc, updateDoc } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  increment,
+  onSnapshot,
+  setDoc,
+  updateDoc
+} from "firebase/firestore";
 
 jest.mock("../firebase", () => ({
   db: { __name: "mock-db" }
@@ -11,8 +18,8 @@ jest.mock("../firebase", () => ({
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(),
   doc: jest.fn(),
-  getDocs: jest.fn(),
   increment: jest.fn((value) => ({ __increment: value })),
+  onSnapshot: jest.fn(),
   setDoc: jest.fn(),
   updateDoc: jest.fn()
 }));
@@ -45,46 +52,36 @@ describe("CustomerList", () => {
   it("preserves a zero-count package history document after the last package is delivered", async () => {
     const onPackagesDelivered = jest.fn();
 
-    getDocs
-      .mockResolvedValueOnce({
-        docs: [
-          createDoc("user-1", {
-            name: "Casey Customer",
-            email: "casey@example.com",
-            status: "trial",
-            packagesCheckedIn: 1,
-            packagesDelivered: 0
-          })
-        ]
-      })
-      .mockResolvedValueOnce({
-        docs: [
-          createDoc("user-1", {
-            count: 1,
-            totalReceived: 1,
-            totalPickedUp: 0
-          })
-        ]
-      })
-      .mockResolvedValueOnce({
-        docs: [
-          createDoc("user-1", {
-            name: "Casey Customer",
-            email: "casey@example.com",
-            status: "trial"
-          })
-        ]
-      })
-      .mockResolvedValueOnce({
-        docs: [
-          createDoc("user-1", {
-            count: 0,
-            totalReceived: 1,
-            totalPickedUp: 1,
-            holdForResubscribe: false
-          })
-        ]
-      });
+    let packageSnapshotListener;
+
+    onSnapshot.mockImplementation((target, onNext) => {
+      if (String(target).includes("mock-db/users")) {
+        onNext({
+          docs: [
+            createDoc("user-1", {
+              name: "Casey Customer",
+              email: "casey@example.com",
+              status: "trial",
+              packagesCheckedIn: 1,
+              packagesDelivered: 0
+            })
+          ]
+        });
+      } else {
+        packageSnapshotListener = onNext;
+        onNext({
+          docs: [
+            createDoc("user-1", {
+              count: 1,
+              totalReceived: 1,
+              totalPickedUp: 0
+            })
+          ]
+        });
+      }
+
+      return jest.fn();
+    });
 
     render(
       <CustomerList
@@ -112,6 +109,17 @@ describe("CustomerList", () => {
           })
         })
       );
+    });
+
+    packageSnapshotListener({
+      docs: [
+        createDoc("user-1", {
+          count: 0,
+          totalReceived: 1,
+          totalPickedUp: 1,
+          holdForResubscribe: false
+        })
+      ]
     });
 
     await waitFor(() => {
