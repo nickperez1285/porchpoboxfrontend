@@ -45,15 +45,17 @@ const MainPage = ({ user, userStatus }) => {
 
       // Geocode each vendor address
       const withCoords = await Promise.all(
-        vendors.map(async (vendor) => {
+        vendors.map(async (vendor, index) => {
           const address = [vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
             .filter(Boolean)
             .join(", ");
           if (!address) return vendor;
           try {
+            // stagger requests to avoid Nominatim rate limiting
+            await new Promise((r) => setTimeout(r, index * 300));
             const res = await fetch(
               `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`,
-              { headers: { "Accept-Language": "en" } }
+              { headers: { "Accept-Language": "en", "User-Agent": "PorchPOBox/1.0" } }
             );
             const data = await res.json();
             if (data[0]) {
@@ -229,33 +231,39 @@ const MainPage = ({ user, userStatus }) => {
             </div>
 
             {/* Map */}
-            {!vendorsLoading && activeVendors.some((v) => v.lat) && (
-              <div style={{ flex: "1 1 220px", minHeight: 300, borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 28px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)" }}>
-                <MapContainer
-                  center={[
-                    activeVendors.filter((v) => v.lat).reduce((s, v) => s + v.lat, 0) / activeVendors.filter((v) => v.lat).length,
-                    activeVendors.filter((v) => v.lat).reduce((s, v) => s + v.lng, 0) / activeVendors.filter((v) => v.lat).length
-                  ]}
-                  zoom={12}
-                  style={{ height: "100%", minHeight: 300 }}
-                  scrollWheelZoom={false}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  />
-                  {activeVendors.filter((v) => v.lat).map((vendor) => (
-                    <Marker key={vendor.id} position={[vendor.lat, vendor.lng]}>
-                      <Popup>
-                        <strong>{vendor.businessName || "Partner"}</strong><br />
-                        {vendor.streetAddress}{vendor.city ? `, ${vendor.city}` : ""}<br />
-                        {vendor.storeHours || ""}
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
-              </div>
-            )}
+            {!vendorsLoading && (() => {
+              const mapped = activeVendors.filter((v) => v.lat);
+              const center = mapped.length
+                ? [
+                    mapped.reduce((s, v) => s + v.lat, 0) / mapped.length,
+                    mapped.reduce((s, v) => s + v.lng, 0) / mapped.length
+                  ]
+                : [39.5, -98.35]; // fallback: center of US
+              return (
+                <div style={{ flex: "1 1 220px", minHeight: 300, borderRadius: 20, overflow: "hidden", boxShadow: "0 12px 28px rgba(0,0,0,0.08)", border: "1px solid rgba(0,0,0,0.08)" }}>
+                  <MapContainer
+                    center={center}
+                    zoom={mapped.length ? 12 : 4}
+                    style={{ height: "100%", minHeight: 300 }}
+                    scrollWheelZoom={false}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    />
+                    {mapped.map((vendor) => (
+                      <Marker key={vendor.id} position={[vendor.lat, vendor.lng]}>
+                        <Popup>
+                          <strong>{vendor.businessName || "Partner"}</strong><br />
+                          {vendor.streetAddress}{vendor.city ? `, ${vendor.city}` : ""}<br />
+                          {vendor.storeHours || ""}
+                        </Popup>
+                      </Marker>
+                    ))}
+                  </MapContainer>
+                </div>
+              );
+            })()}
           </div>
 
           </div> {/* end locations + map wrapper */}
