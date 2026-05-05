@@ -303,12 +303,8 @@ const MainPage = ({ user, userStatus }) => {
             Invite a partner. Earn free service for a YEAR.
           </h4>
           <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
-            Refer a new partner location to Porch P.O. Box and receive 1 whole
-            year of free service for every partner that joins our network. Help
-            us grow our secure delivery network while earning free service for
-            you or a loved one! There is no limit to the number of partners you
-            can refer.
-          </p>
+            Wish you had  a Porch P.O. Box for your packages? Let your local business  
+            know about us and if they decide to parner with us you will receive a whole YEAR  of free service ! okf of free service! 
           <Link
             to="/referrals"
             style={{
