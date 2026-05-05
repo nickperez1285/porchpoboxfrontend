@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import {
   collection,
@@ -529,7 +529,15 @@ const Admin = () => {
                 >
                   <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
                     <strong>{vendor.businessName || "Unnamed partner"}</strong>
-                    <div>{vendor.packageCountTotal || 0}: PKGS</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <Link
+                        to={`/admin/partner/${vendor.id}`}
+                        style={{ fontSize: 13, color: "#0b57d0" }}
+                      >
+                        View Portal
+                      </Link>
+                      <div>{vendor.packageCountTotal || 0}: PKGS</div>
+                    </div>
                   </div>
                   <button
                     type="button"

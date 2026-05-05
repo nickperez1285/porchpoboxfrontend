@@ -18,6 +18,7 @@ import PartnerRegistrationPending from "./components/PartnerRegistrationPending"
 import PackageCheckIn from "./components/PackageCheckIn";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
+import AdminPartnerView from "./components/AdminPartnerView";
 import ForgotPassword from "./components/ForgotPassword";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import CheckoutCancel from "./components/CheckoutCancel";
@@ -278,6 +279,10 @@ function App() {
                 <Navigate to="/admin/login" replace />
               )
             }
+          />
+          <Route
+            path="/admin/partner/:partnerId"
+            element={isAdmin ? <AdminPartnerView /> : <Navigate to="/admin/login" replace />}
           />
           <Route path="/quickcheckout" element={<OneTimeProduct user={user} />} />
           <Route
