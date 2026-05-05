@@ -213,16 +213,9 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
   };
 
   const getCustomerBackgroundColor = (user) => {
-    const isPaidUp = user.status === "active";
-    const totalReceived = user.totalReceived || 0;
-
-    if (isPaidUp || totalReceived === 0) {
-      return "#ffffff"; // White: paid up or new/never used
-    } else if (totalReceived === 1) {
-      return "#fff6bf"; // Yellow: received one package
-    } else {
-      return "#ffd9d9"; // Red: not paid up and received more than one
-    }
+    if (user.status === "active") return "#ffffff";
+    if (user.status === "trial") return "#fff6bf";
+    return "#ffd9d9";
   };
 
   const toggleSelection = (userId) => {
