@@ -303,8 +303,10 @@ const MainPage = ({ user, userStatus }) => {
             Invite a partner. Earn free service for a YEAR.
           </h4>
           <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
-            Wish you had  a Porch P.O. Box for your packages? Let your local business  
-            know about us and if they decide to parner with us you will receive a whole YEAR  of free service ! okf of free service! 
+            Wish you had a Porch P.O. Box for your packages? Let your local
+            business know about us and if they decide to parner with us you will
+            receive a whole YEAR of free service ! okf of free service!{" "}
+          </p>
           <Link
             to="/referrals"
             style={{
