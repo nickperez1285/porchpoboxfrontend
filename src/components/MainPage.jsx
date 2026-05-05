@@ -1,8 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
 import { db } from "../firebase";
+
+// Fix leaflet default marker icons broken by webpack
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
+  iconUrl: require("leaflet/dist/images/marker-icon.png"),
+  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
+});
 
 const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
@@ -11,6 +22,7 @@ const MainPage = ({ user, userStatus }) => {
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
+  const [vendorMarkers, setVendorMarkers] = useState([]);
   useEffect(() => {
     setMainPageTitle(
       "Secure Package Receiving Through Local Partner Locations!.",
@@ -20,6 +32,30 @@ const MainPage = ({ user, userStatus }) => {
     );
     fetchActiveVendors();
   }, []);
+
+  useEffect(() => {
+    if (activeVendors.length === 0) return;
+    const geocode = async () => {
+      const results = await Promise.all(
+        activeVendors.map(async (vendor) => {
+          const addr = [vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
+            .filter(Boolean).join(", ");
+          if (!addr) return null;
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1`,
+              { headers: { "Accept-Language": "en" } }
+            );
+            const data = await res.json();
+            if (data[0]) return { vendor, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+          } catch {}
+          return null;
+        })
+      );
+      setVendorMarkers(results.filter(Boolean));
+    };
+    geocode();
+  }, [activeVendors]);
 
   const fetchActiveVendors = async () => {
     setVendorsLoading(true);
@@ -191,9 +227,16 @@ const MainPage = ({ user, userStatus }) => {
                       </button>
                     </div>
                     {expandedVendorIds.includes(vendor.id) && (
-                      <div style={{ marginTop: 8, color: "#555" }}>
-                        <div>
-                          Store Hours: {vendor.store_hours || "Not provided"}
+                      <div style={{ marginTop: 8, color: "#555", fontSize: "0.9em" }}>
+                        {(vendor.streetAddress || vendor.city) && (
+                          <div>
+                            {[vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </div>
+                        )}
+                        <div style={{ marginTop: 4 }}>
+                          Store Hours: {vendor.storeHours || vendor.store_hours || "Not provided"}
                         </div>
                       </div>
                     )}
@@ -202,6 +245,41 @@ const MainPage = ({ user, userStatus }) => {
               </ul>
             )}
           </div>
+
+          {vendorMarkers.length > 0 && (
+            <div
+              style={{
+                flex: "1 1 400px",
+                minWidth: 300,
+                maxWidth: 560,
+                height: 420,
+                borderRadius: 20,
+                overflow: "hidden",
+                boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
+                border: "1px solid rgba(0, 0, 0, 0.08)",
+              }}
+            >
+              <MapContainer
+                center={[vendorMarkers[0].lat, vendorMarkers[0].lng]}
+                zoom={12}
+                style={{ width: "100%", height: "100%" }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                />
+                {vendorMarkers.map(({ vendor, lat, lng }) => (
+                  <Marker key={vendor.id} position={[lat, lng]}>
+                    <Popup>
+                      <strong>{vendor.businessName}</strong><br />
+                      {[vendor.streetAddress, vendor.city, vendor.state].filter(Boolean).join(", ")}<br />
+                      {vendor.storeHours || vendor.store_hours || ""}
+                    </Popup>
+                  </Marker>
+                ))}
+              </MapContainer>
+            </div>
+          )}
 
           <div
             style={{
