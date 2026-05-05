@@ -10,7 +10,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 
-const Login = ({ title = "Login", redirectTo = "/" }) => {
+const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");

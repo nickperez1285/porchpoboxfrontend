@@ -38,19 +38,30 @@ const MainPage = ({ user, userStatus }) => {
     const geocode = async () => {
       const results = await Promise.all(
         activeVendors.map(async (vendor) => {
-          const addr = [vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
-            .filter(Boolean).join(", ");
+          const addr = [
+            vendor.streetAddress,
+            vendor.city,
+            vendor.state,
+            vendor.zipCode,
+          ]
+            .filter(Boolean)
+            .join(", ");
           if (!addr) return null;
           try {
             const res = await fetch(
               `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1`,
-              { headers: { "Accept-Language": "en" } }
+              { headers: { "Accept-Language": "en" } },
             );
             const data = await res.json();
-            if (data[0]) return { vendor, lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            if (data[0])
+              return {
+                vendor,
+                lat: parseFloat(data[0].lat),
+                lng: parseFloat(data[0].lon),
+              };
           } catch {}
           return null;
-        })
+        }),
       );
       setVendorMarkers(results.filter(Boolean));
     };
@@ -227,16 +238,30 @@ const MainPage = ({ user, userStatus }) => {
                       </button>
                     </div>
                     {expandedVendorIds.includes(vendor.id) && (
-                      <div style={{ marginTop: 8, color: "#555", fontSize: "0.9em" }}>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          color: "#555",
+                          fontSize: "0.9em",
+                        }}
+                      >
                         {(vendor.streetAddress || vendor.city) && (
                           <div>
-                            {[vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode]
+                            {[
+                              vendor.streetAddress,
+                              vendor.city,
+                              vendor.state,
+                              vendor.zipCode,
+                            ]
                               .filter(Boolean)
                               .join(", ")}
                           </div>
                         )}
                         <div style={{ marginTop: 4 }}>
-                          Store Hours: {vendor.storeHours || vendor.store_hours || "Not provided"}
+                          Store Hours:{" "}
+                          {vendor.storeHours ||
+                            vendor.store_hours ||
+                            "Not provided"}
                         </div>
                       </div>
                     )}
@@ -271,8 +296,12 @@ const MainPage = ({ user, userStatus }) => {
                 {vendorMarkers.map(({ vendor, lat, lng }) => (
                   <Marker key={vendor.id} position={[lat, lng]}>
                     <Popup>
-                      <strong>{vendor.businessName}</strong><br />
-                      {[vendor.streetAddress, vendor.city, vendor.state].filter(Boolean).join(", ")}<br />
+                      <strong>{vendor.businessName}</strong>
+                      <br />
+                      {[vendor.streetAddress, vendor.city, vendor.state]
+                        .filter(Boolean)
+                        .join(", ")}
+                      <br />
                       {vendor.storeHours || vendor.store_hours || ""}
                     </Popup>
                   </Marker>
@@ -383,7 +412,7 @@ const MainPage = ({ user, userStatus }) => {
           <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
             Wish you had a Porch P.O. Box for your packages? Let your local
             business know about us and if they decide to parner with us you will
-            receive a whole YEAR of free service ! okf of free service!{" "}
+            hook you up with a whole YEAR of free service !{" "}
           </p>
           <Link
             to="/referrals"
