@@ -45,47 +45,61 @@ export default function ReferralForm() {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
-    <div style={{ ...styles.container, flex: 1 }}>
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <h1 style={styles.title}>Referral Form</h1>
-        <p style={styles.description}>
-          Enter the email address of your referral and add any additional
-          information to you think we should know. We will reach out to them and
-          let them know about our services. Thank you for your support!
-        </p>
+    <div
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
+      <div style={{ ...styles.container, flex: 1 }}>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <h1 style={styles.title}>Referral Form</h1>
+          <p style={styles.description}>
+            Enter the email address of your referral and/or add any additional
+            information about how to get in contact with the referral. We will
+            reach out to them and let them know about our services. Thank you
+            for your support!
+          </p>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Referral Email"
-          required
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          style={styles.input}
-        />
+          <input
+            type="email"
+            name="email"
+            placeholder="Referral Email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            style={styles.input}
+          />
 
-        <textarea
-          name="additionalInfo"
-          placeholder="Additional information"
-          rows={6}
-          value={additionalInfo}
-          onChange={(event) => setAdditionalInfo(event.target.value)}
-          style={{ ...styles.input, resize: "vertical" }}
-        />
+          <textarea
+            name="additionalInfo"
+            placeholder="Additional information"
+            rows={6}
+            value={additionalInfo}
+            onChange={(event) => setAdditionalInfo(event.target.value)}
+            style={{ ...styles.input, resize: "vertical" }}
+          />
 
-        <button type="submit" style={styles.button} disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
-        {status && <p style={styles.status}>{status}</p>}
-      </form>
-    </div>
-    <footer style={{ padding: "1em", background: "#111" }}>
-      <center>
-        <Link to="/partner" style={{ display: "inline-block", paddingRight: 10, color: "inherit" }}>Partners</Link>
-        <Link to="/contact" style={{ color: "inherit" }}>Contact</Link>
-      </center>
-    </footer>
+          <button type="submit" style={styles.button} disabled={isSubmitting}>
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </button>
+          {status && <p style={styles.status}>{status}</p>}
+        </form>
+      </div>
+      <footer style={{ padding: "1em", background: "#111" }}>
+        <center>
+          <Link
+            to="/partner"
+            style={{
+              display: "inline-block",
+              paddingRight: 10,
+              color: "inherit",
+            }}
+          >
+            Partners
+          </Link>
+          <Link to="/contact" style={{ color: "inherit" }}>
+            Contact
+          </Link>
+        </center>
+      </footer>
     </div>
   );
 }
