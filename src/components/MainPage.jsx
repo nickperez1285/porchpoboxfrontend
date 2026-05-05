@@ -13,7 +13,7 @@ const MainPage = ({ user, userStatus }) => {
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
   useEffect(() => {
     setMainPageTitle(
-      "Secure Package Receiving Through Local Partner Locations.",
+      "Secure Package Receiving Through Local Partner Locations!.",
     );
     setMainPageMessage(
       "Have your packages delivered to a local Porch P.O. Box and stored in the safe and secure hands of a trusted neighbor partner.",
