@@ -25,10 +25,10 @@ const MainPage = ({ user, userStatus }) => {
   const [vendorMarkers, setVendorMarkers] = useState([]);
   useEffect(() => {
     setMainPageTitle(
-      "Secure Package Receiving Through Local Partner Locations!.",
+      "Secure Package Receiving Through Local Partner Locations!",
     );
     setMainPageMessage(
-      "Have your packages delivered to a local Porch P.O. Box and stored in the safe and secure hands of a trusted neighbor partner.",
+      "Have your packages delivered and securely stored at a trusted local neigborhood  Porch P.O. Box ",
     );
     fetchActiveVendors();
   }, []);
