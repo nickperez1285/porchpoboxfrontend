@@ -16,6 +16,7 @@ import PartnerRegister from "./components/PartnerRegister";
 import PartnerEditProfile from "./components/PartnerEditProfile";
 import PartnerRegistrationPending from "./components/PartnerRegistrationPending";
 import PackageCheckIn from "./components/PackageCheckIn";
+import PartnerActivityLog from "./components/PartnerActivityLog";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
 import AdminPartnerView from "./components/AdminPartnerView";
@@ -213,6 +214,16 @@ function App() {
                 <PartnerEditProfile user={user} partnerProfile={partnerProfile} />
               ) : (
                 <Navigate to="/partner/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/partner/activity-log"
+            element={
+              user && partnerProfile && partnerProfile.approved ? (
+                <PartnerActivityLog partnerProfile={partnerProfile} />
+              ) : (
+                <Navigate to="/partner" replace />
               )
             }
           />

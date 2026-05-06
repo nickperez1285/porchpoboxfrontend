@@ -166,6 +166,9 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                   <Link to="/partner/package-check-in">Check In Packages</Link>
                 </div>
                 <div style={{ marginTop: 8 }}>
+                  <Link to="/partner/activity-log">Activity Log</Link>
+                </div>
+                <div style={{ marginTop: 8 }}>
                   <Link to="/partner/profile">Partner Profile</Link>
                 </div>
               </div>
