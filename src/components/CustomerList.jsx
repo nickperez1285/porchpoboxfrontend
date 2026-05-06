@@ -132,6 +132,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       const deliveryPayload = selectedUsers
         .map((user) => ({
           id: user.id,
+          name: user.name || "",
+          email: user.email || "",
           packageCount: getNormalizedPackageQuantity(user.id)
         }))
         .filter((recipient) => recipient.packageCount > 0);
