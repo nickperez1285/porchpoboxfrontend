@@ -25,10 +25,10 @@ const MainPage = ({ user, userStatus }) => {
   const [vendorMarkers, setVendorMarkers] = useState([]);
   useEffect(() => {
     setMainPageTitle(
-      "Secure Package Receiving Through Local Partner Locations!",
+      "Secure Package Receiving Through Local Partner Locations",
     );
     setMainPageMessage(
-      "Have your packages delivered and securely stored at a trusted local neigborhood  Porch P.O. Box ",
+      "Get your packages delivered and securely stored at a trusted local neigborhood  Porch P.O. Box ",
     );
     fetchActiveVendors();
   }, []);
@@ -427,17 +427,16 @@ const MainPage = ({ user, userStatus }) => {
           </Link>
         </div>
       </div>
-      <footer style={{ padding: "1.5em", background: "#111", color: "#aaa", fontSize: 14 }}>
+      <footer style={{ padding: "1em", background: "#111" }}>
         <center>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 20px" }}>
-            <Link to="/partner" style={{ color: "#ccc" }}>Partners</Link>
-            <Link to="/contact" style={{ color: "#ccc" }}>Contact</Link>
-            <Link to="/about" style={{ color: "#ccc" }}>About</Link>
-            <Link to="/terms" style={{ color: "#ccc" }}>Terms &amp; Policies</Link>
-          </div>
-          <div style={{ marginTop: 10, color: "#555", fontSize: 12 }}>
-            &copy; {new Date().getFullYear()} Porch P.O. Box
-          </div>
+          <Link
+            to="/partner"
+            style={{ display: "inline-block", paddingRight: 10 }}
+          >
+            Partners
+          </Link>
+          <></>
+          <Link to="/contact">Contact </Link>
         </center>
       </footer>
     </div>
