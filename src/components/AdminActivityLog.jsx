@@ -15,9 +15,10 @@ const AdminActivityLog = () => {
     let unsubscribes = [];
     const partnerMap = {};
     const logMap = {};
+    let signupEntries = [];
 
     const merge = () => {
-      const all = Object.values(logMap).flat();
+      const all = [...signupEntries, ...Object.values(logMap).flat()];
       all.sort((a, b) => {
         const ta = a.timestamp?.toDate?.() || new Date(0);
         const tb = b.timestamp?.toDate?.() || new Date(0);
@@ -35,6 +36,18 @@ const AdminActivityLog = () => {
 
         setLoading(false);
 
+        // Listen to global signup log
+        const signupUnsub = onSnapshot(
+          query(collection(db, "activityLog"), orderBy("timestamp", "desc")),
+          (snapshot) => {
+            signupEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+            merge();
+          },
+          (err) => console.error("Error loading signup log:", err)
+        );
+        unsubscribes.push(signupUnsub);
+
+        // Listen to each partner's activityLog
         partnerList.forEach((partner) => {
           const q = query(
             collection(db, "partners", partner.id, "activityLog"),

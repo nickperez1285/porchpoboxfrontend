@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc, collection, addDoc } from "firebase/firestore";
 import {
   isPasswordValid,
   passwordRequirementsText
@@ -99,6 +99,14 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
+      await addDoc(collection(db, "activityLog"), {
+        type: "signup",
+        userName: displayName || "Unknown",
+        userEmail: user.email || "",
+        authProvider: "google",
+        timestamp: serverTimestamp()
+      });
+
       await sendWelcomeEmail({
         name: displayName,
         email: user.email
@@ -193,6 +201,14 @@ const Register = () => {
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-user-v1",
         createdAt: serverTimestamp()
+      });
+
+      await addDoc(collection(db, "activityLog"), {
+        type: "signup",
+        userName: name || "Unknown",
+        userEmail: email || "",
+        authProvider: "email",
+        timestamp: serverTimestamp()
       });
 
       navigate("/");
