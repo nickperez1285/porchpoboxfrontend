@@ -248,7 +248,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
   const getNormalizedPackageQuantity = (userId) => {
     const user = users.find((u) => u.id === userId);
     const maxQuantity = user?.packageCount || 0;
-    const quantity = Number(packageQuantities[userId]) ?? maxQuantity;
+    const raw = packageQuantities[userId];
+    const quantity = raw !== undefined ? Number(raw) : maxQuantity;
     return Math.min(Math.max(1, quantity), maxQuantity);
   };
 

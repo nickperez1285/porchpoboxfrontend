@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
@@ -11,6 +11,8 @@ import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
 const Register = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const fromGoogle = searchParams.get("google") === "1";
 
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -207,6 +209,11 @@ const Register = () => {
       title="Create account"
       subtitle="Join Porch P.O. Box with your contact details and mailing address."
     >
+      {fromGoogle && (
+        <div style={{ background: "#fff8e1", border: "1px solid #f0c040", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 14, color: "#7a5c00" }}>
+          Please complete registration and agree to the terms before signing in with Google.
+        </div>
+      )}
       <form className="reg-form" onSubmit={handleRegister} noValidate>
         <p className="reg-section-label">Account</p>
         

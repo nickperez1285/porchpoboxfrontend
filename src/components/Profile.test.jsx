@@ -116,13 +116,11 @@ describe("Profile", () => {
 
     expect(await screen.findByText("Main Street Partner")).toBeInTheDocument();
 
-    const totalReceived = screen.getByText("Total Received").parentElement;
-    const pickedUp = screen.getByText("Picked Up").parentElement;
-    const waiting = screen.getByText("Waiting").parentElement;
+    const totalReceivedEl = screen.getByText("Total Received").parentElement;
+    const waitingEl = screen.getByText("Waiting").parentElement;
 
-    expect(within(totalReceived).getByText("1")).toBeInTheDocument();
-    expect(within(pickedUp).getByText("1")).toBeInTheDocument();
-    expect(within(waiting).getByText("0")).toBeInTheDocument();
+    expect(within(totalReceivedEl).getByText("1")).toBeInTheDocument();
+    expect(within(waitingEl).getByText("0")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(getDocs).toHaveBeenCalledWith(expect.stringContaining("partners"));

@@ -1,6 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import CustomerList from "./CustomerList";
 import {
   collection,
@@ -94,8 +93,10 @@ describe("CustomerList", () => {
     expect(await screen.findByText("Casey Customer")).toBeInTheDocument();
 
     const checkbox = screen.getByRole("checkbox");
-    await userEvent.click(checkbox);
-    await userEvent.click(screen.getByRole("button", { name: /deliver selected/i }));
+    fireEvent.click(checkbox);
+
+    const deliverBtn = await screen.findByRole("button", { name: /deliver selected \(1\)/i });
+    fireEvent.click(deliverBtn);
 
     await waitFor(() => {
       expect(fetch).toHaveBeenCalledWith(
@@ -105,7 +106,7 @@ describe("CustomerList", () => {
           body: JSON.stringify({
             partnerId: "partner-1",
             partnerName: "Main Street",
-            recipients: [{ id: "user-1", packageCount: 1 }]
+            recipients: [{ id: "user-1", name: "Casey Customer", email: "casey@example.com", packageCount: 1 }]
           })
         })
       );

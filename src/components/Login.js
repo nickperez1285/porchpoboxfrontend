@@ -5,6 +5,7 @@ import { auth, db } from "../firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
+  signOut,
   GoogleAuthProvider,
   onAuthStateChanged,
 } from "firebase/auth";
@@ -68,6 +69,16 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         navigate("/partner");
         return;
       }
+
+      // Check if user has a registered account with terms accepted
+      const userDoc = await getDoc(doc(db, "users", result.user.uid));
+      if (!userDoc.exists() || !userDoc.data().termsAccepted) {
+        // New or unregistered user — sign them out and send to registration
+        await signOut(auth);
+        navigate("/register?google=1");
+        return;
+      }
+
       navigate(redirectTo);
     } catch (err) {
       console.error("Google sign-in error:", err);
