@@ -346,7 +346,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
 
                 <div style={{ display: "flex", gap: 16, flexWrap: "wrap", color: "#444", fontSize: 14 }}>
                   <div>Packages Waiting: {user.packageCount || 0}</div>
-                  <div>Total Received: {user.totalReceived || 0}</div>
                 </div>
               </div>
 
