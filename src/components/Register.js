@@ -99,20 +99,24 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
-      await addDoc(collection(db, "activityLog"), {
-        type: "signup",
-        userName: displayName || "Unknown",
-        userEmail: user.email || "",
-        authProvider: "google",
-        timestamp: serverTimestamp()
-      });
+      try {
+        await addDoc(collection(db, "activityLog"), {
+          type: "signup",
+          userName: displayName || "Unknown",
+          userEmail: user.email || "",
+          authProvider: "google",
+          timestamp: serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("Failed to write signup log:", logErr);
+      }
 
       await sendWelcomeEmail({
         name: displayName,
         email: user.email
       });
 
-      navigate("/");
+      navigate("/profile");
     } catch (err) {
       console.error("Google sign-in error:", err);
       
@@ -203,15 +207,19 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
-      await addDoc(collection(db, "activityLog"), {
-        type: "signup",
-        userName: name || "Unknown",
-        userEmail: email || "",
-        authProvider: "email",
-        timestamp: serverTimestamp()
-      });
+      try {
+        await addDoc(collection(db, "activityLog"), {
+          type: "signup",
+          userName: name || "Unknown",
+          userEmail: email || "",
+          authProvider: "email",
+          timestamp: serverTimestamp()
+        });
+      } catch (logErr) {
+        console.error("Failed to write signup log:", logErr);
+      }
 
-      navigate("/");
+      navigate("/profile");
     } catch (err) {
       console.error(err);
       setError(err.message);
