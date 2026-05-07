@@ -563,18 +563,10 @@ const Profile = ({ user }) => {
                   >
                     {pkg.partnerName}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                     <div>
                       <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
                         Total Received
-                      </div>
-                      <div style={{ fontSize: 16, fontWeight: 600 }}>
-                        {pkg.totalReceived}
-                      </div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
-                        Picked Up
                       </div>
                       <div style={{ fontSize: 16, fontWeight: 600 }}>
                         {pkg.totalPickedUp}
