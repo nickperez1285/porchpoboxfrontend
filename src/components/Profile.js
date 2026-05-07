@@ -516,7 +516,7 @@ const Profile = ({ user }) => {
               <div style={{ fontSize: 12, color: "#666", marginBottom: 4 }}>
                 Currently Checked In
               </div>
-              <div style={{ fontSize: 18, fontWeight: 600 }}>
+              <div style={{ fontSize: 18, fontWeight: 600, color: currentPackagesWaiting > 0 ? "#b8860b" : "inherit" }}>
                 {currentPackagesWaiting}
               </div>
             </div>

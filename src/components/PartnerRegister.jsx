@@ -29,10 +29,25 @@ const PartnerRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const validate = () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
+    if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, ""))) return "Phone number must have 10 digits.";
+    if (!/^[A-Za-z]{2}$/.test(state.trim())) return "State must be a 2-letter abbreviation (e.g. CA).";
+    if (!/^\d{5}$/.test(zipCode.trim())) return "ZIP code must be exactly 5 digits.";
+    return "";
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
+
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      setLoading(false);
+      return;
+    }
 
     if (!isPasswordValid(password)) {
       setError(passwordRequirementsText);

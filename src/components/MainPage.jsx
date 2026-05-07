@@ -209,38 +209,34 @@ const MainPage = ({ user, userStatus }) => {
                   <li
                     key={vendor.id}
                     style={{
-                      padding: "14px 0",
                       borderBottom: "1px solid #ece5d5",
                     }}
                   >
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    <button
+                      type="button"
+                      onClick={() => toggleVendorExpanded(vendor.id)}
+                      style={{
+                        width: "100%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        padding: "14px 0",
+                        border: "none",
+                        background: "none",
+                        cursor: "pointer",
+                        textAlign: "left",
+                        color: "#181818",
+                      }}
                     >
-                      <strong>
-                        {vendor.businessName || "Unnamed partner"}
-                      </strong>
-                      <button
-                        type="button"
-                        onClick={() => toggleVendorExpanded(vendor.id)}
-                        style={{
-                          padding: 0,
-                          border: "none",
-                          background: "none",
-                          color: "#0b57d0",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                          fontSize: "0.9em",
-                        }}
-                      >
-                        {expandedVendorIds.includes(vendor.id)
-                          ? "Hide Info"
-                          : "Info"}
-                      </button>
-                    </div>
+                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                      <span style={{ fontSize: 12, color: "#8a6a00" }}>
+                        {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
+                      </span>
+                    </button>
                     {expandedVendorIds.includes(vendor.id) && (
                       <div
                         style={{
-                          marginTop: 8,
+                          paddingBottom: 12,
                           color: "#555",
                           fontSize: "0.9em",
                         }}

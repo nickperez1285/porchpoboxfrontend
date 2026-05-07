@@ -59,11 +59,15 @@ module.exports = async (req, res) => {
         "",
         "Welcome to Porch P.O. Box!",
         "",
-        "Your account has been created successfully!  Try the service now to get your first package free or subscribe now and get unlimited access.",
+        "Your account has been created successfully! Your first package delivery is on us — no subscription needed to try the service.",
         "",
-
+        "If you'd like to subscribe right away and get unlimited access, view our plans here:",
         "",
-        "Porch P.O. Box"
+        "https://porchpobox.com/plans",
+        "",
+        "Questions? Just reply to this email.",
+        "",
+        "— The Porch P.O. Box Team"
       ].join("\n")
     });
 
