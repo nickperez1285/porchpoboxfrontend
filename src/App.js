@@ -11,6 +11,7 @@ import Partners from "./components/Partners";
 import Contact from "./components/Contact";
 import Profile from "./components/Profile";
 import EditProfile from "./components/EditProfile";
+import UserSettings from "./components/UserSettings";
 import PartnerProfile from "./components/PartnerProfile";
 import PartnerRegister from "./components/PartnerRegister";
 import PartnerEditProfile from "./components/PartnerEditProfile";
@@ -247,6 +248,10 @@ function App() {
           <Route
             path="/profile"
             element={user ? <Profile user={user} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/profile/settings"
+            element={user ? <UserSettings user={user} /> : <Navigate to="/login" replace />}
           />
           <Route
             path="/profile/edit"

@@ -362,140 +362,6 @@ const Profile = ({ user }) => {
             background: "#fff",
           }}
         >
-          <h3 style={{ marginTop: 0 }}>Contact Information</h3>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Name
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
-              {user.displayName || profileData?.name || "Not provided"}
-            </div>
-          </div>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Email
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
-              {user.email || "Not available"}
-            </div>
-          </div>
-          <div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Phone
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
-              {profileData?.phoneNumber || "Not provided"}
-            </div>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-            <Link to="/profile/edit">Edit</Link>
-          </div>
-        </div>
-
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-          }}
-        >
-          <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Street Address
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
-              {profileData?.streetAddress || "Not provided"}
-            </div>
-          </div>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              City
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
-              {profileData?.city || "Not provided"}
-            </div>
-          </div>
-          <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                State
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
-                {profileData?.state || "Not provided"}
-              </div>
-            </div>
-            <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Zip Code
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
-                {profileData?.zipCode || "Not provided"}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-          }}
-        >
           <h3 style={{ marginTop: 0 }}>Package History</h3>
           <div
             style={{
@@ -674,6 +540,7 @@ const Profile = ({ user }) => {
             </>
           )}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
+            <Link to="/profile/settings">Settings</Link>
             <button type="button" onClick={handleLogout}>
               Logout
             </button>
