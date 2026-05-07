@@ -6,7 +6,6 @@ import {
   doc,
   getDocs,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   updateDoc,
@@ -205,7 +204,7 @@ const Admin = () => {
         });
 
         const signupUnsub = onSnapshot(
-          query(collection(db, "activityLog"), where("timestamp", ">=", startOfDay), orderBy("timestamp", "desc")),
+          query(collection(db, "activityLog"), where("timestamp", ">=", startOfDay)),
           (snap) => { signupEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() })); merge(); },
           (err) => console.error("Today signup log error:", err)
         );
@@ -216,8 +215,7 @@ const Admin = () => {
           const unsub = onSnapshot(
             query(
               collection(db, "partners", partnerId, "activityLog"),
-              where("timestamp", ">=", startOfDay),
-              orderBy("timestamp", "desc")
+              where("timestamp", ">=", startOfDay)
             ),
             (snap) => {
               logMap[partnerId] = snap.docs.map((d) => ({

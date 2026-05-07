@@ -38,7 +38,7 @@ const AdminActivityLog = () => {
 
         // Listen to global signup log
         const signupUnsub = onSnapshot(
-          query(collection(db, "activityLog"), orderBy("timestamp", "desc")),
+          query(collection(db, "activityLog")),
           (snapshot) => {
             signupEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
             merge();
