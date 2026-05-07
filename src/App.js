@@ -21,6 +21,7 @@ import PartnerActivityLog from "./components/PartnerActivityLog";
 import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
 import AdminPartnerView from "./components/AdminPartnerView";
+import AdminActivityLog from "./components/AdminActivityLog";
 import ForgotPassword from "./components/ForgotPassword";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import CheckoutCancel from "./components/CheckoutCancel";
@@ -297,6 +298,10 @@ function App() {
                 <Navigate to="/admin/login" replace />
               )
             }
+          />
+          <Route
+            path="/admin/activity-log"
+            element={isAdmin ? <AdminActivityLog /> : <Navigate to="/admin/login" replace />}
           />
           <Route
             path="/admin/partner/:partnerId"

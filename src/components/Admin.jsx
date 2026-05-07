@@ -348,10 +348,11 @@ const Admin = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 20, display: "flex", gap: 16 }}>
         <button type="button" onClick={handleLogout}>
           Logout
         </button>
+        <Link to="/admin/activity-log">Activity Log</Link>
       </div>
 
       <div
