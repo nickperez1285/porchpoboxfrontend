@@ -5,8 +5,12 @@ import {
   collection,
   doc,
   getDocs,
+  onSnapshot,
+  orderBy,
+  query,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  where
 } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
@@ -21,6 +25,7 @@ const Admin = () => {
   const [expandedCustomerIds, setExpandedCustomerIds] = useState([]);
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [customerSortBy, setCustomerSortBy] = useState("name");
+  const [todayEntries, setTodayEntries] = useState([]);
 
   const handleLogout = async () => {
     try {
@@ -172,6 +177,67 @@ const Admin = () => {
     };
 
     loadAdminData();
+  }, []);
+
+  useEffect(() => {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const partnerMap = {};
+    const logMap = {};
+    let signupEntries = [];
+    const unsubscribes = [];
+
+    const merge = () => {
+      const all = [...signupEntries, ...Object.values(logMap).flat()];
+      all.sort((a, b) => {
+        const ta = a.timestamp?.toDate?.() || new Date(0);
+        const tb = b.timestamp?.toDate?.() || new Date(0);
+        return tb - ta;
+      });
+      setTodayEntries(all);
+    };
+
+    const initTodayLog = async () => {
+      try {
+        const partnerSnap = await getDocs(collection(db, "partners"));
+        partnerSnap.docs.forEach((d) => {
+          partnerMap[d.id] = d.data().businessName || "Unnamed Partner";
+        });
+
+        const signupUnsub = onSnapshot(
+          query(collection(db, "activityLog"), where("timestamp", ">=", startOfDay), orderBy("timestamp", "desc")),
+          (snap) => { signupEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() })); merge(); },
+          (err) => console.error("Today signup log error:", err)
+        );
+        unsubscribes.push(signupUnsub);
+
+        partnerSnap.docs.forEach((partnerDoc) => {
+          const partnerId = partnerDoc.id;
+          const unsub = onSnapshot(
+            query(
+              collection(db, "partners", partnerId, "activityLog"),
+              where("timestamp", ">=", startOfDay),
+              orderBy("timestamp", "desc")
+            ),
+            (snap) => {
+              logMap[partnerId] = snap.docs.map((d) => ({
+                id: d.id, partnerId,
+                partnerName: partnerMap[partnerId],
+                ...d.data()
+              }));
+              merge();
+            },
+            (err) => console.error("Today partner log error:", err)
+          );
+          unsubscribes.push(unsub);
+        });
+      } catch (err) {
+        console.error("Error loading today activity:", err);
+      }
+    };
+
+    initTodayLog();
+    return () => unsubscribes.forEach((u) => u());
   }, []);
 
   const sortedCustomers = useMemo(() => {
@@ -352,7 +418,6 @@ const Admin = () => {
         <button type="button" onClick={handleLogout}>
           Logout
         </button>
-        <Link to="/admin/activity-log">Activity Log</Link>
       </div>
 
       <div
@@ -600,6 +665,72 @@ const Admin = () => {
             </ul>
           )}
         </section>
+      </div>
+
+      <div
+        style={{
+          marginTop: 32,
+          background: "#fff",
+          border: "1px solid rgba(0,0,0,0.08)",
+          borderRadius: 20,
+          padding: 24,
+          boxShadow: "0 12px 28px rgba(0,0,0,0.08)"
+        }}
+      >
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 12 }}>
+          <div>
+            <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase" }}>Live</div>
+            <h3 style={{ margin: "6px 0 0" }}>Today's Activity</h3>
+          </div>
+          <Link to="/admin/activity-log" style={{ fontSize: 14, color: "#0b57d0", fontWeight: 600 }}>
+            View Complete Log →
+          </Link>
+        </div>
+        {todayEntries.length === 0 ? (
+          <p style={{ color: "#888", margin: 0 }}>No activity recorded today yet.</p>
+        ) : (
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+              <thead>
+                <tr style={{ background: "#f8f5ea", textAlign: "left" }}>
+                  {["Time", "Type", "Partner", "User", "Packages"].map((h) => (
+                    <th key={h} style={{ padding: "10px 14px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {todayEntries.map((entry, i) => {
+                  const isSignup = entry.type === "signup";
+                  const typeColors = {
+                    "check-in": { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" },
+                    "delivery": { bg: "#fff3cd", color: "#856404", label: "Delivery" },
+                    "signup":   { bg: "#e8f0fe", color: "#1a56db", label: "Sign Up" }
+                  };
+                  const ts = typeColors[entry.type] || { bg: "#f0f0f0", color: "#444", label: entry.type };
+                  const time = entry.timestamp?.toDate ? entry.timestamp.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
+                  return (
+                    <tr key={`${entry.partnerId || "g"}-${entry.id}`} style={{ borderTop: "1px solid #eee", background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+                      <td style={{ padding: "10px 14px", color: "#555", whiteSpace: "nowrap" }}>{time}</td>
+                      <td style={{ padding: "10px 14px" }}>
+                        <span style={{ background: ts.bg, color: ts.color, borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>{ts.label}</span>
+                      </td>
+                      <td style={{ padding: "10px 14px" }}>
+                        {isSignup ? <span style={{ color: "#aaa" }}>—</span> : (
+                          <Link to={`/admin/partner/${entry.partnerId}`} style={{ color: "#0b57d0", fontWeight: 600 }}>{entry.partnerName}</Link>
+                        )}
+                      </td>
+                      <td style={{ padding: "10px 14px" }}>
+                        <div style={{ fontWeight: 600 }}>{isSignup ? entry.userName : entry.customerName || "Unknown"}</div>
+                        <div style={{ fontSize: 12, color: "#888" }}>{isSignup ? entry.userEmail : entry.customerEmail}</div>
+                      </td>
+                      <td style={{ padding: "10px 14px", color: isSignup ? "#aaa" : "#111", fontWeight: 600 }}>{isSignup ? "—" : entry.packageCount}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
