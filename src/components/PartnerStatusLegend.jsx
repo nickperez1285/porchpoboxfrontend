@@ -3,11 +3,11 @@ import React from "react";
 const legendItems = [
   {
     color: "#d4edda",
-    label: "Subscription paid and active",
+    label: "User has a subscription paid and active",
   },
   {
     color: "#fff6bf",
-    label: "User is trial period and can receive one free package delivery",
+    label: "User is trial period and can receive one free delivery",
   },
   {
     color: "#ffd9d9",
