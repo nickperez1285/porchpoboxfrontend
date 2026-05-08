@@ -2,7 +2,7 @@ import React from "react";
 
 const legendItems = [
   {
-    color: "#ffffff",
+    color: "#d4edda",
     label: "Subscription paid and active",
   },
   {

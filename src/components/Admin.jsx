@@ -285,6 +285,8 @@ const Admin = () => {
     const isActive = customer.status === "active";
     const packageCount = customer.packageCount || 0;
 
+    if (isActive) return "#d4edda";
+
     if (!isActive && packageCount > 1) {
       return "#ffd9d9";
     }

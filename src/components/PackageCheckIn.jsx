@@ -113,7 +113,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   };
 
   const getCustomerBackgroundColor = (user) => {
-    if (user.status === "active") return "#ffffff";
+    if (user.status === "active") return "#d4edda";
     if (user.status === "trial") return "#fff6bf";
     return "#ffd9d9";
   };
