@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { collection, getDocs, query, where } from "firebase/firestore";
+import { auth, db } from "../firebase";
 
 const PartnerProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
+  const [prefCount, setPrefCount] = useState(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const snap = await getDocs(
+          query(collection(db, "users"), where("prefLocation.id", "==", partnerProfile.id))
+        );
+        setPrefCount(snap.size);
+      } catch (err) {
+        console.error("Error loading preferred count:", err);
+        setPrefCount(0);
+      }
+    };
+    load();
+  }, [partnerProfile.id]);
 
   const handleLogout = async () => {
     try {
@@ -123,6 +140,26 @@ const PartnerProfile = ({ user, partnerProfile }) => {
               <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Zip Code</div>
               <div style={{ marginTop: 4, fontSize: 18 }}>{partnerProfile.zipCode || "Not provided"}</div>
             </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
+            background: "#fff"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Community Reach</h3>
+          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>
+            Users Who Selected You
+          </div>
+          <div style={{ fontSize: 36, fontWeight: 700, color: "#121212" }}>
+            {prefCount === null ? "—" : prefCount}
+          </div>
+          <div style={{ fontSize: 13, color: "#888", marginTop: 6 }}>
+            {prefCount === 1 ? "user has" : "users have"} selected your location as their preferred Porch P.O. Box.
           </div>
         </div>
 
