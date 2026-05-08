@@ -138,7 +138,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                     color: "#c8c8c8",
                   }}
                 >
-                  Packages In Stock
+                  Packages Checked In
                 </div>
                 <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
                   {packageCountTotal}

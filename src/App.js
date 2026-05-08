@@ -31,6 +31,7 @@ import ReferralForm from "./components/ReferralForm";
 import PlansPage from "./components/PlansPage";
 import About from "./components/About";
 import TermsIndex from "./components/TermsIndex";
+import PrefLocationModal from "./components/PrefLocationModal";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -118,6 +119,7 @@ function App() {
   const [userStatus, setUserStatus] = useState("");
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
+  const [showPrefModal, setShowPrefModal] = useState(false);
   const isAdmin = user?.uid === ADMIN_UID;
 
   const loadPartnerProfile = async (currentUser) => {
@@ -152,8 +154,15 @@ function App() {
 
       try {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-        setUserStatus(userDoc.exists() ? userDoc.data().status || "" : "");
+        const userData = userDoc.exists() ? userDoc.data() : {};
+        setUserStatus(userData.status || "");
         await loadPartnerProfile(currentUser);
+        // Show pref location modal for regular users who haven't set it yet
+        const isAdminUser = currentUser.uid === ADMIN_UID;
+        const isPartner = (await getDoc(doc(db, "partners", currentUser.uid))).exists();
+        if (!isAdminUser && !isPartner && userDoc.exists() && !userData.prefLocation) {
+          setShowPrefModal(true);
+        }
       } finally {
         setAuthLoading(false);
       }
@@ -165,6 +174,9 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        {showPrefModal && user && (
+          <PrefLocationModal user={user} onDone={() => setShowPrefModal(false)} />
+        )}
         <Header
           authLoading={authLoading}
           isAdmin={isAdmin}

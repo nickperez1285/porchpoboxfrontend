@@ -463,17 +463,19 @@ const Profile = ({ user }) => {
         >
           <h3 style={{ marginTop: 0 }}>Account</h3>
           <div style={{ marginBottom: 16 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Account Type
-            </div>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Account Type</div>
             <div style={{ marginTop: 4, fontSize: 18 }}>Customer</div>
+          </div>
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Preferred Location</div>
+            <div style={{ marginTop: 4, fontSize: 16, fontWeight: 600 }}>
+              {profileData?.prefLocation?.businessName || "Not set"}
+            </div>
+            {profileData?.prefLocation?.streetAddress && (
+              <div style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
+                {[profileData.prefLocation.streetAddress, profileData.prefLocation.city, profileData.prefLocation.state].filter(Boolean).join(", ")}
+              </div>
+            )}
           </div>
           {hasActiveSubscription && (
             <>
