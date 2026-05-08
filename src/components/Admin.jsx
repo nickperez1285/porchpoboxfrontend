@@ -6,10 +6,8 @@ import {
   doc,
   getDocs,
   onSnapshot,
-  query,
   serverTimestamp,
-  updateDoc,
-  where
+  updateDoc
 } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
@@ -187,7 +185,10 @@ const Admin = () => {
     const unsubscribes = [];
 
     const merge = () => {
-      const all = [...signupEntries, ...Object.values(logMap).flat()];
+      const all = [...signupEntries, ...Object.values(logMap).flat()].filter((e) => {
+        const t = e.timestamp?.toDate?.() || null;
+        return t && t >= startOfDay;
+      });
       all.sort((a, b) => {
         const ta = a.timestamp?.toDate?.() || new Date(0);
         const tb = b.timestamp?.toDate?.() || new Date(0);
@@ -204,7 +205,7 @@ const Admin = () => {
         });
 
         const signupUnsub = onSnapshot(
-          query(collection(db, "activityLog"), where("timestamp", ">=", startOfDay)),
+          collection(db, "activityLog"),
           (snap) => { signupEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() })); merge(); },
           (err) => console.error("Today signup log error:", err)
         );
@@ -213,10 +214,7 @@ const Admin = () => {
         partnerSnap.docs.forEach((partnerDoc) => {
           const partnerId = partnerDoc.id;
           const unsub = onSnapshot(
-            query(
-              collection(db, "partners", partnerId, "activityLog"),
-              where("timestamp", ">=", startOfDay)
-            ),
+            collection(db, "partners", partnerId, "activityLog"),
             (snap) => {
               logMap[partnerId] = snap.docs.map((d) => ({
                 id: d.id, partnerId,

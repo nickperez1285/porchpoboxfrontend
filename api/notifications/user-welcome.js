@@ -1,4 +1,5 @@
 const resendApiUrl = "https://api.resend.com/emails";
+const { getFirestore } = require("../../../poboxbackend/backend/config/firebaseAdmin");
 
 const sendEmail = async ({ to, replyTo, subject, text }) => {
   const apiKey = process.env.RESEND_API_KEY;
@@ -43,10 +44,23 @@ module.exports = async (req, res) => {
     return res.status(405).json({ message: "Method not allowed" });
   }
 
-  const { name, email } = req.body || {};
+  const { name, email, authProvider } = req.body || {};
 
   if (!email) {
     return res.status(400).json({ message: "Missing email" });
+  }
+
+  try {
+    const db = getFirestore();
+    await db.collection("activityLog").add({
+      type: "signup",
+      userName: name || "Unknown",
+      userEmail: email || "",
+      authProvider: authProvider || "email",
+      timestamp: require("firebase-admin").firestore.FieldValue.serverTimestamp()
+    });
+  } catch (logErr) {
+    console.error("Failed to write signup log:", logErr);
   }
 
   try {

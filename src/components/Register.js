@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc, collection, addDoc } from "firebase/firestore";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import {
   isPasswordValid,
   passwordRequirementsText
@@ -27,7 +27,7 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const sendWelcomeEmail = async ({ name: userName, email: userEmail }) => {
+  const sendWelcomeEmail = async ({ name: userName, email: userEmail, authProvider }) => {
     try {
       const welcomeResponse = await fetch("/api/notifications/user-welcome", {
         method: "POST",
@@ -36,7 +36,8 @@ const Register = () => {
         },
         body: JSON.stringify({
           name: userName,
-          email: userEmail
+          email: userEmail,
+          authProvider: authProvider || "email"
         })
       });
 
@@ -99,21 +100,10 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
-      try {
-        await addDoc(collection(db, "activityLog"), {
-          type: "signup",
-          userName: displayName || "Unknown",
-          userEmail: user.email || "",
-          authProvider: "google",
-          timestamp: serverTimestamp()
-        });
-      } catch (logErr) {
-        console.error("Failed to write signup log:", logErr);
-      }
-
       await sendWelcomeEmail({
         name: displayName,
-        email: user.email
+        email: user.email,
+        authProvider: "google"
       });
 
       navigate("/profile");
@@ -207,17 +197,7 @@ const Register = () => {
         createdAt: serverTimestamp()
       });
 
-      try {
-        await addDoc(collection(db, "activityLog"), {
-          type: "signup",
-          userName: name || "Unknown",
-          userEmail: email || "",
-          authProvider: "email",
-          timestamp: serverTimestamp()
-        });
-      } catch (logErr) {
-        console.error("Failed to write signup log:", logErr);
-      }
+      await sendWelcomeEmail({ name, email, authProvider: "email" });
 
       navigate("/profile");
     } catch (err) {
