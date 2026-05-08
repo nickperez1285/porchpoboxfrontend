@@ -131,10 +131,36 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             border: "1px solid #ddd",
             borderRadius: 16,
             padding: 24,
+            background: "#fff"
+          }}
+        >
+          <h3 style={{ marginTop: 0 }}>Preferred Payment</h3>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Payment Method</div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {partnerProfile.prefPaymentMethod
+                ? { cashapp: "Cash App", paypal: "PayPal", check: "Check" }[partnerProfile.prefPaymentMethod] || partnerProfile.prefPaymentMethod
+                : "Not set"}
+            </div>
+          </div>
+          {(partnerProfile.prefPaymentMethod === "cashapp" || partnerProfile.prefPaymentMethod === "paypal") && (
+            <div>
+              <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>
+                {partnerProfile.prefPaymentMethod === "cashapp" ? "Cash App Handle" : "PayPal Email / Handle"}
+              </div>
+              <div style={{ marginTop: 4, fontSize: 18 }}>{partnerProfile.prefPaymentHandle || "Not provided"}</div>
+            </div>
+          )}
+        </div>
+
+        <div
+          style={{
+            border: "1px solid #ddd",
+            borderRadius: 16,
+            padding: 24,
             background: "#faf7ef"
           }}
         >
-          <h3 style={{ marginTop: 0 }}>Account</h3>
           <div style={{ marginBottom: 18 }}>
             <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8 }}>Partner ID</div>
             <div style={{ marginTop: 4, fontSize: 15, wordBreak: "break-all" }}>{user.uid}</div>

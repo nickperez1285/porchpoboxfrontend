@@ -20,6 +20,8 @@ const PartnerEditProfile = ({ user, partnerProfile }) => {
   const [storeHours, setStoreHours] = useState(
     partnerProfile.storeHours || DEFAULT_STORE_HOURS
   );
+  const [prefPaymentMethod, setPrefPaymentMethod] = useState(partnerProfile.prefPaymentMethod || "");
+  const [prefPaymentHandle, setPrefPaymentHandle] = useState(partnerProfile.prefPaymentHandle || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -41,7 +43,9 @@ const PartnerEditProfile = ({ user, partnerProfile }) => {
         city,
         state,
         zipCode,
-        storeHours
+        storeHours,
+        prefPaymentMethod,
+        prefPaymentHandle: (prefPaymentMethod === "cashapp" || prefPaymentMethod === "paypal") ? prefPaymentHandle : ""
       });
 
       setSuccess("Partner profile updated.");
@@ -113,6 +117,37 @@ const PartnerEditProfile = ({ user, partnerProfile }) => {
         </div>
 
         <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
+
+        <hr className="reg-divider" />
+        <p className="reg-section-label">Preferred Payment</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+          {[
+            { value: "cashapp", label: "Cash App" },
+            { value: "paypal", label: "PayPal" },
+            { value: "check", label: "Check" },
+          ].map((opt) => (
+            <label key={opt.value} style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="prefPaymentMethod"
+                value={opt.value}
+                checked={prefPaymentMethod === opt.value}
+                onChange={() => setPrefPaymentMethod(opt.value)}
+              />
+              {opt.label}
+            </label>
+          ))}
+        </div>
+        {(prefPaymentMethod === "cashapp" || prefPaymentMethod === "paypal") && (
+          <RegField
+            id="edit-vendor-payment-handle"
+            label={prefPaymentMethod === "cashapp" ? "Cash App Handle (e.g. $YourName)" : "PayPal Email or Handle"}
+            type="text"
+            value={prefPaymentHandle}
+            onChange={(e) => setPrefPaymentHandle(e.target.value)}
+            autoComplete="off"
+          />
+        )}
 
         <RegAlert variant="error">{error}</RegAlert>
         <RegAlert variant="success">{success}</RegAlert>
