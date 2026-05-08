@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 
 const PartnerActivityLog = ({ partnerProfile }) => {
@@ -11,15 +11,17 @@ const PartnerActivityLog = ({ partnerProfile }) => {
   useEffect(() => {
     if (!partnerProfile?.id) return;
 
-    const q = query(
-      collection(db, "partners", partnerProfile.id, "activityLog"),
-      orderBy("timestamp", "desc")
-    );
-
     const unsubscribe = onSnapshot(
-      q,
+      collection(db, "partners", partnerProfile.id, "activityLog"),
       (snapshot) => {
-        setEntries(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+        const sorted = snapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => {
+            const ta = a.timestamp?.toDate?.() || new Date(0);
+            const tb = b.timestamp?.toDate?.() || new Date(0);
+            return tb - ta;
+          });
+        setEntries(sorted);
         setLoading(false);
       },
       (err) => {

@@ -1,17 +1,26 @@
+const admin = require("firebase-admin");
+
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY
+        ? process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n")
+        : undefined
+    })
+  });
+}
+
+const db = admin.firestore();
 const resendApiUrl = "https://api.resend.com/emails";
-const { getFirestore } = require("../../../poboxbackend/backend/config/firebaseAdmin");
 
 const sendEmail = async ({ to, replyTo, subject, text }) => {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM_EMAIL || process.env.SMTP_FROM_EMAIL;
 
-  if (!apiKey) {
-    throw new Error("Missing RESEND_API_KEY");
-  }
-
-  if (!from) {
-    throw new Error("Missing MAIL_FROM_EMAIL or SMTP_FROM_EMAIL");
-  }
+  if (!apiKey) throw new Error("Missing RESEND_API_KEY");
+  if (!from) throw new Error("Missing MAIL_FROM_EMAIL or SMTP_FROM_EMAIL");
 
   const response = await fetch(resendApiUrl, {
     method: "POST",
@@ -19,13 +28,7 @@ const sendEmail = async ({ to, replyTo, subject, text }) => {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      from,
-      to,
-      reply_to: replyTo,
-      subject,
-      text
-    })
+    body: JSON.stringify({ from, to, reply_to: replyTo, subject, text })
   });
 
   if (!response.ok) {
@@ -51,13 +54,12 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const db = getFirestore();
     await db.collection("activityLog").add({
       type: "signup",
       userName: name || "Unknown",
       userEmail: email || "",
       authProvider: authProvider || "email",
-      timestamp: require("firebase-admin").firestore.FieldValue.serverTimestamp()
+      timestamp: admin.firestore.FieldValue.serverTimestamp()
     });
   } catch (logErr) {
     console.error("Failed to write signup log:", logErr);

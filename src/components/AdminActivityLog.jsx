@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 
 const AdminActivityLog = () => {
@@ -38,7 +38,7 @@ const AdminActivityLog = () => {
 
         // Listen to global signup log
         const signupUnsub = onSnapshot(
-          query(collection(db, "activityLog")),
+          collection(db, "activityLog"),
           (snapshot) => {
             signupEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
             merge();
@@ -49,21 +49,19 @@ const AdminActivityLog = () => {
 
         // Listen to each partner's activityLog
         partnerList.forEach((partner) => {
-          const q = query(
+          const unsub = onSnapshot(
             collection(db, "partners", partner.id, "activityLog"),
-            orderBy("timestamp", "desc")
-          );
-          const unsub = onSnapshot(q, (snapshot) => {
-            logMap[partner.id] = snapshot.docs.map((d) => ({
-              id: d.id,
-              partnerId: partner.id,
-              partnerName: partnerMap[partner.id],
-              ...d.data(),
-            }));
-            merge();
-          }, (err) => {
-            console.error(`Error loading log for ${partner.id}:`, err);
-          });
+            (snapshot) => {
+              logMap[partner.id] = snapshot.docs.map((d) => ({
+                id: d.id,
+                partnerId: partner.id,
+                partnerName: partnerMap[partner.id],
+                ...d.data(),
+              }));
+              merge();
+            }, (err) => {
+              console.error(`Error loading log for ${partner.id}:`, err);
+            });
           unsubscribes.push(unsub);
         });
       } catch (err) {
