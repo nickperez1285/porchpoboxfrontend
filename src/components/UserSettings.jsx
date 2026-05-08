@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { updateEmail, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import PrefLocationModal from "./PrefLocationModal";
 
 const UserSettings = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
@@ -11,6 +12,7 @@ const UserSettings = ({ user }) => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [editing, setEditing] = useState(false);
+  const [showPrefModal, setShowPrefModal] = useState(false);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -68,8 +70,22 @@ const UserSettings = ({ user }) => {
 
   if (loading) return <div style={{ maxWidth: 760, margin: "80px auto", padding: "0 20px" }}><p>Loading...</p></div>;
 
+  const handlePrefDone = async () => {
+    setShowPrefModal(false);
+    // Refresh profile data to show updated prefLocation
+    try {
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (snap.exists()) setProfileData(snap.data());
+    } catch (err) {
+      console.error("Error refreshing profile:", err);
+    }
+  };
+
   return (
     <div style={{ maxWidth: 760, margin: "60px auto", padding: "0 20px" }}>
+      {showPrefModal && (
+        <PrefLocationModal user={user} onDone={handlePrefDone} />
+      )}
       <div
         style={{
           background: "linear-gradient(135deg, #121212 0%, #1e1e1e 100%)",
@@ -136,6 +152,31 @@ const UserSettings = ({ user }) => {
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <button type="button" onClick={() => setEditing(true)}>Edit</button>
             <Link to={`/forgot-password?email=${encodeURIComponent(user.email || "")}`}>Change Password</Link>
+          </div>
+
+          <div style={{ gridColumn: "1 / -1", border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
+            <h3 style={{ marginTop: 0 }}>Preferred Location</h3>
+            {profileData?.prefLocation ? (
+              <>
+                <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 4 }}>
+                  {profileData.prefLocation.businessName}
+                </div>
+                {profileData.prefLocation.streetAddress && (
+                  <div style={{ color: "#666", fontSize: 14 }}>
+                    {[profileData.prefLocation.streetAddress, profileData.prefLocation.city, profileData.prefLocation.state].filter(Boolean).join(", ")}
+                  </div>
+                )}
+              </>
+            ) : (
+              <p style={{ color: "#888", margin: 0 }}>No preferred location set.</p>
+            )}
+            <button
+              type="button"
+              onClick={() => setShowPrefModal(true)}
+              style={{ marginTop: 14 }}
+            >
+              {profileData?.prefLocation ? "Change Location" : "Set Location"}
+            </button>
           </div>
         </div>
       ) : (

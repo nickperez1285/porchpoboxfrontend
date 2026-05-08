@@ -85,12 +85,13 @@ const AdminActivityLog = () => {
     if (type === "check-in") return { background: "#e6f4ea", color: "#1a7f37", label: "Check In" };
     if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivery" };
     if (type === "signup") return { background: "#e8f0fe", color: "#1a56db", label: "Sign Up" };
+    if (type === "subscription") return { background: "#f3e8ff", color: "#6d28d9", label: "Subscription" };
     return { background: "#f0f0f0", color: "#444", label: type };
   };
 
   const filtered = entries.filter((e) => {
     if (filterType !== "all" && e.type !== filterType) return false;
-    if (filterPartner !== "all" && e.type === "signup") return false;
+    if (filterPartner !== "all" && (e.type === "signup" || e.type === "subscription")) return false;
     if (filterPartner !== "all" && e.partnerId !== filterPartner) return false;
     return true;
   });
@@ -130,6 +131,7 @@ const AdminActivityLog = () => {
           <option value="check-in">Check Ins</option>
           <option value="delivery">Deliveries</option>
           <option value="signup">Sign Ups</option>
+          <option value="subscription">Subscriptions</option>
         </select>
 
         <select
@@ -177,12 +179,12 @@ const AdminActivityLog = () => {
             <tbody>
               {filtered.map((entry, i) => {
                 const typeStyle = getTypeStyle(entry.type);
-                const isSignup = entry.type === "signup";
+                const isGlobal = entry.type === "signup" || entry.type === "subscription";
                 return (
-                  <tr key={`${entry.partnerId || "signup"}-${entry.id}`} style={{ borderTop: "1px solid #eee", background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
+                  <tr key={`${entry.partnerId || "global"}-${entry.id}`} style={{ borderTop: "1px solid #eee", background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
                     <td style={{ padding: "12px 18px", color: "#444", whiteSpace: "nowrap" }}>{formatTimestamp(entry.timestamp)}</td>
                     <td style={{ padding: "12px 18px" }}>
-                      {isSignup ? (
+                      {isGlobal ? (
                         <span style={{ color: "#888", fontStyle: "italic" }}>—</span>
                       ) : (
                         <Link to={`/admin/partner/${entry.partnerId}`} style={{ fontWeight: 600, color: "#0b57d0" }}>
@@ -196,10 +198,10 @@ const AdminActivityLog = () => {
                       </span>
                     </td>
                     <td style={{ padding: "12px 18px" }}>
-                      <div style={{ fontWeight: 600 }}>{isSignup ? entry.userName : entry.customerName || "Unknown"}</div>
-                      <div style={{ fontSize: 12, color: "#888" }}>{isSignup ? entry.userEmail : entry.customerEmail}</div>
+                      <div style={{ fontWeight: 600 }}>{isGlobal ? entry.userName : entry.customerName || "Unknown"}</div>
+                      <div style={{ fontSize: 12, color: "#888" }}>{isGlobal ? entry.userEmail : entry.customerEmail}</div>
                     </td>
-                    <td style={{ padding: "12px 18px", color: "#aaa" }}>{isSignup ? "—" : entry.packageCount}</td>
+                    <td style={{ padding: "12px 18px", color: "#aaa" }}>{isGlobal ? "—" : entry.packageCount}</td>
                   </tr>
                 );
               })}

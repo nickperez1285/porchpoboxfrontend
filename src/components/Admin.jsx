@@ -702,7 +702,8 @@ const Admin = () => {
                   const typeColors = {
                     "check-in": { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" },
                     "delivery": { bg: "#fff3cd", color: "#856404", label: "Delivery" },
-                    "signup":   { bg: "#e8f0fe", color: "#1a56db", label: "Sign Up" }
+                    "signup":   { bg: "#e8f0fe", color: "#1a56db", label: "Sign Up" },
+                    "subscription": { bg: "#f3e8ff", color: "#6d28d9", label: "Subscription" }
                   };
                   const ts = typeColors[entry.type] || { bg: "#f0f0f0", color: "#444", label: entry.type };
                   const time = entry.timestamp?.toDate ? entry.timestamp.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
