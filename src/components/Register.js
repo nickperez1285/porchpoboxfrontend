@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
@@ -26,6 +27,18 @@ const Register = () => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const logSignup = async ({ name: userName, email: userEmail, authProvider }) => {
+    try {
+      await fetch(`${API_BASE_URL}/api/notifications/user-signup`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: userName, email: userEmail, authProvider: authProvider || "email" })
+      });
+    } catch (err) {
+      console.error("Failed to log signup:", err);
+    }
+  };
 
   const sendWelcomeEmail = async ({ name: userName, email: userEmail, authProvider }) => {
     try {
@@ -105,6 +118,7 @@ const Register = () => {
         email: user.email,
         authProvider: "google"
       });
+      await logSignup({ name: displayName, email: user.email, authProvider: "google" });
 
       navigate("/profile");
     } catch (err) {
@@ -198,6 +212,7 @@ const Register = () => {
       });
 
       await sendWelcomeEmail({ name, email, authProvider: "email" });
+      await logSignup({ name, email, authProvider: "email" });
 
       navigate("/profile");
     } catch (err) {
