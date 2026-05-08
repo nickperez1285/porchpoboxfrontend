@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
@@ -15,11 +15,22 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
+const MapFlyTo = ({ vendorMarkers, selectedVendorId }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!selectedVendorId) return;
+    const target = vendorMarkers.find((m) => m.vendor.id === selectedVendorId);
+    if (target) map.flyTo([target.lat, target.lng], 15, { duration: 1 });
+  }, [selectedVendorId, vendorMarkers, map]);
+  return null;
+};
+
 const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
+  const [selectedVendorId, setSelectedVendorId] = useState(null);
   const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
   const [vendorMarkers, setVendorMarkers] = useState([]);
@@ -95,6 +106,7 @@ const MainPage = ({ user, userStatus }) => {
         ? current.filter((id) => id !== vendorId)
         : [...current, vendorId],
     );
+    setSelectedVendorId(vendorId);
   };
 
   return (
@@ -289,6 +301,7 @@ const MainPage = ({ user, userStatus }) => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
+                <MapFlyTo vendorMarkers={vendorMarkers} selectedVendorId={selectedVendorId} />
                 {vendorMarkers.map(({ vendor, lat, lng }) => (
                   <Marker key={vendor.id} position={[lat, lng]}>
                     <Popup>
