@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { db } from "../firebase";
 
-const PrefLocationModal = ({ user, onDone }) => {
+const PrefLocationModal = ({ user, onDone, required = false }) => {
   const [partners, setPartners] = useState([]);
   const [selected, setSelected] = useState("");
   const [saving, setSaving] = useState(false);
@@ -70,7 +70,9 @@ const PrefLocationModal = ({ user, onDone }) => {
         </div>
         <h2 style={{ margin: "0 0 10px" }}>Choose Your Preferred Location</h2>
         <p style={{ color: "#555", lineHeight: 1.6, marginBottom: 24 }}>
-          Select the partner location where you'd like your packages delivered. You can change this anytime in your profile settings.
+          {required
+            ? "Please select a partner location before subscribing. This is where your packages will be delivered."
+            : "Select the partner location where you'd like your packages delivered. You can change this anytime in your profile settings."}
         </p>
 
         {partners.length === 0 ? (
@@ -116,13 +118,15 @@ const PrefLocationModal = ({ user, onDone }) => {
         )}
 
         <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-          <button
-            type="button"
-            onClick={onDone}
-            style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
-          >
-            Skip for now
-          </button>
+          {!required && (
+            <button
+              type="button"
+              onClick={onDone}
+              style={{ padding: "10px 18px", borderRadius: 10, border: "1px solid #ccc", background: "#fff", cursor: "pointer" }}
+            >
+              Skip for now
+            </button>
+          )}
           <button
             type="button"
             onClick={handleSave}

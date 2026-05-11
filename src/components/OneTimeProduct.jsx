@@ -1,6 +1,9 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "../firebase";
 import API_BASE_URL from "../config/api";
+import PrefLocationModal from "./PrefLocationModal";
 
 const PLAN_CONFIG = [
   {
@@ -38,14 +41,32 @@ const ProductList = ({ user }) => {
   const [selectedPlanId, setSelectedPlanId] = useState(plans[0]?.id || "monthly");
   const [loadingPlanId, setLoadingPlanId] = useState("");
   const [error, setError] = useState("");
+  const [showPrefModal, setShowPrefModal] = useState(false);
 
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) || plans[0];
 
   const startCheckout = async () => {
-    if (!user || !selectedPlan) {
-      return;
+    if (!user || !selectedPlan) return;
+
+    setLoadingPlanId(selectedPlan.id);
+    setError("");
+
+    // Check if user has a preferred location set
+    try {
+      const userSnap = await getDoc(doc(db, "users", user.uid));
+      if (!userSnap.exists() || !userSnap.data().prefLocation) {
+        setLoadingPlanId("");
+        setShowPrefModal(true);
+        return;
+      }
+    } catch (err) {
+      console.error("Error checking prefLocation:", err);
     }
 
+    await proceedToCheckout();
+  };
+
+  const proceedToCheckout = async () => {
     setLoadingPlanId(selectedPlan.id);
     setError("");
 
@@ -94,6 +115,16 @@ const ProductList = ({ user }) => {
 
   return (
     <div style={{ width: "100%" }}>
+      {showPrefModal && user && (
+        <PrefLocationModal
+          user={user}
+          onDone={() => {
+            setShowPrefModal(false);
+            proceedToCheckout();
+          }}
+          required
+        />
+      )}
       <div
         style={{
           display: "grid",

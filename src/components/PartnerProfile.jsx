@@ -7,6 +7,8 @@ import { auth, db } from "../firebase";
 const PartnerProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
   const [prefCount, setPrefCount] = useState(null);
+  const [prefUsers, setPrefUsers] = useState([]);
+  const [showPrefUsers, setShowPrefUsers] = useState(false);
   const [showPaymentPicker, setShowPaymentPicker] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(partnerProfile.prefPaymentMethod || "");
   const [paymentHandle, setPaymentHandle] = useState(partnerProfile.prefPaymentHandle || "");
@@ -63,6 +65,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           query(collection(db, "users"), where("prefLocation.id", "==", partnerProfile.id))
         );
         setPrefCount(snap.size);
+        setPrefUsers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       } catch (err) {
         console.error("Error loading preferred count:", err);
         setPrefCount(0);
@@ -196,11 +199,18 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             border: "1px solid #ddd",
             borderRadius: 16,
             padding: 24,
-            background: "#fff"
+            background: "#fff",
+            cursor: prefCount > 0 ? "pointer" : "default"
           }}
+          onClick={() => prefCount > 0 && setShowPrefUsers(!showPrefUsers)}
         >
-          <h3 style={{ marginTop: 0 }}>Community Reach</h3>
-          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <h3 style={{ margin: 0 }}>Community Reach</h3>
+            {prefCount > 0 && (
+              <span style={{ fontSize: 13, color: "#0b57d0" }}>{showPrefUsers ? "Hide ▲" : "View ▼"}</span>
+            )}
+          </div>
+          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, margin: "12px 0 8px" }}>
             Users Who Selected You
           </div>
           <div style={{ fontSize: 36, fontWeight: 700, color: "#121212" }}>
@@ -209,6 +219,19 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           <div style={{ fontSize: 13, color: "#888", marginTop: 6 }}>
             {prefCount === 1 ? "user has" : "users have"} selected your location as their preferred Porch P.O. Box.
           </div>
+          {showPrefUsers && prefUsers.length > 0 && (
+            <div style={{ marginTop: 18, borderTop: "1px solid #eee", paddingTop: 16 }}>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                {prefUsers.map((u) => (
+                  <li key={u.id} style={{ display: "flex", flexDirection: "column", padding: "10px 14px", background: "#fafafa", borderRadius: 10, border: "1px solid #eee" }}>
+                    <span style={{ fontWeight: 600 }}>{u.name || "Unnamed user"}</span>
+                    {u.email && <span style={{ fontSize: 13, color: "#666", marginTop: 2 }}>{u.email}</span>}
+                    {u.phoneNumber && <span style={{ fontSize: 13, color: "#888", marginTop: 1 }}>{u.phoneNumber}</span>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
 
         <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
