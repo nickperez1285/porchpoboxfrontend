@@ -205,17 +205,31 @@ const MainPage = ({ user, userStatus }) => {
           </div>
         </div>
 
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 24,
-            alignItems: "flex-start",
-            justifyContent: "center",
-          }}
-        >
+        {/* How it works — only for non-logged-in users */}
+        {!user && (
+          <div style={{ width: "100%", maxWidth: 1180, marginBottom: 24 }}>
+            <div style={{ textAlign: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase" }}>How It Works</div>
+              <h3 style={{ margin: "8px 0 0", color: "#181818" }}>Three simple steps</h3>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
+              {[
+                { icon: "📋", step: "1", title: "Sign Up", desc: "Create a free account and choose your nearest Porch P.O. Box location." },
+                { icon: "📦", step: "2", title: "Ship There", desc: "Use your partner location's address when placing orders online." },
+                { icon: "🏪", step: "3", title: "Pick Up", desc: "Get notified when your package arrives and pick it up at your convenience." },
+              ].map((item) => (
+                <div key={item.step} style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.06)", textAlign: "center" }}>
+                  <div style={{ fontSize: 32, marginBottom: 10 }}>{item.icon}</div>
+                  <div style={{ fontSize: 11, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Step {item.step}</div>
+                  <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>{item.title}</div>
+                  <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{item.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div style={{ width: "100%", maxWidth: 1180, display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start", justifyContent: "center" }}>
           <div
             style={{
               flex: "1 1 320px",
@@ -276,7 +290,7 @@ const MainPage = ({ user, userStatus }) => {
                         color: "#181818",
                       }}
                     >
-                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                      <strong>📍 {vendor.businessName || "Unnamed partner"}</strong>
                       <span style={{ fontSize: 12, color: "#8a6a00" }}>
                         {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
                       </span>
@@ -419,23 +433,19 @@ const MainPage = ({ user, userStatus }) => {
             boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
           }}
         >
-          <div
-            style={{
-              fontSize: 12,
-              color: "#0b3f66",
-              letterSpacing: 1,
-              textTransform: "uppercase",
-            }}
-          >
-            Promotion
-          </div>
-          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
-            Try Porch P.O. Box for free!
-          </h4>
-          <p style={{ margin: 0, color: "#0d3555", lineHeight: 1.6 }}>
-            Sign up today and get your first package delivered to a Porch P.O.
-            Box for free.
+          <div style={{ fontSize: 12, color: "#0b3f66", letterSpacing: 1, textTransform: "uppercase" }}>🎁 Promotion</div>
+          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>Try Porch P.O. Box for free!</h4>
+          <p style={{ margin: "0 0 16px", color: "#0d3555", lineHeight: 1.6 }}>
+            Sign up today and get your first package delivered to a Porch P.O. Box for free — no credit card needed to try it.
           </p>
+          {!user && (
+            <Link
+              to="/register"
+              style={{ display: "inline-block", padding: "10px 22px", background: "#0b3f66", color: "#fff", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 14 }}
+            >
+              Claim Free Delivery →
+            </Link>
+          )}
         </div>
         <div
           className="Referral"
@@ -450,16 +460,7 @@ const MainPage = ({ user, userStatus }) => {
             boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
           }}
         >
-          <div
-            style={{
-              fontSize: 12,
-              color: "#6a4a00",
-              letterSpacing: 1,
-              textTransform: "uppercase",
-            }}
-          >
-            Referrals
-          </div>
+          <div style={{ fontSize: 12, color: "#6a4a00", letterSpacing: 1, textTransform: "uppercase" }}>💰 Referrals</div>
           <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
             Invite a partner. Earn free service for a YEAR.
           </h4>
