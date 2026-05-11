@@ -129,7 +129,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          vendorName: partnerProfile.businessName,
+          vendorName: partnerProfile.businessName || partnerProfile.streetAddress || "Your Porch P.O. Box Location",
           partnerId: partnerProfile.id,
           recipients: selectedUsers.map((user) => ({
             id: user.id,
