@@ -42,7 +42,7 @@ const PartnerActivityLog = ({ partnerProfile }) => {
 
   const getTypeStyle = (type) => {
     if (type === "check-in") return { background: "#e6f4ea", color: "#1a7f37", label: "Check In" };
-    if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivery" };
+    if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivered" };
     return { background: "#f0f0f0", color: "#444", label: type };
   };
 

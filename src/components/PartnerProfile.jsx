@@ -8,6 +8,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
   const [prefCount, setPrefCount] = useState(null);
   const [prefUsers, setPrefUsers] = useState([]);
+  const [monthlyCount, setMonthlyCount] = useState(null);
   const [showPrefUsers, setShowPrefUsers] = useState(false);
   const [showPaymentPicker, setShowPaymentPicker] = useState(false);
   const [selectedMethod, setSelectedMethod] = useState(partnerProfile.prefPaymentMethod || "");
@@ -64,8 +65,19 @@ const PartnerProfile = ({ user, partnerProfile }) => {
         const snap = await getDocs(
           query(collection(db, "users"), where("prefLocation.id", "==", partnerProfile.id))
         );
-        setPrefCount(snap.size);
-        setPrefUsers(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        const allUsers = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+        // Total active subscribers at this location
+        const activeUsers = allUsers.filter((u) => u.status === "active");
+        setPrefCount(activeUsers.length);
+        setPrefUsers(activeUsers);
+        // Monthly subscribers — subscribed this calendar month
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthly = activeUsers.filter((u) => {
+          const subDate = u.subscribedAt?.toDate ? u.subscribedAt.toDate() : u.subscribedAt ? new Date(u.subscribedAt) : null;
+          return subDate && subDate >= startOfMonth;
+        });
+        setMonthlyCount(monthly.length);
       } catch (err) {
         console.error("Error loading preferred count:", err);
         setPrefCount(0);
@@ -204,20 +216,23 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           }}
           onClick={() => prefCount > 0 && setShowPrefUsers(!showPrefUsers)}
         >
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <h3 style={{ margin: 0 }}>Community Reach</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ margin: 0 }}>Monthly Subscribers</h3>
             {prefCount > 0 && (
               <span style={{ fontSize: 13, color: "#0b57d0" }}>{showPrefUsers ? "Hide ▲" : "View ▼"}</span>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, margin: "12px 0 8px" }}>
-            Users Who Selected You
-          </div>
-          <div style={{ fontSize: 36, fontWeight: 700, color: "#121212" }}>
-            {prefCount === null ? "—" : prefCount}
-          </div>
-          <div style={{ fontSize: 13, color: "#888", marginTop: 6 }}>
-            {prefCount === 1 ? "user has" : "users have"} selected your location as their preferred Porch P.O. Box.
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 8 }}>
+            <div style={{ background: "#f8f5ea", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: "#8a6a00", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Total Active</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: "#121212" }}>{prefCount === null ? "—" : prefCount}</div>
+              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>active subscriber{prefCount !== 1 ? "s" : ""} at your location</div>
+            </div>
+            <div style={{ background: "#e8f5e9", borderRadius: 12, padding: 14 }}>
+              <div style={{ fontSize: 11, color: "#1a7f37", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>This Month</div>
+              <div style={{ fontSize: 32, fontWeight: 700, color: "#1a7f37" }}>{monthlyCount === null ? "—" : monthlyCount}</div>
+              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>new subscriber{monthlyCount !== 1 ? "s" : ""} in {new Date().toLocaleString("default", { month: "long" })}</div>
+            </div>
           </div>
           {showPrefUsers && prefUsers.length > 0 && (
             <div style={{ marginTop: 18, borderTop: "1px solid #eee", paddingTop: 16 }}>

@@ -22,7 +22,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       try {
         const [usersSnapshot, packageCountsSnapshot] = await Promise.all([
           getDocs(collection(db, "users")),
-          getDocs(collection(db, "partners", partnerProfile.id, "packageCounts"))
+          getDocs(
+            collection(db, "partners", partnerProfile.id, "packageCounts"),
+          ),
         ]);
 
         const packageCounts = Object.fromEntries(
@@ -30,10 +32,13 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             entry.id,
             {
               count: Number(entry.data().count) || 0,
-              totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
-              totalPickedUp: Number(entry.data().totalPickedUp) || 0
-            }
-          ])
+              totalReceived:
+                Number(entry.data().totalReceived) ||
+                Number(entry.data().count) ||
+                0,
+              totalPickedUp: Number(entry.data().totalPickedUp) || 0,
+            },
+          ]),
         );
 
         setUsers(
@@ -44,8 +49,8 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             packagesDelivered: Number(entry.data().packagesDelivered) || 0,
             packageCount: packageCounts[entry.id]?.count || 0,
             totalReceived: packageCounts[entry.id]?.totalReceived || 0,
-            totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0
-          }))
+            totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
+          })),
         );
       } catch (loadError) {
         console.error("Error loading users for package check in:", loadError);
@@ -65,7 +70,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     }
 
     return users.filter((user) =>
-      `${user.name || ""} ${user.email || ""}`.toLowerCase().includes(term)
+      `${user.name || ""} ${user.email || ""}`.toLowerCase().includes(term),
     );
   }, [search, users]);
 
@@ -73,7 +78,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setExpandedUserIds((current) =>
       current.includes(userId)
         ? current.filter((id) => id !== userId)
-        : [...current, userId]
+        : [...current, userId],
     );
   };
 
@@ -84,31 +89,33 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setSelectedUserIds((current) =>
       current.includes(userId)
         ? current.filter((id) => id !== userId)
-        : [...current, userId]
+        : [...current, userId],
     );
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: current[userId] ?? "1"
+      [userId]: current[userId] ?? "1",
     }));
   };
 
-  const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
+  const selectedUsers = users.filter((user) =>
+    selectedUserIds.includes(user.id),
+  );
   const totalSelectedPackages = selectedUsers.reduce(
     (sum, user) => sum + getNormalizedPackageQuantity(user.id),
-    0
+    0,
   );
 
   const updatePackageQuantity = (userId, nextValue) => {
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: nextValue
+      [userId]: nextValue,
     }));
   };
 
   const finalizePackageQuantity = (userId) => {
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: String(getNormalizedPackageQuantity(userId))
+      [userId]: String(getNormalizedPackageQuantity(userId)),
     }));
   };
 
@@ -123,22 +130,28 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setError("");
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/notifications/package-check-in`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const response = await fetch(
+        `${API_BASE_URL}/api/notifications/package-check-in`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            vendorName:
+              partnerProfile.businessName ||
+              partnerProfile.streetAddress ||
+              "Your Porch P.O. Box Location",
+            partnerId: partnerProfile.id,
+            recipients: selectedUsers.map((user) => ({
+              id: user.id,
+              name: user.name || "Customer",
+              email: user.email,
+              packageCount: getNormalizedPackageQuantity(user.id),
+            })),
+          }),
         },
-        body: JSON.stringify({
-          vendorName: partnerProfile.businessName || partnerProfile.streetAddress || "Your Porch P.O. Box Location",
-          partnerId: partnerProfile.id,
-          recipients: selectedUsers.map((user) => ({
-            id: user.id,
-            name: user.name || "Customer",
-            email: user.email,
-            packageCount: getNormalizedPackageQuantity(user.id)
-          }))
-        })
-      });
+      );
 
       if (!response.ok) {
         const responseText = await response.text();
@@ -151,7 +164,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         }
 
         throw new Error(
-          body?.message || responseText || "Package notification email failed."
+          body?.message || responseText || "Package notification email failed.",
         );
       }
 
@@ -187,7 +200,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       {loading ? (
         <p>Loading users...</p>
       ) : (
-        <div style={{ border: "1px solid #ccc", borderRadius: 12, padding: 16 }}>
+        <div
+          style={{ border: "1px solid #ccc", borderRadius: 12, padding: 16 }}
+        >
           {filteredUsers.length === 0 ? (
             <p>No users found.</p>
           ) : (
@@ -203,11 +218,13 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                     background: getCustomerBackgroundColor(user),
                     borderRadius: 12,
                     padding: 16,
-                    marginBottom: 8
+                    marginBottom: 8,
                   }}
                 >
                   <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 8 }}
+                    >
                       <strong>{user.name || "Unnamed user"}</strong>
                       <button
                         type="button"
@@ -219,17 +236,30 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                           color: "#0b57d0",
                           cursor: "pointer",
                           textDecoration: "underline",
-                          fontSize: "0.9em"
+                          fontSize: "0.9em",
                         }}
                       >
-                        {expandedUserIds.includes(user.id) ? "Hide Info" : "Info"}
+                        {expandedUserIds.includes(user.id)
+                          ? "Hide Info"
+                          : "Info"}
                       </button>
                     </div>
                     {expandedUserIds.includes(user.id) && (
-                      <div style={{ marginTop: 8, fontSize: "0.9em", color: "#444" }}>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          fontSize: "0.9em",
+                          color: "#444",
+                        }}
+                      >
                         <div>Email: {user.email || "Not provided"}</div>
                         <div>Phone: {user.phoneNumber || "Not provided"}</div>
-                        <div>Address: {user.streetAddress || "Not provided"}{user.city ? `, ${user.city}` : ""}{user.state ? `, ${user.state}` : ""}{user.zipCode ? ` ${user.zipCode}` : ""}</div>
+                        <div>
+                          Address: {user.streetAddress || "Not provided"}
+                          {user.city ? `, ${user.city}` : ""}
+                          {user.state ? `, ${user.state}` : ""}
+                          {user.zipCode ? ` ${user.zipCode}` : ""}
+                        </div>
                         <div>Total Received: {user.totalReceived}</div>
                         <div>Total Picked Up: {user.totalPickedUp}</div>
                         <div>Waiting: {user.packageCount}</div>
@@ -237,20 +267,24 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                       </div>
                     )}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 12 }}
+                  >
                     <input
                       type="number"
                       min="1"
                       step="1"
                       value={packageQuantities[user.id] ?? "1"}
-                      onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
+                      onChange={(event) =>
+                        updatePackageQuantity(user.id, event.target.value)
+                      }
                       onBlur={() => finalizePackageQuantity(user.id)}
                       style={{
                         width: 40,
                         padding: 8,
                         MozAppearance: "textfield",
                         WebkitAppearance: "none",
-                        appearance: "none"
+                        appearance: "none",
                       }}
                       aria-label={`Package count for ${user.name || "user"}`}
                     />
@@ -273,9 +307,13 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
           onClick={() => setShowConfirm(true)}
           disabled={totalSelectedPackages === 0 || submitting}
         >
-          Check In Packages
+          CHECK IN PACKAGES
         </button>
-        <button type="button" onClick={() => navigate("/partner")} disabled={submitting}>
+        <button
+          type="button"
+          onClick={() => navigate("/partner")}
+          disabled={submitting}
+        >
           Cancel
         </button>
       </div>
@@ -289,16 +327,34 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            padding: 20
+            padding: 20,
           }}
         >
-          <div style={{ background: "#fff", padding: 24, borderRadius: 12, maxWidth: 420, width: "100%" }}>
+          <div
+            style={{
+              background: "#fff",
+              padding: 24,
+              borderRadius: 12,
+              maxWidth: 420,
+              width: "100%",
+            }}
+          >
             <p>You are about to check in {totalSelectedPackages} packages.</p>
-            <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-              <button type="button" onClick={() => setShowConfirm(false)} disabled={submitting}>
+            <div
+              style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}
+            >
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                disabled={submitting}
+              >
                 Cancel
               </button>
-              <button type="button" onClick={handleCheckIn} disabled={submitting}>
+              <button
+                type="button"
+                onClick={handleCheckIn}
+                disabled={submitting}
+              >
                 {submitting ? "Sending..." : "Ok"}
               </button>
             </div>

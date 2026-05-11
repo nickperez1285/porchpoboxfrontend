@@ -83,7 +83,7 @@ const AdminActivityLog = () => {
 
   const getTypeStyle = (type) => {
     if (type === "check-in") return { background: "#e6f4ea", color: "#1a7f37", label: "Check In" };
-    if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivery" };
+    if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivered" };
     if (type === "signup") return { background: "#e8f0fe", color: "#1a56db", label: "Sign Up" };
     if (type === "subscription") return { background: "#f3e8ff", color: "#6d28d9", label: "Subscription" };
     return { background: "#f0f0f0", color: "#444", label: type };

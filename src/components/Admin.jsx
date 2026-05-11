@@ -692,7 +692,7 @@ const Admin = () => {
                   const isSignup = entry.type === "signup";
                   const typeColors = {
                     "check-in": { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" },
-                    "delivery": { bg: "#fff3cd", color: "#856404", label: "Delivery" },
+                    "delivery": { bg: "#fff3cd", color: "#856404", label: "Delivered" },
                     "signup":   { bg: "#e8f0fe", color: "#1a56db", label: "Sign Up" },
                     "subscription": { bg: "#f3e8ff", color: "#6d28d9", label: "Subscription" }
                   };
