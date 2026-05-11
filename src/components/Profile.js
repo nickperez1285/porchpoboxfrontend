@@ -8,6 +8,7 @@ import {
   onSnapshot
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import Footer from "./Footer";
 
 const formatDate = (value) => {
   if (!value) {
@@ -251,7 +252,8 @@ const Profile = ({ user }) => {
   };
 
   return (
-    <div style={{ maxWidth: 960, margin: "60px auto", padding: "0 20px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <div style={{ maxWidth: 960, margin: "60px auto", padding: "0 20px", flex: 1, width: "100%", boxSizing: "border-box" }}>
       {/* Hero */}
       <div
         style={{
@@ -436,6 +438,8 @@ const Profile = ({ user }) => {
           </div>
         </div>
       </div>
+      </div>
+      <Footer />
     </div>
   );
 };

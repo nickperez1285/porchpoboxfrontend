@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
+import Footer from "./Footer";
 import { db } from "../firebase";
 
 // Fix leaflet default marker icons broken by webpack
@@ -448,6 +449,52 @@ const MainPage = ({ user, userStatus }) => {
           )}
         </div>
         <div
+          style={{
+            width: "100%",
+            maxWidth: 1180,
+            marginTop: 24,
+            background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+            border: "1px solid rgba(212, 175, 55, 0.2)",
+            borderRadius: 20,
+            padding: "28px 28px",
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.18)",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 20,
+          }}
+        >
+          <div style={{ maxWidth: 600 }}>
+            <div style={{ fontSize: 12, color: "#d4af37", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 8 }}>
+              🏪 Become a Partner
+            </div>
+            <h3 style={{ margin: "0 0 10px", color: "#f5f5f5", fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)" }}>
+              Own a local business? Join the Porch P.O. Box network.
+            </h3>
+            <p style={{ margin: 0, color: "#c8c8c8", lineHeight: 1.6, fontSize: 14 }}>
+              Earn extra income by accepting packages for customers in your area. No major changes to your operations — just a new way to serve your community.
+            </p>
+          </div>
+          <Link
+            to="/partner/register"
+            style={{
+              display: "inline-block",
+              padding: "14px 28px",
+              background: "#d4af37",
+              color: "#121212",
+              borderRadius: 12,
+              fontWeight: 700,
+              fontSize: 15,
+              textDecoration: "none",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Apply to Become a Partner →
+          </Link>
+        </div>
+
+        <div
           className="Referral"
           style={{
             width: "100%",
@@ -480,19 +527,7 @@ const MainPage = ({ user, userStatus }) => {
           </Link>
         </div>
       </div>
-      <footer style={{ padding: "1.5em", background: "#111", color: "#aaa", fontSize: 14 }}>
-        <center>
-          <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 20px" }}>
-            <Link to="/partner" style={{ color: "#ccc" }}>Partners</Link>
-            <Link to="/contact" style={{ color: "#ccc" }}>Contact</Link>
-            <Link to="/about" style={{ color: "#ccc" }}>About</Link>
-            <Link to="/terms" style={{ color: "#ccc" }}>Terms &amp; Policies</Link>
-          </div>
-          <div style={{ marginTop: 10, color: "#555", fontSize: 12 }}>
-            &copy; {new Date().getFullYear()} Porch P.O. Box
-          </div>
-        </center>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -300,9 +300,8 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
-        <h2>Admin</h2>
-        <p>Loading customers and partners...</p>
+      <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px", textAlign: "center" }}>
+        <p style={{ color: "#888", fontSize: 16 }}>Loading admin data...</p>
       </div>
     );
   }
@@ -310,8 +309,9 @@ const Admin = () => {
   if (error) {
     return (
       <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
-        <h2>Admin</h2>
-        <p>{error}</p>
+        <div style={{ background: "#fff3cd", border: "1px solid #f0c040", borderRadius: 12, padding: 20, color: "#7a5c00" }}>
+          {error}
+        </div>
       </div>
     );
   }
@@ -412,8 +412,15 @@ const Admin = () => {
         </div>
       </div>
 
-      <div style={{ marginBottom: 20, display: "flex", gap: 16 }}>
-        <button type="button" onClick={handleLogout}>
+      <div style={{ marginBottom: 20, display: "flex", gap: 12, alignItems: "center" }}>
+        <Link to="/admin/activity-log" style={{ padding: "8px 16px", background: "rgba(255,255,255,0.08)", color: "#d4af37", borderRadius: 8, fontWeight: 600, fontSize: 13, border: "1px solid rgba(212,175,55,0.3)", textDecoration: "none" }}>
+          📋 Full Activity Log
+        </Link>
+        <button
+          type="button"
+          onClick={handleLogout}
+          style={{ padding: "8px 16px", background: "#f5f5f5", color: "#555", borderRadius: 8, border: "1px solid #ddd", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+        >
           Logout
         </button>
       </div>
@@ -492,52 +499,42 @@ const Admin = () => {
                 <li
                   key={customer.id}
                   style={{
-                    padding: 16,
-                    border: "1px solid #ccc",
-                    borderRadius: 10,
-                    marginBottom: 12,
+                    padding: 14,
+                    border: "1px solid #e8e8e8",
+                    borderRadius: 12,
+                    marginBottom: 10,
                     background: getCustomerBackgroundColor(customer)
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <strong>{customer.name || "Unnamed user"}</strong>
-                    <div>{customer.packageCount || 0}: PKGS</div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 15 }}>{customer.name || "Unnamed user"}</div>
+                      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{customer.email || ""}</div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {customer.packageCount > 0 && (
+                        <span style={{ background: "#121212", color: "#fff", borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>
+                          📦 {customer.packageCount}
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => toggleCustomerExpanded(customer.id)}
+                        style={{ padding: "4px 10px", border: "1px solid #ccc", background: "#f5f5f5", borderRadius: 6, color: "#444", cursor: "pointer", fontSize: 12 }}
+                      >
+                        {expandedCustomerIds.includes(customer.id) ? "Hide ▲" : "Info ▼"}
+                      </button>
+                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => toggleCustomerExpanded(customer.id)}
-                    style={{
-                      marginTop: 8,
-                      padding: 0,
-                      border: "none",
-                      background: "none",
-                      color: "#0b57d0",
-                      cursor: "pointer",
-                      textDecoration: "underline"
-                    }}
-                  >
-                    {expandedCustomerIds.includes(customer.id) ? "Hide Info" : "Info"}
-                  </button>
                   {expandedCustomerIds.includes(customer.id) && (
-                    <div style={{ marginTop: 12 }}>
-                      <div>Status: {customer.status || "inactive"}</div>
-                      <div>Subscribed: {formatDate(customer.subscribedAt)}</div>
-                      <div>Ends: {formatDate(customer.subscriptionEndsAt)}</div>
-                      <div>Days Left: {getDaysLeft(customer.subscriptionEndsAt)}</div>
-                      <div>Email: {customer.email || "No email"}</div>
-                      <div>Phone: {customer.phoneNumber || "No phone number"}</div>
-                      <div>
-                        Checked In At: {customer.packageLocations?.length
-                          ? customer.packageLocations.join(", ")
-                          : "No checked-in location"}
-                      </div>
-                      <div>
-                        Address: {customer.streetAddress || "No street address"}
-                        {customer.city ? `, ${customer.city}` : ""}
-                        {customer.state ? `, ${customer.state}` : ""}
-                        {customer.zipCode ? ` ${customer.zipCode}` : ""}
-                      </div>
-                      <div>User ID: {customer.id}</div>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 13, color: "#444" }}>
+                      <div><span style={{ color: "#888" }}>Status:</span> {customer.status || "inactive"}</div>
+                      <div><span style={{ color: "#888" }}>Days Left:</span> {getDaysLeft(customer.subscriptionEndsAt)}</div>
+                      <div><span style={{ color: "#888" }}>Subscribed:</span> {formatDate(customer.subscribedAt)}</div>
+                      <div><span style={{ color: "#888" }}>Ends:</span> {formatDate(customer.subscriptionEndsAt)}</div>
+                      <div><span style={{ color: "#888" }}>Phone:</span> {customer.phoneNumber || "—"}</div>
+                      <div><span style={{ color: "#888" }}>Location:</span> {customer.packageLocations?.length ? customer.packageLocations.join(", ") : "—"}</div>
+                      <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#888" }}>Address:</span> {[customer.streetAddress, customer.city, customer.state, customer.zipCode].filter(Boolean).join(", ") || "—"}</div>
                     </div>
                   )}
                 </li>
@@ -584,80 +581,74 @@ const Admin = () => {
                 <li
                   key={vendor.id}
                   style={{
-                    padding: 16,
-                    border: "1px solid #ccc",
-                    borderRadius: 10,
-                    marginBottom: 12,
-                    backgroundColor: vendor.approved ? "#ffffff" : "#ffdddd"
+                    padding: 14,
+                    border: "1px solid #e8e8e8",
+                    borderRadius: 12,
+                    marginBottom: 10,
+                    background: vendor.approved ? "#fff" : "#fff8f8",
+                    borderLeft: !vendor.approved && vendor.status !== "deactivated" ? "3px solid #f0a500" : vendor.status === "deactivated" ? "3px solid #dc3545" : "1px solid #e8e8e8"
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
-                    <strong>{vendor.businessName || "Unnamed partner"}</strong>
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <Link
-                        to={`/admin/partner/${vendor.id}`}
-                        style={{ fontSize: 13, color: "#0b57d0" }}
-                      >
-                        View Portal
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                    <div>
+                      <div style={{ fontWeight: 600, fontSize: 15 }}>{vendor.businessName || "Unnamed partner"}</div>
+                      <div style={{ fontSize: 12, marginTop: 2 }}>
+                        <span style={{
+                          background: vendor.status === "deactivated" ? "#ffd9d9" : vendor.approved ? "#d4edda" : "#fff3cd",
+                          color: vendor.status === "deactivated" ? "#c00" : vendor.approved ? "#1a7f37" : "#856404",
+                          borderRadius: 999, padding: "2px 8px", fontSize: 11, fontWeight: 600
+                        }}>
+                          {vendor.status === "deactivated" ? "Deactivated" : vendor.approved ? "Approved" : "Pending Review"}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      {vendor.packageCountTotal > 0 && (
+                        <span style={{ background: "#121212", color: "#fff", borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>
+                          📦 {vendor.packageCountTotal}
+                        </span>
+                      )}
+                      <Link to={`/admin/partner/${vendor.id}`} style={{ padding: "4px 10px", border: "1px solid #0b57d0", borderRadius: 6, color: "#0b57d0", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+                        Portal
                       </Link>
-                      <div>{vendor.packageCountTotal || 0}: PKGS</div>
+                      <button
+                        type="button"
+                        onClick={() => toggleVendorExpanded(vendor.id)}
+                        style={{ padding: "4px 10px", border: "1px solid #ccc", background: "#f5f5f5", borderRadius: 6, color: "#444", cursor: "pointer", fontSize: 12 }}
+                      >
+                        {expandedVendorIds.includes(vendor.id) ? "Hide ▲" : "Info ▼"}
+                      </button>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => toggleVendorExpanded(vendor.id)}
-                    style={{
-                      marginTop: 8,
-                      padding: 0,
-                      border: "none",
-                      background: "none",
-                      color: "#0b57d0",
-                      cursor: "pointer",
-                      textDecoration: "underline"
-                    }}
-                  >
-                    {expandedVendorIds.includes(vendor.id) ? "Hide Info" : "Info"}
-                  </button>
                   {expandedVendorIds.includes(vendor.id) && (
-                    <div style={{ marginTop: 12 }}>
-                      <div>Email: {vendor.email || "No email"}</div>
-                      <div>Phone: {vendor.phoneNumber || "No phone number"}</div>
-                      <div>
-                        Status: {vendor.status === "deactivated"
-                          ? "Deactivated"
-                          : vendor.approved
-                            ? "Approved"
-                            : "Pending Review"}
-                      </div>
-                      <div>
-                        Address: {vendor.streetAddress || "No street address"}
-                        {vendor.city ? `, ${vendor.city}` : ""}
-                        {vendor.state ? `, ${vendor.state}` : ""}
-                        {vendor.zipCode ? ` ${vendor.zipCode}` : ""}
-                      </div>
-                      <div>Store Hours: {vendor.storeHours || "Not provided"}</div>
-                      <div>Partner ID: {vendor.id}</div>
+                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 13, color: "#444" }}>
+                      <div><span style={{ color: "#888" }}>Email:</span> {vendor.email || "—"}</div>
+                      <div><span style={{ color: "#888" }}>Phone:</span> {vendor.phoneNumber || "—"}</div>
+                      <div><span style={{ color: "#888" }}>Hours:</span> {vendor.storeHours || "—"}</div>
+                      <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#888" }}>Address:</span> {[vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode].filter(Boolean).join(", ") || "—"}</div>
                     </div>
                   )}
-                  {!vendor.approved ? (
-                    <button
-                      type="button"
-                      onClick={() => updateVendorApproval(vendor.id, true)}
-                      disabled={updatingVendorId === vendor.id}
-                      style={{ marginTop: 12 }}
-                    >
-                      {updatingVendorId === vendor.id ? "Updating..." : "Approve"}
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => updateVendorApproval(vendor.id, false)}
-                      disabled={updatingVendorId === vendor.id}
-                      style={{ marginTop: 12 }}
-                    >
-                      {updatingVendorId === vendor.id ? "Updating..." : "Deactivate"}
-                    </button>
-                  )}
+                  <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
+                    {!vendor.approved ? (
+                      <button
+                        type="button"
+                        onClick={() => updateVendorApproval(vendor.id, true)}
+                        disabled={updatingVendorId === vendor.id}
+                        style={{ padding: "7px 16px", background: "#1a7f37", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+                      >
+                        {updatingVendorId === vendor.id ? "Updating..." : "✓ Approve"}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => updateVendorApproval(vendor.id, false)}
+                        disabled={updatingVendorId === vendor.id}
+                        style={{ padding: "7px 16px", background: "#dc3545", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+                      >
+                        {updatingVendorId === vendor.id ? "Updating..." : "Deactivate"}
+                      </button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
