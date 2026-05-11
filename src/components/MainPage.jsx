@@ -39,7 +39,7 @@ const MainPage = ({ user, userStatus }) => {
       "Secure Package Receiving Through Local Partner Locations",
     );
     setMainPageMessage(
-      "Get your packages delivered and securely stored at a trusted local neigborhood  Porch P.O. Box ",
+      "Have your packages delivered to a trusted local Porch P.O. Box partner and pick them up at your convenience — no more porch piracy.",
     );
     fetchActiveVendors();
   }, []);
@@ -159,7 +159,7 @@ const MainPage = ({ user, userStatus }) => {
             </h2>
             <p
               style={{
-                margin: 0,
+                margin: "0 0 20px",
                 color: "#d3d3d3",
                 lineHeight: 1.6,
                 maxWidth: 620,
@@ -167,6 +167,41 @@ const MainPage = ({ user, userStatus }) => {
             >
               {mainPageMessage}
             </p>
+            {!user && (
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <Link
+                  to="/register"
+                  style={{
+                    display: "inline-block",
+                    padding: "12px 24px",
+                    background: "#d4af37",
+                    color: "#121212",
+                    borderRadius: 10,
+                    fontWeight: 700,
+                    fontSize: 15,
+                    textDecoration: "none",
+                  }}
+                >
+                  Get Started Free
+                </Link>
+                <Link
+                  to="/about"
+                  style={{
+                    display: "inline-block",
+                    padding: "12px 24px",
+                    background: "rgba(255,255,255,0.08)",
+                    color: "#f5f5f5",
+                    borderRadius: 10,
+                    fontWeight: 600,
+                    fontSize: 15,
+                    textDecoration: "none",
+                    border: "1px solid rgba(255,255,255,0.15)",
+                  }}
+                >
+                  Learn More
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
@@ -207,7 +242,8 @@ const MainPage = ({ user, userStatus }) => {
               >
                 Active Locations
               </div>
-              <h4 style={{ margin: "8px 0 0" }}>Porch P.O. Boxes</h4>
+              <h4 style={{ margin: "8px 0 4px" }}>Porch P.O. Boxes</h4>
+              <p style={{ margin: 0, fontSize: 12, color: "#999" }}>Click a location to see it on the map</p>
             </div>
             {vendorsLoading ? (
               <p>Loading partners...</p>
@@ -346,16 +382,25 @@ const MainPage = ({ user, userStatus }) => {
               </div>
               <h4 style={{ margin: "8px 0 6px" }}>
                 {user && userStatus === "active"
-                  ? "Welcome to PorchPOBox!"
-                  : "Sign Up"}
+                  ? `Welcome back${user.displayName ? ", " + user.displayName.split(" ")[0] : ""}!`
+                  : "Choose a Plan"}
               </h4>
               <p style={{ margin: 0, color: "#666" }}>
                 {user && userStatus === "active"
-                  ? "Your subscription is active. You can continue using Porch P.O. Box services."
-                  : "Select the subscription term that fits your delivery needs and start receiving your packages today!"}
+                  ? "Your subscription is active. Use any Porch P.O. Box location to receive your packages."
+                  : "Pick the plan that fits your needs. Your first delivery is on us — no subscription required to try it."}
               </p>
             </div>
-            {user && userStatus === "active" ? null : (
+            {user && userStatus === "active" ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
+                <Link to="/profile" style={{ display: "inline-block", padding: "10px 20px", background: "#121212", color: "#fff", borderRadius: 10, fontWeight: 600, textDecoration: "none", textAlign: "center" }}>
+                  View My Profile
+                </Link>
+                <Link to="/profile/settings" style={{ display: "inline-block", padding: "10px 20px", background: "#f5f5f5", color: "#333", borderRadius: 10, fontWeight: 600, textDecoration: "none", textAlign: "center", border: "1px solid #ddd" }}>
+                  Update Preferred Location
+                </Link>
+              </div>
+            ) : (
               <OneTimeProduct user={user} />
             )}
           </div>
@@ -419,9 +464,7 @@ const MainPage = ({ user, userStatus }) => {
             Invite a partner. Earn free service for a YEAR.
           </h4>
           <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
-            Wish you had a Porch P.O. Box for your packages? Let your local
-            business know about us and if they decide to parner with us you will
-            hook you up with a whole YEAR of free service !{" "}
+            Know a local business that would make a great Porch P.O. Box partner? Refer them — if they join, you get a whole year of free service.
           </p>
           <Link
             to="/referrals"
