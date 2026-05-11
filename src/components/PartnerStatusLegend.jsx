@@ -22,27 +22,27 @@ const PartnerStatusLegend = () => {
       style={{
         background: "#f8f5ea",
         border: "1px solid rgba(0, 0, 0, 0.08)",
-        borderRadius: 18,
-        padding: 20,
-        marginBottom: 20,
+        borderRadius: 12,
+        padding: "8px 14px",
+        marginBottom: 12,
       }}
     >
       <div
         style={{
-          fontSize: 12,
+          fontSize: 10,
           color: "#8a6a00",
           letterSpacing: 1,
           textTransform: "uppercase",
-          marginBottom: 12,
+          marginBottom: 6,
         }}
       >
         Customer Status Legend
       </div>
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: 12,
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "6px 16px",
         }}
       >
         {legendItems.map((item) => (
@@ -51,13 +51,14 @@ const PartnerStatusLegend = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 10,
+              gap: 6,
+              fontSize: 11,
             }}
           >
             <span
               style={{
-                width: 18,
-                height: 18,
+                width: 10,
+                height: 10,
                 borderRadius: 999,
                 background: item.color,
                 border: "1px solid rgba(0, 0, 0, 0.18)",
