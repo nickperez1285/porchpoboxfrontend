@@ -95,87 +95,49 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
             }}
           >
             <div style={{ maxWidth: 540 }}>
-              <div
-                style={{
-                  color: "#d4af37",
-                  fontSize: 12,
-                  letterSpacing: 1.2,
-                  textTransform: "uppercase",
-                }}
-              >
+              <div style={{ color: "#d4af37", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase" }}>
                 Partner Portal
               </div>
-              <h2 style={{ margin: "10px 0 8px" }}>
-                {partnerProfile.businessName}
-              </h2>
+              <h2 style={{ margin: "10px 0 8px" }}>{partnerProfile.businessName}</h2>
               <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
-                Review active customer deliveries, manage package intake, and
-                clear delivered packages from your location.
+                Review active customer deliveries, manage package intake, and clear delivered packages from your location.
               </p>
             </div>
 
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-                gap: 14,
-                flex: "1 1 320px",
-              }}
-            >
-              <div
-                style={{
-                  background: "rgba(255, 255, 255, 0.06)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  borderRadius: 16,
-                  padding: 16,
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 12,
-                    textTransform: "uppercase",
-                    letterSpacing: 1,
-                    color: "#c8c8c8",
-                  }}
-                >
-                  Packages Checked In
-                </div>
-                <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 14, flex: "1 1 320px" }}>
+              {/* Stat card */}
+              <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16 }}>
+                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>Packages In Stock</div>
+                <div style={{ marginTop: 8, fontSize: 36, fontWeight: 700, color: packageCountTotal > 0 ? "#d4af37" : "#fff" }}>
                   {packageCountTotal}
                 </div>
               </div>
-              <div
+
+              {/* Primary action */}
+              <Link
+                to="/partner/package-check-in"
                 style={{
-                  background: "rgba(255, 255, 255, 0.06)",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  background: "#d4af37",
                   borderRadius: 16,
                   padding: 16,
+                  textDecoration: "none",
+                  textAlign: "center",
+                  gap: 6,
                 }}
               >
-                <div
-                  style={{
-                    fontSize: 12,
-                    textTransform: "uppercase",
-                    letterSpacing: 1,
-                    color: "#c8c8c8",
-                  }}
-                >
-                  Actions
-                </div>
-                <div style={{ marginTop: 10 }}>
-                  <Link
-                    to="/partner/package-check-in"
-                    style={{ color: "#fff", fontSize: 18, fontWeight: 700 }}
-                  >
-                    Check In Packages
-                  </Link>
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  <Link to="/partner/activity-log">Activity Log</Link>
-                </div>
-                <div style={{ marginTop: 8 }}>
-                  <Link to="/partner/profile">Partner Profile</Link>
-                </div>
+                <span style={{ fontSize: 28 }}>📦</span>
+                <span style={{ color: "#121212", fontSize: 15, fontWeight: 700 }}>Check In Packages</span>
+              </Link>
+
+              {/* Secondary actions */}
+              <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
+                <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8", marginBottom: 2 }}>More</div>
+                <Link to="/partner/activity-log" style={{ color: "#d4af37", fontSize: 14, fontWeight: 600 }}>📋 Activity Log</Link>
+                <Link to="/partner/profile" style={{ color: "#d4af37", fontSize: 14, fontWeight: 600 }}>👤 Partner Profile</Link>
               </div>
             </div>
           </div>
@@ -192,11 +154,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
           <PartnerStatusLegend />
           <CustomerList
             vendorId={partnerProfile.id}
-            partnerLocationName={
-              partnerProfile.businessName ||
-              partnerProfile.streetAddress ||
-              "Unnamed partner"
-            }
+            partnerLocationName={partnerProfile.businessName || partnerProfile.streetAddress || "Unnamed partner"}
             onPackagesDelivered={handlePackagesDelivered}
           />
         </div>
@@ -219,8 +177,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
         <p style={{ color: "#d6d6d6" }}>
           Sign up here to become a Porch P.O. Box partner and start accepting
           package deliveries for customers in your area. If you already have an
-          account, please log in to access your partner dashboard[po
-          console.log(6oly); ]
+          account, please log in to access your partner dashboard.
         </p>
         {/* <p>
                     <Link to="/partner/login">Partner Login</Link>
