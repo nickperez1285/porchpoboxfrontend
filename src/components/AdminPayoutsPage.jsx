@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDocs,
   onSnapshot,
@@ -109,6 +110,16 @@ const AdminPayoutsPage = () => {
       setMsg(`Error: ${err.message}`);
     } finally {
       setBulkSaving(false);
+    }
+  };
+
+  const handleDeletePayout = async (partnerId, payoutId) => {
+    if (!window.confirm("Delete this payout? This cannot be undone.")) return;
+    try {
+      await deleteDoc(doc(db, "partners", partnerId, "payouts", payoutId));
+      setMsg("✓ Payout deleted.");
+    } catch (err) {
+      setMsg(`Error: ${err.message}`);
     }
   };
 
@@ -293,6 +304,13 @@ const AdminPayoutsPage = () => {
                             >
                               Mark Paid
                             </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePayout(partner.id, p.id)}
+                              style={{ padding: "5px 10px", background: "#fff", color: "#dc3545", border: "1px solid #dc3545", borderRadius: 7, fontWeight: 600, cursor: "pointer", fontSize: 12 }}
+                            >
+                              Delete
+                            </button>
                           </>
                         ) : (
                           <>
@@ -303,6 +321,13 @@ const AdminPayoutsPage = () => {
                                 {p.paidAt?.toDate ? p.paidAt.toDate().toLocaleDateString() : ""}
                               </span>
                             )}
+                            <button
+                              type="button"
+                              onClick={() => handleDeletePayout(partner.id, p.id)}
+                              style={{ padding: "5px 10px", background: "#fff", color: "#dc3545", border: "1px solid #dc3545", borderRadius: 7, fontWeight: 600, cursor: "pointer", fontSize: 12 }}
+                            >
+                              Delete
+                            </button>
                           </>
                         )}
                       </div>
