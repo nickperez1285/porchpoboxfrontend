@@ -349,7 +349,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
 
         {/* Payout Tracking */}
         {(() => {
-          const now = new Date();
           const currentMonthEarnings = (prefCount || 0) * PAYOUT_RATE;
           const totalPaid = payouts.filter((p) => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
           const pendingPayout = payouts.find((p) => p.status === "pending");
