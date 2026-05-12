@@ -32,9 +32,10 @@ const MainPage = ({ user, userStatus }) => {
   const [vendorsError, setVendorsError] = useState("");
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [selectedVendorId, setSelectedVendorId] = useState(null);
+  const [partnerSearch, setPartnerSearch] = useState("");
+  const [vendorMarkers, setVendorMarkers] = useState([]);
   const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
   const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
-  const [vendorMarkers, setVendorMarkers] = useState([]);
   useEffect(() => {
     setMainPageTitle(
       "Secure Package Receiving Through Local Partner Locations",
@@ -260,6 +261,13 @@ const MainPage = ({ user, userStatus }) => {
               <h4 style={{ margin: "8px 0 4px" }}>Porch P.O. Boxes</h4>
               <p style={{ margin: 0, fontSize: 12, color: "#999" }}>Click a location to see it on the map</p>
             </div>
+            <input
+              type="text"
+              placeholder="Search by name, city, or zip..."
+              value={partnerSearch}
+              onChange={(e) => setPartnerSearch(e.target.value)}
+              style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, marginBottom: 12, boxSizing: "border-box", background: "#fff" }}
+            />
             {vendorsLoading ? (
               <p>Loading partners...</p>
             ) : vendorsError ? (
@@ -268,7 +276,15 @@ const MainPage = ({ user, userStatus }) => {
               <p>No active partners listed yet.</p>
             ) : (
               <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {activeVendors.map((vendor) => (
+                {activeVendors.filter((vendor) => {
+                  const q = partnerSearch.toLowerCase().trim();
+                  if (!q) return true;
+                  return (
+                    vendor.businessName?.toLowerCase().includes(q) ||
+                    vendor.city?.toLowerCase().includes(q) ||
+                    vendor.zipCode?.toLowerCase().includes(q)
+                  );
+                }).map((vendor) => (
                   <li
                     key={vendor.id}
                     style={{
