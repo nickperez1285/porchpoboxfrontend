@@ -28,6 +28,15 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const generateReferralCode = (fullName) => {
+    const prefix = (fullName || "US").replace(/\s+/g, "").substring(0, 2).toUpperCase();
+    const now = new Date();
+    const dd = String(now.getDate()).padStart(2, "0");
+    const mm = String(now.getMonth() + 1).padStart(2, "0");
+    const yy = String(now.getFullYear()).slice(-2);
+    return `${prefix}${dd}${mm}${yy}`;
+  };
+
   const logSignup = async ({ name: userName, email: userEmail, authProvider }) => {
     try {
       await fetch(`${API_BASE_URL}/api/notifications/user-signup`, {
@@ -107,6 +116,8 @@ const Register = () => {
         packagesDelivered: 0,
         subscribedAt: null,
         subscriptionEndsAt: null,
+        referralCode: generateReferralCode(displayName),
+        notificationsEnabled: true,
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-user-v1",
@@ -205,6 +216,8 @@ const Register = () => {
         packagesDelivered: 0,
         subscribedAt: null,
         subscriptionEndsAt: null,
+        referralCode: generateReferralCode(name),
+        notificationsEnabled: true,
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-user-v1",

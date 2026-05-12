@@ -438,6 +438,25 @@ const Profile = ({ user }) => {
         <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#faf7ef" }}>
           <h3 style={{ marginTop: 0, marginBottom: 16 }}>⚙️ Account</h3>
 
+          <div style={{ marginBottom: 16, padding: 14, borderRadius: 12, background: "#f8f5ea", border: "1px solid #e8d98a" }}>
+            <div style={{ fontSize: 11, color: "#8a6a00", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Your Referral Code</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontWeight: 700, fontSize: 20, letterSpacing: 2, color: "#121212" }}>
+                {profileData?.referralCode || "—"}
+              </span>
+              {profileData?.referralCode && (
+                <button
+                  type="button"
+                  onClick={() => navigator.clipboard.writeText(profileData.referralCode).then(() => alert("Referral code copied!"))}
+                  style={{ padding: "4px 10px", background: "#d4af37", border: "none", borderRadius: 6, fontWeight: 600, fontSize: 12, cursor: "pointer", color: "#121212" }}
+                >
+                  Copy
+                </button>
+              )}
+            </div>
+            <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>Share this code with a business to refer them as a partner.</div>
+          </div>
+
           {/* Preferred Location */}
           <div style={{ marginBottom: 16, padding: 14, borderRadius: 12, background: profileData?.prefLocation ? "#f0faf0" : "#fff8e1", border: `1px solid ${profileData?.prefLocation ? "#b2dfdb" : "#f0c040"}` }}>
             <div style={{ fontSize: 11, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>Preferred Location</div>

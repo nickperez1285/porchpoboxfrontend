@@ -57,6 +57,9 @@ export default function ReferralForm() {
             reach out to them and let them know about our services. Thank you
             for your support!
           </p>
+          <p style={{ margin: 0, fontSize: 13, color: "#6a4a00", background: "#fff8e1", border: "1px solid #f0c040", borderRadius: 6, padding: "10px 14px", textAlign: "center" }}>
+            💡 Your personal referral code can be found on your <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>Profile page</Link>.
+          </p>
 
           <input
             type="email"

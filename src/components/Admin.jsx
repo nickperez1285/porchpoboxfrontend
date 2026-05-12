@@ -6,8 +6,10 @@ import {
   doc,
   getDocs,
   onSnapshot,
+  query,
   serverTimestamp,
-  updateDoc
+  updateDoc,
+  where
 } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
@@ -57,7 +59,8 @@ const Admin = () => {
               streetAddress: vendor.streetAddress,
               city: vendor.city,
               state: vendor.state,
-              zipCode: vendor.zipCode
+              zipCode: vendor.zipCode,
+              referredBy: vendor.referredBy || ""
             })
           });
 
@@ -165,6 +168,19 @@ const Admin = () => {
             )
           }))
         );
+
+        // Load referrer names for vendors that have a referredBy code
+        const vendorsWithReferral = vendorDocs.filter((v) => v.referredBy);
+        if (vendorsWithReferral.length > 0) {
+          const referrerSnap = await getDocs(
+            query(collection(db, "users"), where("referralCode", "in", vendorsWithReferral.map((v) => v.referredBy)))
+          );
+          const referrerMap = {};
+          referrerSnap.docs.forEach((d) => {
+            referrerMap[d.data().referralCode] = d.data().name || d.data().email || "Unknown";
+          });
+          setVendors((prev) => prev.map((v) => v.referredBy ? { ...v, referrerName: referrerMap[v.referredBy] || v.referredBy } : v));
+        }
       } catch (fetchError) {
         console.error("Error loading admin data:", fetchError);
         setError("Unable to load admin data. Firestore rules must allow your admin UID to read users and partners.");
@@ -595,6 +611,11 @@ const Admin = () => {
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
                     <div>
                       <div style={{ fontWeight: 600, fontSize: 15 }}>{vendor.businessName || "Unnamed partner"}</div>
+                      {vendor.referrerName && (
+                        <div style={{ fontSize: 12, color: "#6d28d9", marginTop: 2 }}>
+                          <span style={{ fontWeight: 600 }}>Referrer:</span> {vendor.referrerName}
+                        </div>
+                      )}
                       <div style={{ fontSize: 12, marginTop: 2 }}>
                         <span style={{
                           background: vendor.status === "deactivated" ? "#ffd9d9" : vendor.approved ? "#d4edda" : "#fff3cd",

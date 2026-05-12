@@ -21,6 +21,8 @@ const UserSettings = ({ user }) => {
   const [city, setCity] = useState("");
   const [state, setState] = useState("");
   const [zipCode, setZipCode] = useState("");
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [savingNotif, setSavingNotif] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -45,6 +47,7 @@ const UserSettings = ({ user }) => {
       setCity(profileData.city || "");
       setState(profileData.state || "");
       setZipCode(profileData.zipCode || "");
+      setNotificationsEnabled(profileData.notificationsEnabled !== false);
     }
   }, [profileData, user.displayName, user.email]);
 
@@ -65,6 +68,20 @@ const UserSettings = ({ user }) => {
       setError(err.message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleNotifToggle = async () => {
+    const next = !notificationsEnabled;
+    setSavingNotif(true);
+    try {
+      await updateDoc(doc(db, "users", user.uid), { notificationsEnabled: next });
+      setNotificationsEnabled(next);
+      setProfileData((prev) => ({ ...prev, notificationsEnabled: next }));
+    } catch (err) {
+      console.error("Error saving notification setting:", err);
+    } finally {
+      setSavingNotif(false);
     }
   };
 
@@ -152,6 +169,34 @@ const UserSettings = ({ user }) => {
           <div style={{ gridColumn: "1 / -1", display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center" }}>
             <button type="button" onClick={() => setEditing(true)}>Edit</button>
             <Link to={`/forgot-password?email=${encodeURIComponent(user.email || "")}`}>Change Password</Link>
+          </div>
+
+          <div style={{ gridColumn: "1 / -1", border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
+            <h3 style={{ marginTop: 0, marginBottom: 6 }}>🔔 Notifications</h3>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "#666" }}>Receive an email when a package is checked in at your location.</p>
+            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+              <button
+                type="button"
+                onClick={handleNotifToggle}
+                disabled={savingNotif}
+                style={{
+                  width: 52, height: 28, borderRadius: 999, border: "none", cursor: "pointer",
+                  background: notificationsEnabled ? "#1a7f37" : "#ccc",
+                  position: "relative", transition: "background 0.2s", flexShrink: 0
+                }}
+                aria-label="Toggle notifications"
+              >
+                <span style={{
+                  position: "absolute", top: 3, left: notificationsEnabled ? 26 : 3,
+                  width: 22, height: 22, borderRadius: "50%", background: "#fff",
+                  transition: "left 0.2s", boxShadow: "0 1px 4px rgba(0,0,0,0.2)"
+                }} />
+              </button>
+              <span style={{ fontSize: 15, fontWeight: 600, color: notificationsEnabled ? "#1a7f37" : "#888" }}>
+                {notificationsEnabled ? "On" : "Off"}
+              </span>
+              {savingNotif && <span style={{ fontSize: 13, color: "#888" }}>Saving...</span>}
+            </div>
           </div>
 
           <div style={{ gridColumn: "1 / -1", border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>

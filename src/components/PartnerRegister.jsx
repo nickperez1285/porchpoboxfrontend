@@ -26,6 +26,8 @@ const PartnerRegister = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [wasReferred, setWasReferred] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -91,6 +93,7 @@ const PartnerRegister = () => {
         storeHours,
         approved: false,
         status: "pending",
+        referredBy: wasReferred === "yes" ? referralCode.trim().toUpperCase() : "",
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-partner-v1",
@@ -229,6 +232,34 @@ const PartnerRegister = () => {
         </div>
 
         <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
+
+        <hr className="reg-divider" />
+        <p className="reg-section-label">Referral</p>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 8 }}>
+          <label style={{ fontSize: 14, color: "#444" }}>Were you referred by someone?</label>
+          <div style={{ display: "flex", gap: 16 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14 }}>
+              <input type="radio" name="wasReferred" value="yes" checked={wasReferred === "yes"} onChange={() => setWasReferred("yes")} />
+              Yes
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14 }}>
+              <input type="radio" name="wasReferred" value="no" checked={wasReferred === "no"} onChange={() => { setWasReferred("no"); setReferralCode(""); }} />
+              No
+            </label>
+          </div>
+          {wasReferred === "yes" && (
+            <RegField
+              id="referral-code"
+              label="Referral Code"
+              type="text"
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+              placeholder="e.g. JA120525"
+              autoComplete="off"
+              maxLength={10}
+            />
+          )}
+        </div>
 
         <hr className="reg-divider" />
         <p className="reg-section-label">Password</p>
