@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
 import { auth, db } from "../firebase";
+
+const PAYOUT_RATE = 5; // $5 per active subscriber
 
 const PartnerProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
@@ -14,6 +16,8 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   const [selectedMethod, setSelectedMethod] = useState(partnerProfile.prefPaymentMethod || "");
   const [paymentHandle, setPaymentHandle] = useState(partnerProfile.prefPaymentHandle || "");
   const [savingPayment, setSavingPayment] = useState(false);
+  const [payouts, setPayouts] = useState([]);
+  const [payoutsLoading, setPayoutsLoading] = useState(true);
 
   const PAYMENT_OPTIONS = [
     {

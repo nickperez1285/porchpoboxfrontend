@@ -321,9 +321,107 @@ const Profile = ({ user }) => {
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20 }}>
 
+        {/* Delivery Address Card */}
+        <div style={{ gridColumn: "1 / -1" }}>
+          {profileData?.prefLocation?.streetAddress ? (
+            <div style={{
+              background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
+              borderRadius: 16,
+              padding: "24px 28px",
+              color: "#f5f5f5",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+              position: "relative",
+              overflow: "hidden"
+            }}>
+              <div style={{ position: "absolute", top: 0, right: 0, width: 180, height: 180, background: "radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%)" }} />
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+                <div>
+                  <div style={{ fontSize: 11, color: "#d4af37", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 12 }}>
+                    📦 Your Package Delivery Address
+                  </div>
+                  <div style={{ fontFamily: "monospace", lineHeight: 1.9, fontSize: 15 }}>
+                    <div style={{ fontWeight: 700, fontSize: 16 }}>{user.displayName || profileData?.name || "Your Name"}</div>
+                    <div style={{ color: "#d4af37" }}>c/o {profileData.prefLocation.businessName}</div>
+                    <div>{profileData.prefLocation.streetAddress}</div>
+                    <div>{[profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")}</div>
+                  </div>
+                  <p style={{ margin: "12px 0 0", fontSize: 12, color: "#888" }}>
+                    Use this address when placing orders online. Your packages will be held securely until you pick them up.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const addr = [
+                      user.displayName || profileData?.name || "",
+                      `c/o ${profileData.prefLocation.businessName}`,
+                      profileData.prefLocation.streetAddress,
+                      [profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")
+                    ].join("\n");
+                    navigator.clipboard.writeText(addr).then(() => alert("Address copied to clipboard!"));
+                  }}
+                  style={{
+                    padding: "10px 18px",
+                    background: "#d4af37",
+                    color: "#121212",
+                    border: "none",
+                    borderRadius: 10,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    fontSize: 13,
+                    whiteSpace: "nowrap",
+                    alignSelf: "flex-start"
+                  }}
+                >
+                  📋 Copy Address
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div style={{ background: "#fff8e1", border: "1px solid #f0c040", borderRadius: 16, padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              <div>
+                <div style={{ fontWeight: 600, fontSize: 15, color: "#7a5c00" }}>📦 No delivery address yet</div>
+                <div style={{ fontSize: 13, color: "#888", marginTop: 4 }}>Set a preferred partner location to get your package delivery address.</div>
+              </div>
+              <Link to="/profile/settings" style={{ padding: "9px 18px", background: "#d4af37", color: "#121212", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 13 }}>
+                Set Location
+              </Link>
+            </div>
+          )}
+        </div>
+
         {/* Package History */}
         <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
-          <h3 style={{ marginTop: 0, marginBottom: 16 }}>📦 Package History</h3>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ margin: 0 }}>📦 Package History</h3>
+            {packageHistory.length > 0 && (
+              <button
+                type="button"
+                onClick={() => {
+                  const name = user.displayName || profileData?.name || "User";
+                  const rows = [
+                    ["Partner Location", "Total Received", "Currently Waiting"],
+                    ...packageHistory.map((pkg) => [
+                      pkg.partnerName,
+                      pkg.totalPickedUp,
+                      pkg.currentWaiting
+                    ])
+                  ];
+                  const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+                  const blob = new Blob([csv], { type: "text/csv" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `porchpobox-history-${name.replace(/\s+/g, "-").toLowerCase()}.csv`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                style={{ padding: "7px 14px", background: "#f5f5f5", border: "1px solid #ddd", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#444" }}
+              >
+                ⬇️ Export CSV
+              </button>
+            )}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
             <div style={{ borderRadius: 12, padding: 16, background: currentPackagesWaiting > 0 ? "#fff8e1" : "#fafafa", border: `1px solid ${currentPackagesWaiting > 0 ? "#f0c040" : "#eee"}` }}>
               <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Waiting for Pickup</div>

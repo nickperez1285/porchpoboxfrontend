@@ -33,6 +33,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
           streetAddress: partner?.streetAddress || "",
           city: partner?.city || "",
           state: partner?.state || "",
+          zipCode: partner?.zipCode || "",
         }
       });
       onDone();
