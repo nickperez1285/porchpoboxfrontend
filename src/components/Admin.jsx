@@ -416,6 +416,9 @@ const Admin = () => {
         <Link to="/admin/activity-log" style={{ padding: "8px 16px", background: "rgba(255,255,255,0.08)", color: "#d4af37", borderRadius: 8, fontWeight: 600, fontSize: 13, border: "1px solid rgba(212,175,55,0.3)", textDecoration: "none" }}>
           📋 Full Activity Log
         </Link>
+        <Link to="/admin/payouts" style={{ padding: "8px 16px", background: "rgba(255,255,255,0.08)", color: "#d4af37", borderRadius: 8, fontWeight: 600, fontSize: 13, border: "1px solid rgba(212,175,55,0.3)", textDecoration: "none" }}>
+          💰 Payout Management
+        </Link>
         <button
           type="button"
           onClick={handleLogout}

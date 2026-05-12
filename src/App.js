@@ -22,6 +22,7 @@ import Admin from "./components/Admin";
 import AdminLogin from "./components/AdminLogin";
 import AdminPartnerView from "./components/AdminPartnerView";
 import AdminActivityLog from "./components/AdminActivityLog";
+import AdminPayoutsPage from "./components/AdminPayoutsPage";
 import ForgotPassword from "./components/ForgotPassword";
 import CheckoutSuccess from "./components/CheckoutSuccess";
 import CheckoutCancel from "./components/CheckoutCancel";
@@ -318,6 +319,10 @@ function App() {
           <Route
             path="/admin/partner/:partnerId"
             element={isAdmin ? <AdminPartnerView /> : <Navigate to="/admin/login" replace />}
+          />
+          <Route
+            path="/admin/payouts"
+            element={isAdmin ? <AdminPayoutsPage /> : <Navigate to="/admin/login" replace />}
           />
           <Route path="/quickcheckout" element={<OneTimeProduct user={user} />} />
           <Route
