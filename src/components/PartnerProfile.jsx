@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { collection, doc, getDocs, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
 const PAYOUT_RATE = 5; // $5 per active subscriber
@@ -64,15 +64,20 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   };
 
   useEffect(() => {
-    const unsub = onSnapshot(
-      query(collection(db, "partners", partnerProfile.id, "payouts"), orderBy("createdAt", "desc")),
-      (snap) => {
-        setPayouts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+    const loadPayouts = async () => {
+      try {
+        const snap = await getDocs(collection(db, "partners", partnerProfile.id, "payouts"));
+        const sorted = snap.docs
+          .map((d) => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => (b.createdAt?.toDate?.() || 0) - (a.createdAt?.toDate?.() || 0));
+        setPayouts(sorted);
+      } catch (err) {
+        console.error("Error loading payouts:", err);
+      } finally {
         setPayoutsLoading(false);
-      },
-      (err) => { console.error("Error loading payouts:", err); setPayoutsLoading(false); }
-    );
-    return () => unsub();
+      }
+    };
+    loadPayouts();
   }, [partnerProfile.id]);
 
   useEffect(() => {
@@ -345,7 +350,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
         {/* Payout Tracking */}
         {(() => {
           const now = new Date();
-          const monthName = now.toLocaleString("default", { month: "long", year: "numeric" });
           const currentMonthEarnings = (prefCount || 0) * PAYOUT_RATE;
           const totalPaid = payouts.filter((p) => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
           const pendingPayout = payouts.find((p) => p.status === "pending");
