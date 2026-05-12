@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { collection, doc, getDoc, getDocs, updateDoc } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, query, serverTimestamp, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
+
+const PAYOUT_RATE = 5;
 
 const AdminPartnerView = () => {
   const { partnerId } = useParams();
@@ -12,6 +14,10 @@ const AdminPartnerView = () => {
   const [error, setError] = useState("");
   const [cleaning, setCleaning] = useState(false);
   const [cleanResult, setCleanResult] = useState("");
+  const [payouts, setPayouts] = useState([]);
+  const [activeSubscriberCount, setActiveSubscriberCount] = useState(0);
+  const [payoutSaving, setPayoutSaving] = useState(false);
+  const [payoutMsg, setPayoutMsg] = useState("");
 
   useEffect(() => {
     const load = async () => {

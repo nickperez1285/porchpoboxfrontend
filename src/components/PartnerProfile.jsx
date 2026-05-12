@@ -64,6 +64,18 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   };
 
   useEffect(() => {
+    const unsub = onSnapshot(
+      query(collection(db, "partners", partnerProfile.id, "payouts"), orderBy("createdAt", "desc")),
+      (snap) => {
+        setPayouts(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
+        setPayoutsLoading(false);
+      },
+      (err) => { console.error("Error loading payouts:", err); setPayoutsLoading(false); }
+    );
+    return () => unsub();
+  }, [partnerProfile.id]);
+
+  useEffect(() => {
     const load = async () => {
       try {
         const snap = await getDocs(
@@ -329,6 +341,65 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             </div>
           )}
         </div>
+
+        {/* Payout Tracking */}
+        {(() => {
+          const now = new Date();
+          const monthName = now.toLocaleString("default", { month: "long", year: "numeric" });
+          const currentMonthEarnings = (prefCount || 0) * PAYOUT_RATE;
+          const totalPaid = payouts.filter((p) => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
+          const pendingPayout = payouts.find((p) => p.status === "pending");
+          return (
+            <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
+              <h3 style={{ marginTop: 0, marginBottom: 16 }}>💰 Payout Tracking</h3>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 20 }}>
+                <div style={{ background: "#e8f5e9", borderRadius: 12, padding: 14 }}>
+                  <div style={{ fontSize: 11, color: "#1a7f37", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>This Month</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: "#1a7f37" }}>${currentMonthEarnings}</div>
+                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>{prefCount || 0} subscribers × $5</div>
+                </div>
+                <div style={{ background: "#fff8e1", borderRadius: 12, padding: 14 }}>
+                  <div style={{ fontSize: 11, color: "#856404", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Pending</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: "#856404" }}>${pendingPayout ? pendingPayout.amount : currentMonthEarnings}</div>
+                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>awaiting payment</div>
+                </div>
+                <div style={{ background: "#f8f5ea", borderRadius: 12, padding: 14 }}>
+                  <div style={{ fontSize: 11, color: "#8a6a00", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Total Paid</div>
+                  <div style={{ fontSize: 28, fontWeight: 700, color: "#121212" }}>${totalPaid}</div>
+                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>all time</div>
+                </div>
+              </div>
+              {!payoutsLoading && payouts.length > 0 && (
+                <div>
+                  <div style={{ fontSize: 12, color: "#666", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>Payout History</div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {payouts.map((p) => (
+                      <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "#fafafa", borderRadius: 10, border: "1px solid #eee" }}>
+                        <div>
+                          <div style={{ fontWeight: 600, fontSize: 14 }}>{p.month || "—"}</div>
+                          <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{p.subscriberCount} subscriber{p.subscriberCount !== 1 ? "s" : ""}</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontWeight: 700, fontSize: 16 }}>${p.amount}</div>
+                          <span style={{
+                            fontSize: 11, fontWeight: 600, borderRadius: 999, padding: "2px 8px",
+                            background: p.status === "paid" ? "#d4edda" : "#fff3cd",
+                            color: p.status === "paid" ? "#1a7f37" : "#856404"
+                          }}>
+                            {p.status === "paid" ? "✓ Paid" : "Pending"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {!payoutsLoading && payouts.length === 0 && (
+                <p style={{ color: "#888", fontSize: 13, margin: 0 }}>No payout history yet. Payouts are processed monthly based on your active subscriber count.</p>
+              )}
+            </div>
+          );
+        })()}
 
         <div
           style={{
