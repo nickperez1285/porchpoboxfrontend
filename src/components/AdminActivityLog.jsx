@@ -86,6 +86,9 @@ const AdminActivityLog = () => {
     if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivered" };
     if (type === "signup") return { background: "#e8f0fe", color: "#1a56db", label: "Sign Up" };
     if (type === "subscription") return { background: "#f3e8ff", color: "#6d28d9", label: "Subscription" };
+    if (type === "payout-created") return { background: "#e8f5e9", color: "#1a7f37", label: "Payout Created" };
+    if (type === "payout-paid") return { background: "#d4edda", color: "#0f5132", label: "Payout Paid" };
+    if (type === "payout-deleted") return { background: "#ffd9d9", color: "#c00", label: "Payout Deleted" };
     return { background: "#f0f0f0", color: "#444", label: type };
   };
 
@@ -95,6 +98,8 @@ const AdminActivityLog = () => {
     if (filterPartner !== "all" && e.partnerId !== filterPartner) return false;
     return true;
   });
+
+  const isPayoutType = (type) => ["payout-created", "payout-paid", "payout-deleted"].includes(type);
 
   return (
     <div style={{ maxWidth: 1180, margin: "60px auto", padding: "0 20px" }}>
@@ -132,6 +137,9 @@ const AdminActivityLog = () => {
           <option value="delivery">Deliveries</option>
           <option value="signup">Sign Ups</option>
           <option value="subscription">Subscriptions</option>
+          <option value="payout-created">Payout Created</option>
+          <option value="payout-paid">Payout Paid</option>
+          <option value="payout-deleted">Payout Deleted</option>
         </select>
 
         <select
@@ -198,10 +206,19 @@ const AdminActivityLog = () => {
                       </span>
                     </td>
                     <td style={{ padding: "12px 18px" }}>
-                      <div style={{ fontWeight: 600 }}>{isGlobal ? entry.userName : entry.customerName || "Unknown"}</div>
-                      <div style={{ fontSize: 12, color: "#888" }}>{isGlobal ? entry.userEmail : entry.customerEmail}</div>
+                      {isPayoutType(entry.type) ? (
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{entry.month || "—"}</div>
+                          <div style={{ fontSize: 12, color: "#888" }}>${entry.amount} · {entry.subscriberCount} subscriber{entry.subscriberCount !== 1 ? "s" : ""}</div>
+                        </div>
+                      ) : (
+                        <div>
+                          <div style={{ fontWeight: 600 }}>{isGlobal ? entry.userName : entry.customerName || "Unknown"}</div>
+                          <div style={{ fontSize: 12, color: "#888" }}>{isGlobal ? entry.userEmail : entry.customerEmail}</div>
+                        </div>
+                      )}
                     </td>
-                    <td style={{ padding: "12px 18px", color: "#aaa" }}>{isGlobal ? "—" : entry.packageCount}</td>
+                    <td style={{ padding: "12px 18px", color: "#aaa" }}>{isPayoutType(entry.type) ? "—" : isGlobal ? "—" : entry.packageCount}</td>
                   </tr>
                 );
               })}

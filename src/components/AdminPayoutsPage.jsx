@@ -95,15 +95,17 @@ const AdminPayoutsPage = () => {
     setMsg("");
     try {
       await Promise.all(
-        eligible.map((p) =>
-          addDoc(collection(db, "partners", p.id, "payouts"), {
+        eligible.map(async (p) => {
+          const amount = getDefaultAmount(p.id);
+          await addDoc(collection(db, "partners", p.id, "payouts"), {
             month: currentMonth,
-            amount: getDefaultAmount(p.id),
+            amount,
             subscriberCount: subscriberCounts[p.id] || 0,
             status: "pending",
             createdAt: serverTimestamp()
-          })
-        )
+          });
+          await logPayoutEvent(p.id, "payout-created", { month: currentMonth, amount, subscriberCount: subscriberCounts[p.id] || 0 });
+        })
       );
       setMsg(`✓ Created payouts for ${eligible.length} partner(s).`);
     } catch (err) {
@@ -113,10 +115,24 @@ const AdminPayoutsPage = () => {
     }
   };
 
+  const logPayoutEvent = async (partnerId, type, data) => {
+    try {
+      await addDoc(collection(db, "partners", partnerId, "activityLog"), {
+        type,
+        timestamp: serverTimestamp(),
+        ...data
+      });
+    } catch (err) {
+      console.error("Error writing payout activity log:", err);
+    }
+  };
+
   const handleDeletePayout = async (partnerId, payoutId) => {
+    const payout = (payoutsByPartner[partnerId] || []).find((p) => p.id === payoutId);
     if (!window.confirm("Delete this payout? This cannot be undone.")) return;
     try {
       await deleteDoc(doc(db, "partners", partnerId, "payouts", payoutId));
+      if (payout) await logPayoutEvent(partnerId, "payout-deleted", { month: payout.month, amount: payout.amount, subscriberCount: payout.subscriberCount });
       setMsg("✓ Payout deleted.");
     } catch (err) {
       setMsg(`Error: ${err.message}`);
@@ -124,12 +140,11 @@ const AdminPayoutsPage = () => {
   };
 
   const handleMarkPaid = async (partnerId, payoutId) => {
+    const payout = (payoutsByPartner[partnerId] || []).find((p) => p.id === payoutId);
     if (!window.confirm("Mark this payout as paid?")) return;
     try {
-      await updateDoc(doc(db, "partners", partnerId, "payouts", payoutId), {
-        status: "paid",
-        paidAt: serverTimestamp()
-      });
+      await updateDoc(doc(db, "partners", partnerId, "payouts", payoutId), { status: "paid", paidAt: serverTimestamp() });
+      if (payout) await logPayoutEvent(partnerId, "payout-paid", { month: payout.month, amount: payout.amount, subscriberCount: payout.subscriberCount });
       setMsg("✓ Marked as paid.");
     } catch (err) {
       setMsg(`Error: ${err.message}`);
@@ -253,6 +268,7 @@ const AdminPayoutsPage = () => {
                           status: "pending",
                           createdAt: serverTimestamp()
                         });
+                        await logPayoutEvent(partner.id, "payout-created", { month: currentMonth, amount: defaultAmount, subscriberCount: subCount });
                         setMsg(`✓ Payout created for ${partner.businessName}.`);
                       } catch (err) {
                         setMsg(`Error: ${err.message}`);

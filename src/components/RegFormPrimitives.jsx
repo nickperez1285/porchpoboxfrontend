@@ -21,7 +21,8 @@ export function RegField({
   onChange,
   required,
   autoComplete,
-  placeholder
+  placeholder,
+  maxLength
 }) {
   return (
     <div className="reg-field">
@@ -38,6 +39,7 @@ export function RegField({
         required={required}
         autoComplete={autoComplete}
         placeholder={placeholder}
+        maxLength={maxLength}
       />
     </div>
   );

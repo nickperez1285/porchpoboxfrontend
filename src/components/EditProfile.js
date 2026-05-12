@@ -135,14 +135,16 @@ const EditProfile = ({ user }) => {
             type="text"
             placeholder="State"
             value={state}
-            onChange={(event) => setState(event.target.value)}
+            onChange={(event) => setState(event.target.value.toUpperCase())}
+            maxLength={2}
             required
           />
           <input
             type="text"
             placeholder="Zip Code"
             value={zipCode}
-            onChange={(event) => setZipCode(event.target.value)}
+            onChange={(event) => setZipCode(event.target.value.replace(/\D/g, ""))}
+            maxLength={5}
             required
           />
 

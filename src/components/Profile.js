@@ -394,33 +394,6 @@ const Profile = ({ user }) => {
         <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <h3 style={{ margin: 0 }}>📦 Package History</h3>
-            {packageHistory.length > 0 && (
-              <button
-                type="button"
-                onClick={() => {
-                  const name = user.displayName || profileData?.name || "User";
-                  const rows = [
-                    ["Partner Location", "Total Received", "Currently Waiting"],
-                    ...packageHistory.map((pkg) => [
-                      pkg.partnerName,
-                      pkg.totalPickedUp,
-                      pkg.currentWaiting
-                    ])
-                  ];
-                  const csv = rows.map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
-                  const blob = new Blob([csv], { type: "text/csv" });
-                  const url = URL.createObjectURL(blob);
-                  const a = document.createElement("a");
-                  a.href = url;
-                  a.download = `porchpobox-history-${name.replace(/\s+/g, "-").toLowerCase()}.csv`;
-                  a.click();
-                  URL.revokeObjectURL(url);
-                }}
-                style={{ padding: "7px 14px", background: "#f5f5f5", border: "1px solid #ddd", borderRadius: 8, cursor: "pointer", fontSize: 13, fontWeight: 600, color: "#444" }}
-              >
-                ⬇️ Export CSV
-              </button>
-            )}
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 18 }}>
             <div style={{ borderRadius: 12, padding: 16, background: currentPackagesWaiting > 0 ? "#fff8e1" : "#fafafa", border: `1px solid ${currentPackagesWaiting > 0 ? "#f0c040" : "#eee"}` }}>

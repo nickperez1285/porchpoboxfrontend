@@ -355,20 +355,22 @@ const Register = () => {
             label="State"
             type="text"
             value={state}
-            onChange={(e) => setState(e.target.value)}
+            onChange={(e) => setState(e.target.value.toUpperCase())}
             required
             autoComplete="address-level1"
             placeholder="ST"
+            maxLength={2}
           />
           <RegField
             id="reg-zip"
             label="ZIP code"
             type="text"
             value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
+            onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
             required
             autoComplete="postal-code"
             placeholder="12345"
+            maxLength={5}
           />
         </div>
 

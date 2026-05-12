@@ -1,6 +1,8 @@
 const resendApiUrl = "https://api.resend.com/emails";
 
-const sendEmail = async ({ to, replyTo, subject, text }) => {
+const htmlEmail = (body) => `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif"><table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f4;padding:40px 0"><tr><td align="center"><table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.08);max-width:600px;width:100%"><tr><td style="background:#121212;padding:28px 32px;text-align:center"><img src="https://porchpobox.com/porchlogo.png" alt="Porch P.O. Box" style="height:56px;display:block;margin:0 auto" /></td></tr><tr><td style="padding:36px 32px;color:#222;font-size:15px;line-height:1.7">${body}</td></tr><tr><td style="background:#f8f8f8;border-top:1px solid #eee;padding:20px 32px;text-align:center"><img src="https://porchpobox.com/logo.png" alt="Porch P.O. Box" style="height:48px;display:block;margin:0 auto 12px" /><p style="margin:0 0 4px;font-size:13px;color:#888">Porch P.O. Box &mdash; Convenient Package Receiving</p><p style="margin:0;font-size:13px"><a href="mailto:contact@porchpobox.com" style="color:#d4af37;text-decoration:none">contact@porchpobox.com</a></p></td></tr></table></td></tr></table></body></html>`;
+
+const sendEmail = async ({ to, replyTo, subject, html }) => {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.MAIL_FROM_EMAIL || process.env.SMTP_FROM_EMAIL;
 
@@ -13,7 +15,7 @@ const sendEmail = async ({ to, replyTo, subject, text }) => {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ from, to, reply_to: replyTo, subject, text })
+    body: JSON.stringify({ from, to, reply_to: replyTo, subject, html })
   });
 
   if (!response.ok) {
@@ -43,21 +45,16 @@ module.exports = async (req, res) => {
       to: email,
       replyTo: "contact@porchpobox.com",
       subject: "Welcome to Porch P.O. Box",
-      text: [
-        `Hello ${name || "there"},`,
-        "",
-        "Welcome to Porch P.O. Box!",
-        "",
-        "Your account has been created successfully! Your first package delivery is on us — no subscription needed to try the service.",
-        "",
-        "If you'd like to subscribe right away and get unlimited access, view our plans here:",
-        "",
-        "https://porchpobox.com/plans",
-        "",
-        "Questions? Just reply to this email.",
-        "",
-        "— The Porch P.O. Box Team"
-      ].join("\n")
+      html: htmlEmail(`
+        <h2 style="margin:0 0 16px;color:#121212">Welcome, ${name || "there"}!</h2>
+        <p>Your Porch P.O. Box account has been created successfully.</p>
+        <p>Your <strong>first package delivery is on us</strong> &mdash; no subscription needed to try the service.</p>
+        <p>Ready to get unlimited access? View our plans and subscribe today:</p>
+        <p style="text-align:center;margin:28px 0">
+          <a href="https://porchpobox.com/plans" style="background:#d4af37;color:#121212;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:bold;font-size:15px">View Plans</a>
+        </p>
+        <p style="color:#666;font-size:14px">Questions? Just reply to this email and we'll be happy to help.</p>
+      `)
     });
 
     return res.status(200).json({ success: true });
