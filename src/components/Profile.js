@@ -537,7 +537,10 @@ const Profile = ({ user }) => {
         >
           {/* Package History */}
           <Card>
-            <SectionLabel>Package History</SectionLabel>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+              <SectionLabel>Package History</SectionLabel>
+              <Link to="/profile/packages" style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}>View Full History →</Link>
+            </div>
             <div
               style={{
                 display: "grid",
@@ -614,13 +617,16 @@ const Profile = ({ user }) => {
                 style={{ display: "flex", flexDirection: "column", gap: 10 }}
               >
                 {packageHistory.map((pkg) => (
-                  <div
+                  <Link
                     key={pkg.partnerId}
+                    to="/profile/packages"
                     style={{
                       padding: "12px 14px",
                       borderRadius: 10,
                       background: "#fafafa",
                       border: "1px solid #f0f0f0",
+                      textDecoration: "none",
+                      display: "block"
                     }}
                   >
                     <div
@@ -641,47 +647,15 @@ const Profile = ({ user }) => {
                       }}
                     >
                       <div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: "#bbb",
-                            marginBottom: 2,
-                          }}
-                        >
-                          Received
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 700,
-                            color: "#333",
-                          }}
-                        >
-                          {pkg.totalPickedUp}
-                        </div>
+                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Received</div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: "#333" }}>{pkg.totalPickedUp}</div>
                       </div>
                       <div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: "#bbb",
-                            marginBottom: 2,
-                          }}
-                        >
-                          Waiting
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 700,
-                            color: pkg.currentWaiting > 0 ? "#b8860b" : "#333",
-                          }}
-                        >
-                          {pkg.currentWaiting}
-                        </div>
+                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Waiting</div>
+                        <div style={{ fontSize: 15, fontWeight: 700, color: pkg.currentWaiting > 0 ? "#b8860b" : "#333" }}>{pkg.currentWaiting}</div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

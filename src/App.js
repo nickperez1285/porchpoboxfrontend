@@ -32,6 +32,7 @@ import ReferralForm from "./components/ReferralForm";
 import PlansPage from "./components/PlansPage";
 import About from "./components/About";
 import TermsIndex from "./components/TermsIndex";
+import PackageHistoryPage from "./components/PackageHistoryPage";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -260,6 +261,10 @@ function App() {
           <Route
             path="/profile/edit"
             element={user ? <EditProfile user={user} /> : <Navigate to="/login" replace />}
+          />
+          <Route
+            path="/profile/packages"
+            element={user ? <PackageHistoryPage user={user} /> : <Navigate to="/login" replace />}
           />
           {/* <Route path="/admin/create-user" element={<AdminCreateUser />} /> */}
           <Route
