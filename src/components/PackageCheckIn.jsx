@@ -318,49 +318,83 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         </button>
       </div>
 
-      {showConfirm && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 20,
-          }}
-        >
+      {showConfirm && (() => {
+        const inactiveSelected = selectedUsers.filter((u) => u.status !== "active" && u.status !== "trial");
+        return (
           <div
             style={{
-              background: "#fff",
-              padding: 24,
-              borderRadius: 12,
-              maxWidth: 420,
-              width: "100%",
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0, 0, 0, 0.55)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 20,
+              zIndex: 9999
             }}
           >
-            <p>You are about to check in {totalSelectedPackages} packages.</p>
             <div
-              style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}
+              style={{
+                background: "#fff",
+                padding: 28,
+                borderRadius: 16,
+                maxWidth: 440,
+                width: "100%",
+                boxShadow: "0 16px 48px rgba(0,0,0,0.2)"
+              }}
             >
-              <button
-                type="button"
-                onClick={() => setShowConfirm(false)}
-                disabled={submitting}
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleCheckIn}
-                disabled={submitting}
-              >
-                {submitting ? "Sending..." : "Ok"}
-              </button>
+              <h3 style={{ margin: "0 0 12px", fontSize: 17 }}>Confirm Check-In</h3>
+              <p style={{ margin: "0 0 16px", color: "#555", fontSize: 14 }}>
+                You are about to check in <strong>{totalSelectedPackages} package{totalSelectedPackages !== 1 ? "s" : ""}</strong> for <strong>{selectedUsers.length} customer{selectedUsers.length !== 1 ? "s" : ""}</strong>.
+              </p>
+
+              {inactiveSelected.length > 0 && (
+                <div style={{
+                  background: "#fff3f3",
+                  border: "1px solid #f5c2c2",
+                  borderRadius: 10,
+                  padding: "14px 16px",
+                  marginBottom: 20
+                }}>
+                  <div style={{ fontWeight: 700, color: "#c00", fontSize: 14, marginBottom: 8 }}>
+                    ⚠️ Payment Required
+                  </div>
+                  <p style={{ margin: "0 0 8px", fontSize: 13, color: "#7a0000" }}>
+                    The following customer{inactiveSelected.length !== 1 ? "s are" : " is"} <strong>inactive</strong> and require{inactiveSelected.length === 1 ? "s" : ""} payment to continue using the service:
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: 18 }}>
+                    {inactiveSelected.map((u) => (
+                      <li key={u.id} style={{ fontSize: 13, color: "#7a0000", fontWeight: 600 }}>{u.name || u.email || "Unknown user"}</li>
+                    ))}
+                  </ul>
+                  <p style={{ margin: "8px 0 0", fontSize: 12, color: "#a00" }}>
+                    You may still accept their package, but please inform them that a subscription is needed.
+                  </p>
+                </div>
+              )}
+
+              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(false)}
+                  disabled={submitting}
+                  style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: 14 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCheckIn}
+                  disabled={submitting}
+                  style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#121212", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 14 }}
+                >
+                  {submitting ? "Checking in..." : "Confirm Check-In"}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

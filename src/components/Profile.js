@@ -1,12 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDocs,
-  onSnapshot
-} from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
 
@@ -14,7 +9,11 @@ const formatDate = (value) => {
   if (!value) return "Not available";
   const date = value?.toDate ? value.toDate() : new Date(value);
   if (Number.isNaN(date.getTime())) return "Not available";
-  return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
 };
 
 const getDaysLeft = (value) => {
@@ -27,29 +26,44 @@ const getDaysLeft = (value) => {
 
 const getStatusDisplay = (status) => {
   switch (status) {
-    case "active":   return { label: "Active",   color: "#1a7f37", bg: "#d4edda", icon: "✓" };
-    case "trial":    return { label: "Trial",    color: "#856404", bg: "#fff3cd", icon: "◎" };
+    case "active":
+      return { label: "Active", color: "#1a7f37", bg: "#d4edda", icon: "✓" };
+    case "trial":
+      return { label: "Trial", color: "#856404", bg: "#fff3cd", icon: "◎" };
     case "inactive":
-    case "canceled": return { label: "Inactive", color: "#dc3545", bg: "#ffd9d9", icon: "✕" };
-    default:         return { label: "Unknown",  color: "#888",    bg: "#f0f0f0", icon: "?" };
+    case "canceled":
+      return { label: "Inactive", color: "#dc3545", bg: "#ffd9d9", icon: "✕" };
+    default:
+      return { label: "Unknown", color: "#888", bg: "#f0f0f0", icon: "?" };
   }
 };
 
 const Card = ({ children, style = {} }) => (
-  <div style={{
-    background: "#fff",
-    border: "1px solid #ebebeb",
-    borderRadius: 18,
-    padding: 24,
-    boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-    ...style
-  }}>
+  <div
+    style={{
+      background: "#fff",
+      border: "1px solid #ebebeb",
+      borderRadius: 18,
+      padding: 24,
+      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
+      ...style,
+    }}
+  >
     {children}
   </div>
 );
 
 const SectionLabel = ({ children }) => (
-  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.2, textTransform: "uppercase", color: "#aaa", marginBottom: 10 }}>
+  <div
+    style={{
+      fontSize: 11,
+      fontWeight: 700,
+      letterSpacing: 1.2,
+      textTransform: "uppercase",
+      color: "#aaa",
+      marginBottom: 10,
+    }}
+  >
     {children}
   </div>
 );
@@ -61,13 +75,16 @@ const Profile = ({ user }) => {
   const [packagesLoading, setPackagesLoading] = useState(false);
 
   const currentPackagesWaiting = packageHistory.reduce(
-    (sum, entry) => sum + (Number(entry.currentWaiting) || 0), 0
+    (sum, entry) => sum + (Number(entry.currentWaiting) || 0),
+    0,
   );
   const hasActiveSubscription = Boolean(
     profileData?.status === "active" &&
-    (profileData?.subscribedAt || profileData?.subscriptionEndsAt)
+    (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
   );
-  const statusInfo = profileData?.status ? getStatusDisplay(profileData.status) : null;
+  const statusInfo = profileData?.status
+    ? getStatusDisplay(profileData.status)
+    : null;
 
   useEffect(() => {
     let isCancelled = false;
@@ -78,7 +95,10 @@ const Profile = ({ user }) => {
         const partnersSnapshot = await getDocs(collection(db, "partners"));
         if (isCancelled) return () => {};
 
-        const partnersList = partnersSnapshot.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+        const partnersList = partnersSnapshot.docs.map((entry) => ({
+          id: entry.id,
+          ...entry.data(),
+        }));
         const partnerHistoryMap = new Map();
         const userHistoryMap = new Map();
         let userHistoryInitialized = false;
@@ -92,12 +112,15 @@ const Profile = ({ user }) => {
             if (historyEntry) {
               nextHistory.push({
                 partnerId: partner.id,
-                partnerName: historyEntry.partnerName || partner.businessName || "Unknown Partner",
+                partnerName:
+                  historyEntry.partnerName ||
+                  partner.businessName ||
+                  "Unknown Partner",
                 totalReceived: Number(historyEntry.totalReceived) || 0,
                 totalPickedUp: Number(historyEntry.totalPickedUp) || 0,
                 currentWaiting: partnerOwnedHistory
                   ? Number(partnerOwnedHistory.currentWaiting) || 0
-                  : Number(historyEntry.currentWaiting) || 0
+                  : Number(historyEntry.currentWaiting) || 0,
               });
             }
           });
@@ -115,7 +138,7 @@ const Profile = ({ user }) => {
                   partnerName: partner.businessName || "Unknown Partner",
                   totalReceived: Number(data.totalReceived) || 0,
                   totalPickedUp: Number(data.totalPickedUp) || 0,
-                  currentWaiting: Number(data.count) || 0
+                  currentWaiting: Number(data.count) || 0,
                 });
               } else {
                 partnerHistoryMap.delete(partner.id);
@@ -123,10 +146,14 @@ const Profile = ({ user }) => {
               if (!isCancelled) syncPackageHistory();
             },
             (error) => {
-              if (error?.code !== "permission-denied") console.error(`Error loading packages for partner ${partner.id}:`, error);
+              if (error?.code !== "permission-denied")
+                console.error(
+                  `Error loading packages for partner ${partner.id}:`,
+                  error,
+                );
               if (!isCancelled) syncPackageHistory();
-            }
-          )
+            },
+          ),
         );
 
         const userHistoryUnsubscribe = onSnapshot(
@@ -139,7 +166,7 @@ const Profile = ({ user }) => {
                 partnerName: data.partnerName || "Unknown Partner",
                 totalReceived: Number(data.totalReceived) || 0,
                 totalPickedUp: Number(data.totalPickedUp) || 0,
-                currentWaiting: Number(data.currentWaiting) || 0
+                currentWaiting: Number(data.currentWaiting) || 0,
               });
             });
             userHistoryInitialized = true;
@@ -148,13 +175,19 @@ const Profile = ({ user }) => {
           (error) => {
             console.error("Error loading package history:", error);
             userHistoryInitialized = true;
-            if (!isCancelled) { setPackageHistory([]); syncPackageHistory(); }
-          }
+            if (!isCancelled) {
+              setPackageHistory([]);
+              syncPackageHistory();
+            }
+          },
         );
 
         return () => {
-          partnerUnsubscribes.forEach((u) => { if (typeof u === "function") u(); });
-          if (typeof userHistoryUnsubscribe === "function") userHistoryUnsubscribe();
+          partnerUnsubscribes.forEach((u) => {
+            if (typeof u === "function") u();
+          });
+          if (typeof userHistoryUnsubscribe === "function")
+            userHistoryUnsubscribe();
         };
       } catch (error) {
         console.error("Error loading package history:", error);
@@ -165,12 +198,18 @@ const Profile = ({ user }) => {
 
     const unsubscribeProfile = onSnapshot(
       doc(db, "users", user.uid),
-      (snapshot) => { if (!isCancelled && snapshot.exists()) setProfileData(snapshot.data()); },
-      (error) => { console.error("Error loading user profile:", error); }
+      (snapshot) => {
+        if (!isCancelled && snapshot.exists()) setProfileData(snapshot.data());
+      },
+      (error) => {
+        console.error("Error loading user profile:", error);
+      },
     );
 
     let unsubscribePackageHistory = () => {};
-    subscribeToPackageHistory().then((u) => { unsubscribePackageHistory = u; });
+    subscribeToPackageHistory().then((u) => {
+      unsubscribePackageHistory = u;
+    });
 
     return () => {
       isCancelled = true;
@@ -180,33 +219,65 @@ const Profile = ({ user }) => {
   }, [user.uid]);
 
   const handleLogout = async () => {
-    try { await signOut(auth); navigate("/"); }
-    catch (error) { console.error("Error signing out:", error); }
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
 
   const daysLeft = getDaysLeft(profileData?.subscriptionEndsAt);
-  const urgentColor = daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
+  const urgentColor =
+    daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#f7f7f8" }}>
-      <div style={{ maxWidth: 980, margin: "48px auto 0", padding: "0 20px", flex: 1, width: "100%", boxSizing: "border-box" }}>
-
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        background: "#f7f7f8",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 980,
+          margin: "48px auto 0",
+          padding: "0 20px",
+          flex: 1,
+          width: "100%",
+          boxSizing: "border-box",
+        }}
+      >
         {/* ── Hero ── */}
-        <div style={{
-          background: "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)",
-          color: "#f5f5f5",
-          borderRadius: 22,
-          padding: "32px 28px",
-          marginBottom: 28,
-          boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 20
-        }}>
+        <div
+          style={{
+            background: "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)",
+            color: "#f5f5f5",
+            borderRadius: 22,
+            padding: "32px 28px",
+            marginBottom: 28,
+            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: 20,
+          }}
+        >
           <div>
-            <div style={{ fontSize: 11, color: "#d4af37", letterSpacing: 1.6, textTransform: "uppercase", marginBottom: 8 }}>My Profile</div>
+            <div
+              style={{
+                fontSize: 11,
+                color: "#d4af37",
+                letterSpacing: 1.6,
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              My Profile
+            </div>
             <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 4 }}>
               {user.displayName || profileData?.name || "Account Holder"}
             </div>
@@ -214,33 +285,60 @@ const Profile = ({ user }) => {
           </div>
 
           {statusInfo && (
-            <div style={{
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              borderRadius: 14,
-              padding: "14px 20px",
-              minWidth: 180,
-              textAlign: "center"
-            }}>
-              <div style={{ fontSize: 11, color: "#888", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Subscription</div>
-              <span style={{
-                display: "inline-block",
-                background: statusInfo.bg,
-                color: statusInfo.color,
-                borderRadius: 999,
-                padding: "4px 14px",
-                fontWeight: 700,
-                fontSize: 13
-              }}>
+            <div
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                borderRadius: 14,
+                padding: "14px 20px",
+                minWidth: 180,
+                textAlign: "center",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#888",
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  marginBottom: 8,
+                }}
+              >
+                Subscription
+              </div>
+              <span
+                style={{
+                  display: "inline-block",
+                  background: statusInfo.bg,
+                  color: statusInfo.color,
+                  borderRadius: 999,
+                  padding: "4px 14px",
+                  fontWeight: 700,
+                  fontSize: 13,
+                }}
+              >
                 {statusInfo.icon} {statusInfo.label}
               </span>
               <div style={{ marginTop: 10, fontSize: 12 }}>
-                {profileData?.status === "inactive" || profileData?.status === "canceled" ? (
-                  <Link to="/plans" style={{ color: "#d4af37", fontWeight: 600 }}>Subscribe to continue →</Link>
+                {profileData?.status === "inactive" ||
+                profileData?.status === "canceled" ? (
+                  <Link
+                    to="/plans"
+                    style={{ color: "#d4af37", fontWeight: 600 }}
+                  >
+                    Subscribe to continue →
+                  </Link>
                 ) : profileData?.status === "trial" ? (
-                  <Link to="/plans" style={{ color: "#d4af37", fontWeight: 600 }}>Get unlimited access →</Link>
+                  <Link
+                    to="/plans"
+                    style={{ color: "#d4af37", fontWeight: 600 }}
+                  >
+                    Get unlimited access →
+                  </Link>
                 ) : hasActiveSubscription ? (
-                  <span style={{ color: urgentColor, fontWeight: 600 }}>{daysLeft} days left</span>
+                  <span style={{ color: urgentColor, fontWeight: 600 }}>
+                    {daysLeft} days left
+                  </span>
                 ) : null}
               </div>
             </div>
@@ -250,40 +348,102 @@ const Profile = ({ user }) => {
         {/* ── Delivery Address ── */}
         <div style={{ marginBottom: 28 }}>
           {profileData?.prefLocation?.streetAddress ? (
-            <div style={{
-              background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)",
-              borderRadius: 20,
-              padding: "28px 32px",
-              color: "#f5f5f5",
-              boxShadow: "0 0 0 3px #d4af37, 0 16px 48px rgba(0,0,0,0.3)",
-              position: "relative",
-              overflow: "hidden"
-            }}>
-              <div style={{ position: "absolute", top: -40, right: -40, width: 200, height: 200, background: "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)", pointerEvents: "none" }} />
-              <div style={{ position: "absolute", bottom: -30, left: -30, width: 160, height: 160, background: "radial-gradient(circle, rgba(212,175,55,0.07), transparent 70%)", pointerEvents: "none" }} />
+            <div
+              style={{
+                background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)",
+                borderRadius: 20,
+                padding: "28px 32px",
+                color: "#f5f5f5",
+                boxShadow: "0 0 0 3px #d4af37, 0 16px 48px rgba(0,0,0,0.3)",
+                position: "relative",
+                overflow: "hidden",
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  top: -40,
+                  right: -40,
+                  width: 200,
+                  height: 200,
+                  background:
+                    "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
+                  pointerEvents: "none",
+                }}
+              />
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -30,
+                  left: -30,
+                  width: 160,
+                  height: 160,
+                  background:
+                    "radial-gradient(circle, rgba(212,175,55,0.07), transparent 70%)",
+                  pointerEvents: "none",
+                }}
+              />
 
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 20 }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  flexWrap: "wrap",
+                  gap: 20,
+                }}
+              >
                 <div>
-                  <div style={{ fontSize: 11, color: "#d4af37", letterSpacing: 1.8, textTransform: "uppercase", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#d4af37",
+                      letterSpacing: 1.8,
+                      textTransform: "uppercase",
+                      marginBottom: 16,
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
                     <span>📦</span> Your Package Delivery Address
                   </div>
-                  <div style={{
-                    fontFamily: "'Courier New', monospace",
-                    lineHeight: 2,
-                    fontSize: 15,
-                    background: "rgba(255,255,255,0.04)",
-                    border: "1px solid rgba(212,175,55,0.3)",
-                    borderRadius: 12,
-                    padding: "16px 20px",
-                    marginBottom: 14
-                  }}>
-                    <div style={{ fontWeight: 700, fontSize: 17, color: "#fff" }}>{user.displayName || profileData?.name || "Your Name"}</div>
-                    <div style={{ color: "#d4af37", fontWeight: 600 }}>c/o {profileData.prefLocation.businessName}</div>
-                    <div style={{ color: "#bbb" }}>{profileData.prefLocation.streetAddress}</div>
-                    <div style={{ color: "#bbb" }}>{[profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")}</div>
+                  <div
+                    style={{
+                      fontFamily: "'Courier New', monospace",
+                      lineHeight: 2,
+                      fontSize: 15,
+                      background: "rgba(255,255,255,0.04)",
+                      border: "1px solid rgba(212,175,55,0.3)",
+                      borderRadius: 12,
+                      padding: "16px 20px",
+                      marginBottom: 14,
+                    }}
+                  >
+                    <div
+                      style={{ fontWeight: 700, fontSize: 17, color: "#fff" }}
+                    >
+                      {user.displayName || profileData?.name || "Your Name"}
+                    </div>
+                    <div style={{ color: "#d4af37", fontWeight: 600 }}>
+                      c/o {profileData.prefLocation.businessName}
+                    </div>
+                    <div style={{ color: "#bbb" }}>
+                      {profileData.prefLocation.streetAddress}
+                    </div>
+                    <div style={{ color: "#bbb" }}>
+                      {[
+                        profileData.prefLocation.city,
+                        profileData.prefLocation.state,
+                        profileData.prefLocation.zipCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </div>
                   </div>
                   <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
-                    Use this address when placing orders online. Packages are held securely until you pick them up.
+                    Use this address when placing orders online. Packages are
+                    held securely until you pick them up.
                   </p>
                 </div>
                 <button
@@ -293,9 +453,17 @@ const Profile = ({ user }) => {
                       user.displayName || profileData?.name || "",
                       `c/o ${profileData.prefLocation.businessName}`,
                       profileData.prefLocation.streetAddress,
-                      [profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")
+                      [
+                        profileData.prefLocation.city,
+                        profileData.prefLocation.state,
+                        profileData.prefLocation.zipCode,
+                      ]
+                        .filter(Boolean)
+                        .join(", "),
                     ].join("\n");
-                    navigator.clipboard.writeText(addr).then(() => alert("Address copied to clipboard!"));
+                    navigator.clipboard
+                      .writeText(addr)
+                      .then(() => alert("Address copied to clipboard!"));
                   }}
                   style={{
                     padding: "11px 20px",
@@ -308,7 +476,7 @@ const Profile = ({ user }) => {
                     fontSize: 13,
                     whiteSpace: "nowrap",
                     alignSelf: "flex-start",
-                    boxShadow: "0 4px 16px rgba(212,175,55,0.45)"
+                    boxShadow: "0 4px 16px rgba(212,175,55,0.45)",
                   }}
                 >
                   📋 Copy Address
@@ -316,48 +484,117 @@ const Profile = ({ user }) => {
               </div>
             </div>
           ) : (
-            <div style={{
-              background: "#fffbea",
-              border: "1px solid #f0c040",
-              borderRadius: 16,
-              padding: "20px 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 12
-            }}>
+            <div
+              style={{
+                background: "#fffbea",
+                border: "1px solid #f0c040",
+                borderRadius: 16,
+                padding: "20px 24px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flexWrap: "wrap",
+                gap: 12,
+              }}
+            >
               <div>
-                <div style={{ fontWeight: 700, fontSize: 15, color: "#7a5c00" }}>📦 No delivery address yet</div>
-                <div style={{ fontSize: 13, color: "#999", marginTop: 4 }}>Set a preferred partner location to get your package delivery address.</div>
+                <div
+                  style={{ fontWeight: 700, fontSize: 15, color: "#7a5c00" }}
+                >
+                  📦 No delivery address yet
+                </div>
+                <div style={{ fontSize: 13, color: "#999", marginTop: 4 }}>
+                  Set a preferred partner location to get your package delivery
+                  address.
+                </div>
               </div>
-              <Link to="/profile/settings" style={{ padding: "9px 18px", background: "#d4af37", color: "#121212", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 13 }}>
-                Set Location
+              <Link
+                to="/profile/settings"
+                style={{
+                  padding: "9px 18px",
+                  background: "#d4af37",
+                  color: "#121212",
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  textDecoration: "none",
+                  fontSize: 13,
+                }}
+              >
+                Set Preferred Location
               </Link>
             </div>
           )}
         </div>
 
         {/* ── Main Grid ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 20, marginBottom: 40 }}>
-
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: 20,
+            marginBottom: 40,
+          }}
+        >
           {/* Package History */}
           <Card>
             <SectionLabel>Package History</SectionLabel>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 20 }}>
-              <div style={{
-                borderRadius: 12,
-                padding: "14px 16px",
-                background: currentPackagesWaiting > 0 ? "#fff8e1" : "#f8f8f8",
-                border: `1px solid ${currentPackagesWaiting > 0 ? "#f0c040" : "#eee"}`
-              }}>
-                <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Waiting</div>
-                <div style={{ fontSize: 30, fontWeight: 800, color: currentPackagesWaiting > 0 ? "#b8860b" : "#222" }}>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gap: 12,
+                marginBottom: 20,
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: 12,
+                  padding: "14px 16px",
+                  background:
+                    currentPackagesWaiting > 0 ? "#fff8e1" : "#f8f8f8",
+                  border: `1px solid ${currentPackagesWaiting > 0 ? "#f0c040" : "#eee"}`,
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#aaa",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                    marginBottom: 6,
+                  }}
+                >
+                  Waiting
+                </div>
+                <div
+                  style={{
+                    fontSize: 30,
+                    fontWeight: 800,
+                    color: currentPackagesWaiting > 0 ? "#b8860b" : "#222",
+                  }}
+                >
                   {currentPackagesWaiting}
                 </div>
               </div>
-              <div style={{ borderRadius: 12, padding: "14px 16px", background: "#f8f8f8", border: "1px solid #eee" }}>
-                <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Picked Up</div>
+              <div
+                style={{
+                  borderRadius: 12,
+                  padding: "14px 16px",
+                  background: "#f8f8f8",
+                  border: "1px solid #eee",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#aaa",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                    marginBottom: 6,
+                  }}
+                >
+                  Picked Up
+                </div>
                 <div style={{ fontSize: 30, fontWeight: 800, color: "#222" }}>
                   {Number(profileData?.packagesDelivered) || 0}
                 </div>
@@ -365,27 +602,83 @@ const Profile = ({ user }) => {
             </div>
 
             {packagesLoading ? (
-              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>Loading...</p>
+              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>
+                Loading...
+              </p>
             ) : packageHistory.length === 0 ? (
-              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>No package history yet.</p>
+              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>
+                No package history yet.
+              </p>
             ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div
+                style={{ display: "flex", flexDirection: "column", gap: 10 }}
+              >
                 {packageHistory.map((pkg) => (
-                  <div key={pkg.partnerId} style={{
-                    padding: "12px 14px",
-                    borderRadius: 10,
-                    background: "#fafafa",
-                    border: "1px solid #f0f0f0"
-                  }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#333", marginBottom: 8 }}>📍 {pkg.partnerName}</div>
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <div
+                    key={pkg.partnerId}
+                    style={{
+                      padding: "12px 14px",
+                      borderRadius: 10,
+                      background: "#fafafa",
+                      border: "1px solid #f0f0f0",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "#333",
+                        marginBottom: 8,
+                      }}
+                    >
+                      📍 {pkg.partnerName}
+                    </div>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: 8,
+                      }}
+                    >
                       <div>
-                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Received</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: "#333" }}>{pkg.totalPickedUp}</div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "#bbb",
+                            marginBottom: 2,
+                          }}
+                        >
+                          Received
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: "#333",
+                          }}
+                        >
+                          {pkg.totalPickedUp}
+                        </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Waiting</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: pkg.currentWaiting > 0 ? "#b8860b" : "#333" }}>{pkg.currentWaiting}</div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "#bbb",
+                            marginBottom: 2,
+                          }}
+                        >
+                          Waiting
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: pkg.currentWaiting > 0 ? "#b8860b" : "#333",
+                          }}
+                        >
+                          {pkg.currentWaiting}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -399,42 +692,121 @@ const Profile = ({ user }) => {
             <SectionLabel>Account</SectionLabel>
 
             {/* Referral Code */}
-            <div style={{ marginBottom: 14, padding: "14px 16px", borderRadius: 12, background: "#fff", border: "1px solid #ebebeb" }}>
-              <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 8 }}>Your Referral Code</div>
+            <div
+              style={{
+                marginBottom: 14,
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#fff",
+                border: "1px solid #ebebeb",
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#aaa",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.8,
+                  marginBottom: 8,
+                }}
+              >
+                Your Referral Code
+              </div>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ fontWeight: 800, fontSize: 22, letterSpacing: 3, color: "#121212", fontFamily: "monospace" }}>
+                <span
+                  style={{
+                    fontWeight: 800,
+                    fontSize: 22,
+                    letterSpacing: 3,
+                    color: "#121212",
+                    fontFamily: "monospace",
+                  }}
+                >
                   {profileData?.referralCode || "—"}
                 </span>
                 {profileData?.referralCode && (
                   <button
                     type="button"
-                    onClick={() => navigator.clipboard.writeText(profileData.referralCode).then(() => alert("Referral code copied!"))}
-                    style={{ padding: "4px 10px", background: "#d4af37", border: "none", borderRadius: 6, fontWeight: 700, fontSize: 11, cursor: "pointer", color: "#121212" }}
+                    onClick={() =>
+                      navigator.clipboard
+                        .writeText(profileData.referralCode)
+                        .then(() => alert("Referral code copied!"))
+                    }
+                    style={{
+                      padding: "4px 10px",
+                      background: "#d4af37",
+                      border: "none",
+                      borderRadius: 6,
+                      fontWeight: 700,
+                      fontSize: 11,
+                      cursor: "pointer",
+                      color: "#121212",
+                    }}
                   >
                     Copy
                   </button>
                 )}
               </div>
-              <div style={{ fontSize: 12, color: "#bbb", marginTop: 6 }}>Share with a business to refer them as a partner.</div>
+              <div style={{ fontSize: 12, color: "#bbb", marginTop: 6 }}>
+                Share with a business to refer them as a partner.
+              </div>
             </div>
 
             {/* Preferred Location */}
-            <div style={{ marginBottom: 14, padding: "14px 16px", borderRadius: 12, background: "#fff", border: `1px solid ${profileData?.prefLocation ? "#c8e6c9" : "#f0c040"}` }}>
-              <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Preferred Location</div>
+            <div
+              style={{
+                marginBottom: 14,
+                padding: "14px 16px",
+                borderRadius: 12,
+                background: "#fff",
+                border: `1px solid ${profileData?.prefLocation ? "#c8e6c9" : "#f0c040"}`,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#aaa",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.8,
+                  marginBottom: 6,
+                }}
+              >
+                Preferred Location
+              </div>
               {profileData?.prefLocation ? (
                 <>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>{profileData.prefLocation.businessName}</div>
+                  <div style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>
+                    {profileData.prefLocation.businessName}
+                  </div>
                   {profileData.prefLocation.streetAddress && (
                     <div style={{ fontSize: 12, color: "#999", marginTop: 3 }}>
-                      {[profileData.prefLocation.streetAddress, profileData.prefLocation.city, profileData.prefLocation.state].filter(Boolean).join(", ")}
+                      {[
+                        profileData.prefLocation.streetAddress,
+                        profileData.prefLocation.city,
+                        profileData.prefLocation.state,
+                      ]
+                        .filter(Boolean)
+                        .join(", ")}
                     </div>
                   )}
                   <div style={{ marginTop: 8 }}>
-                    <Link to="/profile/settings" style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}>Change location</Link>
+                    <Link
+                      to="/profile/settings"
+                      style={{
+                        fontSize: 12,
+                        color: "#0b57d0",
+                        fontWeight: 600,
+                      }}
+                    >
+                      Change location
+                    </Link>
                   </div>
                 </>
               ) : (
-                <Link to="/profile/settings" style={{ fontSize: 13, color: "#b8860b", fontWeight: 600 }}>
+                <Link
+                  to="/profile/settings"
+                  style={{ fontSize: 13, color: "#b8860b", fontWeight: 600 }}
+                >
                   ⚠️ No location set — tap to choose one
                 </Link>
               )}
@@ -442,38 +814,116 @@ const Profile = ({ user }) => {
 
             {/* Subscription dates */}
             {hasActiveSubscription && (
-              <div style={{ marginBottom: 14, padding: "14px 16px", borderRadius: 12, background: "#fff", border: "1px solid #ebebeb" }}>
-                <div style={{ fontSize: 11, color: "#aaa", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 10 }}>Subscription</div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
+              <div
+                style={{
+                  marginBottom: 14,
+                  padding: "14px 16px",
+                  borderRadius: 12,
+                  background: "#fff",
+                  border: "1px solid #ebebeb",
+                }}
+              >
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#aaa",
+                    textTransform: "uppercase",
+                    letterSpacing: 0.8,
+                    marginBottom: 10,
+                  }}
+                >
+                  Subscription
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr 1fr",
+                    gap: 10,
+                    marginBottom: 10,
+                  }}
+                >
                   <div>
                     <div style={{ fontSize: 11, color: "#bbb" }}>Started</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{formatDate(profileData?.subscribedAt)}</div>
+                    <div
+                      style={{ fontSize: 13, fontWeight: 600, color: "#333" }}
+                    >
+                      {formatDate(profileData?.subscribedAt)}
+                    </div>
                   </div>
                   <div>
                     <div style={{ fontSize: 11, color: "#bbb" }}>Ends</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#333" }}>{formatDate(profileData?.subscriptionEndsAt)}</div>
+                    <div
+                      style={{ fontSize: 13, fontWeight: 600, color: "#333" }}
+                    >
+                      {formatDate(profileData?.subscriptionEndsAt)}
+                    </div>
                   </div>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <div style={{ fontSize: 11, color: "#bbb" }}>Days left</div>
-                  <div style={{ fontSize: 20, fontWeight: 800, color: urgentColor }}>{daysLeft}</div>
-                  {daysLeft <= 7 && <span style={{ fontSize: 12, color: urgentColor, fontWeight: 600 }}>Renew soon!</span>}
+                  <div
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 800,
+                      color: urgentColor,
+                    }}
+                  >
+                    {daysLeft}
+                  </div>
+                  {daysLeft <= 7 && (
+                    <span
+                      style={{
+                        fontSize: 12,
+                        color: urgentColor,
+                        fontWeight: 600,
+                      }}
+                    >
+                      Renew soon!
+                    </span>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Actions */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: 8,
+                marginTop: 4,
+              }}
+            >
               <Link
                 to="/profile/settings"
-                style={{ display: "block", padding: "11px 16px", background: "#121212", color: "#fff", borderRadius: 10, fontWeight: 600, textDecoration: "none", textAlign: "center", fontSize: 14 }}
+                style={{
+                  display: "block",
+                  padding: "11px 16px",
+                  background: "#121212",
+                  color: "#fff",
+                  borderRadius: 10,
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  textAlign: "center",
+                  fontSize: 14,
+                }}
               >
                 ⚙️ Settings
               </Link>
               {!hasActiveSubscription && (
                 <Link
                   to="/plans"
-                  style={{ display: "block", padding: "11px 16px", background: "#d4af37", color: "#121212", borderRadius: 10, fontWeight: 700, textDecoration: "none", textAlign: "center", fontSize: 14 }}
+                  style={{
+                    display: "block",
+                    padding: "11px 16px",
+                    background: "#d4af37",
+                    color: "#121212",
+                    borderRadius: 10,
+                    fontWeight: 700,
+                    textDecoration: "none",
+                    textAlign: "center",
+                    fontSize: 14,
+                  }}
                 >
                   Subscribe Now
                 </Link>
@@ -481,7 +931,16 @@ const Profile = ({ user }) => {
               <button
                 type="button"
                 onClick={handleLogout}
-                style={{ padding: "11px 16px", background: "#fff", color: "#888", borderRadius: 10, fontWeight: 600, border: "1px solid #e8e8e8", cursor: "pointer", fontSize: 14 }}
+                style={{
+                  padding: "11px 16px",
+                  background: "#fff",
+                  color: "#888",
+                  borderRadius: 10,
+                  fontWeight: 600,
+                  border: "1px solid #e8e8e8",
+                  cursor: "pointer",
+                  fontSize: 14,
+                }}
               >
                 Logout
               </button>

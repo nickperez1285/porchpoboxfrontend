@@ -4,6 +4,7 @@ import API_BASE_URL from "../config/api";
 
 export default function ReferralForm() {
   const [email, setEmail] = useState("");
+  const [referralCode, setReferralCode] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
   const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,6 +24,7 @@ export default function ReferralForm() {
           },
           body: JSON.stringify({
             email,
+            referralCode: referralCode.trim().toUpperCase(),
             additionalInfo,
           }),
         },
@@ -36,6 +38,7 @@ export default function ReferralForm() {
 
       setStatus("Referral submitted successfully.");
       setEmail("");
+      setReferralCode("");
       setAdditionalInfo("");
     } catch (error) {
       setStatus(error.message || "Failed to send referral.");
@@ -70,6 +73,21 @@ export default function ReferralForm() {
             onChange={(event) => setEmail(event.target.value)}
             style={styles.input}
           />
+
+          <div>
+            <input
+              type="text"
+              name="referralCode"
+              placeholder="Your Referral Code (e.g. JA120525)"
+              value={referralCode}
+              onChange={(event) => setReferralCode(event.target.value.toUpperCase())}
+              maxLength={10}
+              style={styles.input}
+            />
+            <p style={{ margin: "6px 0 0", fontSize: 12, color: "#888" }}>
+              Optional — find your code on your <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>Profile page</Link>.
+            </p>
+          </div>
 
           <textarea
             name="additionalInfo"
