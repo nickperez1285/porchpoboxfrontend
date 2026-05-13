@@ -33,6 +33,7 @@ import PlansPage from "./components/PlansPage";
 import About from "./components/About";
 import TermsIndex from "./components/TermsIndex";
 import PackageHistoryPage from "./components/PackageHistoryPage";
+import PartnerOnboarding from "./components/PartnerOnboarding";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -325,6 +326,7 @@ function App() {
             element={<CheckoutSuccess user={user} authLoading={authLoading} />}
           />
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
+          <Route path="/onboarding" element={<PartnerOnboarding />} />
           <Route path="/about" element={<About />} />
           <Route path="/terms" element={<TermsIndex />} />
           <Route path="/terms/user" element={<UserTermsPage />} />
