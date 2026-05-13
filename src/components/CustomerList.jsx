@@ -58,11 +58,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
           holdForResubscribe: packageCounts[entry.id]?.holdForResubscribe || false
         }))
-        .filter(
-          (user) =>
-            user.packageCount > 0 ||
-            (user.status !== "active" && user.holdForResubscribe)
-        );
+        .filter((user) => user.packageCount > 0);
 
       setUsers(usersList);
       setLoading(false);
