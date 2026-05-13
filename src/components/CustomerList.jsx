@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import API_BASE_URL from "../config/api";
@@ -8,10 +7,14 @@ import {
   increment,
   onSnapshot,
   setDoc,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
 
-const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) => {
+const CustomerList = ({
+  vendorId,
+  partnerLocationName,
+  onPackagesDelivered,
+}) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -40,11 +43,14 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           entry.id,
           {
             count: Number(entry.data().count) || 0,
-            totalReceived: Number(entry.data().totalReceived) || Number(entry.data().count) || 0,
+            totalReceived:
+              Number(entry.data().totalReceived) ||
+              Number(entry.data().count) ||
+              0,
             totalPickedUp: Number(entry.data().totalPickedUp) || 0,
-            holdForResubscribe: Boolean(entry.data().holdForResubscribe)
-          }
-        ])
+            holdForResubscribe: Boolean(entry.data().holdForResubscribe),
+          },
+        ]),
       );
 
       const usersList = usersSnapshotData.docs
@@ -56,7 +62,8 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           packageCount: packageCounts[entry.id]?.count || 0,
           totalReceived: packageCounts[entry.id]?.totalReceived || 0,
           totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
-          holdForResubscribe: packageCounts[entry.id]?.holdForResubscribe || false
+          holdForResubscribe:
+            packageCounts[entry.id]?.holdForResubscribe || false,
         }))
         .filter((user) => user.packageCount > 0);
 
@@ -73,9 +80,11 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       },
       (snapshotError) => {
         console.error("Error fetching users:", snapshotError);
-        setError("Unable to load customers. Check Firestore partner read permissions.");
+        setError(
+          "Unable to load customers. Check Firestore partner read permissions.",
+        );
         setLoading(false);
-      }
+      },
     );
 
     const unsubscribePackageCounts = onSnapshot(
@@ -87,9 +96,11 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       },
       (snapshotError) => {
         console.error("Error fetching partner package counts:", snapshotError);
-        setError("Unable to load customers. Check Firestore partner read permissions.");
+        setError(
+          "Unable to load customers. Check Firestore partner read permissions.",
+        );
         setLoading(false);
-      }
+      },
     );
 
     return () => {
@@ -102,7 +113,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     setExpandedUserIds((current) =>
       current.includes(userId)
         ? current.filter((id) => id !== userId)
-        : [...current, userId]
+        : [...current, userId],
     );
   };
 
@@ -111,11 +122,16 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       return;
     }
 
-    const selectedUsers = users.filter((user) => selectedUserIds.includes(user.id));
-    const totalPackages = selectedUsers.reduce((sum, user) => sum + getNormalizedPackageQuantity(user.id), 0);
+    const selectedUsers = users.filter((user) =>
+      selectedUserIds.includes(user.id),
+    );
+    const totalPackages = selectedUsers.reduce(
+      (sum, user) => sum + getNormalizedPackageQuantity(user.id),
+      0,
+    );
 
     const confirmed = window.confirm(
-      `Deliver ${totalPackages} package(s) for ${selectedUsers.length} customer(s)?`
+      `Deliver ${totalPackages} package(s) for ${selectedUsers.length} customer(s)?`,
     );
     if (!confirmed) {
       return;
@@ -130,22 +146,25 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           id: user.id,
           name: user.name || "",
           email: user.email || "",
-          packageCount: getNormalizedPackageQuantity(user.id)
+          packageCount: getNormalizedPackageQuantity(user.id),
         }))
         .filter((recipient) => recipient.packageCount > 0);
 
       if (deliveryPayload.length > 0) {
-        const response = await fetch(`${API_BASE_URL}/api/notifications/package-delivery`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
+        const response = await fetch(
+          `${API_BASE_URL}/api/notifications/package-delivery`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              partnerId: vendorId,
+              partnerName: partnerLocationName,
+              recipients: deliveryPayload,
+            }),
           },
-          body: JSON.stringify({
-            partnerId: vendorId,
-            partnerName: partnerLocationName,
-            recipients: deliveryPayload
-          })
-        });
+        );
 
         if (!response.ok) {
           const responseText = await response.text();
@@ -157,35 +176,43 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
             body = null;
           }
 
-          throw new Error(body?.message || responseText || "Package delivery update failed.");
+          throw new Error(
+            body?.message || responseText || "Package delivery update failed.",
+          );
         }
       }
 
       const deliveryPromises = selectedUsers.map(async (user) => {
-          const packageCount = getNormalizedPackageQuantity(user.id);
-          if (packageCount === 0) return;
+        const packageCount = getNormalizedPackageQuantity(user.id);
+        if (packageCount === 0) return;
 
-          const packageCountRef = doc(db, "partners", vendorId, "packageCounts", user.id);
+        const packageCountRef = doc(
+          db,
+          "partners",
+          vendorId,
+          "packageCounts",
+          user.id,
+        );
 
-          await updateDoc(packageCountRef, {
-            totalPickedUp: increment(packageCount)
-          });
-
-          const remainingCount = user.packageCount - packageCount;
-          if (remainingCount <= 0) {
-            await setDoc(
-              packageCountRef,
-              { count: 0, holdForResubscribe: false },
-              { merge: true }
-            );
-          } else {
-            await updateDoc(packageCountRef, {
-              count: increment(-packageCount)
-            });
-          }
-
-          return packageCount;
+        await updateDoc(packageCountRef, {
+          totalPickedUp: increment(packageCount),
         });
+
+        const remainingCount = user.packageCount - packageCount;
+        if (remainingCount <= 0) {
+          await setDoc(
+            packageCountRef,
+            { count: 0, holdForResubscribe: false },
+            { merge: true },
+          );
+        } else {
+          await updateDoc(packageCountRef, {
+            count: increment(-packageCount),
+          });
+        }
+
+        return packageCount;
+      });
       await Promise.all(deliveryPromises);
 
       setSelectedUserIds([]);
@@ -213,23 +240,26 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
     setSelectedUserIds((current) =>
       current.includes(userId)
         ? current.filter((id) => id !== userId)
-        : [...current, userId]
+        : [...current, userId],
     );
   };
 
   const updatePackageQuantity = (userId, value) => {
     setPackageQuantities((current) => ({
       ...current,
-      [userId]: value
+      [userId]: value,
     }));
   };
 
   const finalizePackageQuantity = (userId) => {
     const quantity = packageQuantities[userId];
-    if (quantity !== undefined && (quantity === "" || isNaN(quantity) || quantity < 1)) {
+    if (
+      quantity !== undefined &&
+      (quantity === "" || isNaN(quantity) || quantity < 1)
+    ) {
       setPackageQuantities((current) => ({
         ...current,
-        [userId]: "1"
+        [userId]: "1",
       }));
     }
   };
@@ -250,12 +280,12 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
             fontSize: 12,
             color: "#8a6a00",
             letterSpacing: 1,
-            textTransform: "uppercase"
+            textTransform: "uppercase",
           }}
         >
           Active Deliveries
         </div>
-        <h2 style={{ margin: "8px 0 0" }}> Packages Checked In</h2>
+        <h2 style={{ margin: "8px 0 0" }}> Package Check In</h2>
       </div>
 
       <button
@@ -269,10 +299,12 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           border: "none",
           borderRadius: 4,
           cursor: selectedUserIds.length === 0 ? "not-allowed" : "pointer",
-          marginBottom: 16
+          marginBottom: 16,
         }}
       >
-        {deliveringUserId ? "Delivering..." : `Deliver Selected (${selectedUserIds.length})`}
+        {deliveringUserId
+          ? "Delivering..."
+          : `Deliver Selected (${selectedUserIds.length})`}
       </button>
 
       {loading ? (
@@ -280,7 +312,10 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
       ) : error ? (
         <p>{error}</p>
       ) : users.length === 0 ? (
-        <p>No customers currently have packages checked in at this partner location.</p>
+        <p>
+          No customers currently have packages checked in at this partner
+          location.
+        </p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
           {users.map((user) => (
@@ -294,12 +329,20 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                 borderRadius: 14,
                 padding: 16,
                 marginBottom: 12,
-                background: getCustomerBackgroundColor(user)
+                background: getCustomerBackgroundColor(user),
               }}
             >
               <div style={{ flex: 1 }}>
-                <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: 8,
+                  }}
+                >
+                  <div
+                    style={{ display: "flex", alignItems: "center", gap: 8 }}
+                  >
                     <strong>{user.name || "Unnamed user"}</strong>
                     <button
                       type="button"
@@ -311,7 +354,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                         color: "#0b57d0",
                         cursor: "pointer",
                         textDecoration: "underline",
-                        fontSize: "0.9em"
+                        fontSize: "0.9em",
                       }}
                     >
                       {expandedUserIds.includes(user.id) ? "Hide Info" : "Info"}
@@ -319,7 +362,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                   </div>
                 </div>
 
-                    {expandedUserIds.includes(user.id) && (
+                {expandedUserIds.includes(user.id) && (
                   <div style={{ marginTop: 12 }}>
                     <div>Subscription Status: {user.status || "inactive"}</div>
                     <div>Email: {user.email || "No email"}</div>
@@ -334,13 +377,30 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                   </div>
                 )}
 
-                <div style={{ display: "flex", gap: 16, flexWrap: "wrap", color: "#444", fontSize: 14 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 16,
+                    flexWrap: "wrap",
+                    color: "#444",
+                    fontSize: 14,
+                  }}
+                >
                   <div>Packages Waiting: {user.packageCount || 0}</div>
                 </div>
               </div>
 
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginLeft: 16 }}>
-                <label style={{ fontSize: 12, color: "#666", whiteSpace: "nowrap" }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  marginLeft: 16,
+                }}
+              >
+                <label
+                  style={{ fontSize: 12, color: "#666", whiteSpace: "nowrap" }}
+                >
                   Deliver now
                 </label>
                 <input
@@ -348,15 +408,19 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
                   min="1"
                   max={user.packageCount || 0}
                   step="1"
-                  value={packageQuantities[user.id] ?? String(user.packageCount || 1)}
-                  onChange={(event) => updatePackageQuantity(user.id, event.target.value)}
+                  value={
+                    packageQuantities[user.id] ?? String(user.packageCount || 1)
+                  }
+                  onChange={(event) =>
+                    updatePackageQuantity(user.id, event.target.value)
+                  }
                   onBlur={() => finalizePackageQuantity(user.id)}
                   style={{
                     width: 50,
                     padding: 6,
                     MozAppearance: "textfield",
                     WebkitAppearance: "none",
-                    appearance: "none"
+                    appearance: "none",
                   }}
                   aria-label={`Packages to deliver now for ${user.name || "user"}`}
                 />
