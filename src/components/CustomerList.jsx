@@ -182,39 +182,6 @@ const CustomerList = ({
         }
       }
 
-      const deliveryPromises = selectedUsers.map(async (user) => {
-        const packageCount = getNormalizedPackageQuantity(user.id);
-        if (packageCount === 0) return;
-
-        const packageCountRef = doc(
-          db,
-          "partners",
-          vendorId,
-          "packageCounts",
-          user.id,
-        );
-
-        await updateDoc(packageCountRef, {
-          totalPickedUp: increment(packageCount),
-        });
-
-        const remainingCount = user.packageCount - packageCount;
-        if (remainingCount <= 0) {
-          await setDoc(
-            packageCountRef,
-            { count: 0, holdForResubscribe: false },
-            { merge: true },
-          );
-        } else {
-          await updateDoc(packageCountRef, {
-            count: increment(-packageCount),
-          });
-        }
-
-        return packageCount;
-      });
-      await Promise.all(deliveryPromises);
-
       setSelectedUserIds([]);
       setPackageQuantities({});
 
