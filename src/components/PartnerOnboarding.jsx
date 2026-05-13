@@ -4,9 +4,9 @@ import "./PartnerOnboarding.css";
 
 const STEPS = [
   {
-    title: "Learn what partnership means",
+    title: "Understand what partnership means",
     body: [
-      "You will securely receive and hold customer packages at your business. Customers subscribe with us and use your address as their delivery location. You check packages in when they arrive so customers get notified for pickup.",
+      "Get more foot traffic! Earn more income ! Absolutely free to join! As a Porch P.O. Box partner You will securely receive and hold customer packages at your business. Customers subscribe with us and use your address as their delivery location. You check packages in when they arrive so customers get notified for pickup.",
     ],
     links: [
       { to: "/terms/partner", label: "Read partner terms →" },
@@ -16,7 +16,7 @@ const STEPS = [
   {
     title: "Register your business",
     body: [
-      "Create a partner account with your business name, address, contact information, store hours, and a secure password. Accept the partner terms to submit your application.",
+      "Navigate to the 'Partners' link on the bottom of the main page or use the link below to create a partner account with your business name, address, contact information, store hours, and a secure password. Accept the partner terms to submit your application.",
     ],
     links: [
       { to: "/partner/register", label: "Go to partner registration →" },
@@ -71,10 +71,10 @@ const PartnerOnboarding = () => {
 
       <section className="partner-onboarding__panel" aria-labelledby="steps-heading">
         <h2 id="steps-heading">Steps for new partners</h2>
-        <p className="partner-onboarding__sub">
+        {/* <p className="partner-onboarding__sub">
           Most partners complete registration in one sitting; approval and
           profile polish may take a few days.
-        </p>
+        </p> */}
 
         <ol className="partner-onboarding__steps">
           {STEPS.map((step, i) => (

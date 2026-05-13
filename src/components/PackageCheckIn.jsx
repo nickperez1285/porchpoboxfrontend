@@ -1,9 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { db } from "../firebase";
 import PartnerStatusLegend from "./PartnerStatusLegend";
+import "./PackageCheckIn.css";
+
+const rowStatusClass = (user) => {
+  if (user.status === "active") return "pkg-checkin__row--active";
+  if (user.status === "trial") return "pkg-checkin__row--trial";
+  return "pkg-checkin__row--inactive";
+};
 
 const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const navigate = useNavigate();
@@ -119,12 +126,6 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     }));
   };
 
-  const getCustomerBackgroundColor = (user) => {
-    if (user.status === "active") return "#d4edda";
-    if (user.status === "trial") return "#fff6bf";
-    return "#ffd9d9";
-  };
-
   const handleCheckIn = async () => {
     setSubmitting(true);
     setError("");
@@ -181,214 +182,242 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     }
   };
 
+  const locationLabel =
+    partnerProfile.businessName ||
+    partnerProfile.streetAddress ||
+    "Your location";
+
   return (
-    <div style={{ maxWidth: 900, margin: "60px auto", padding: "0 20px" }}>
-      <h2>Package Check In</h2>
-      <p>Selected packages: {totalSelectedPackages}</p>
-      <PartnerStatusLegend />
+    <div className="pkg-checkin">
+      <div className="pkg-checkin__inner">
+        <header className="pkg-checkin__hero">
+          <div className="pkg-checkin__hero-top">
+            <div>
+              <div className="pkg-checkin__eyebrow">Partner</div>
+              <h2 className="pkg-checkin__title">Package check-in</h2>
+              <p className="pkg-checkin__lead">
+                Select customers, set how many packages arrived, then confirm.
+                Customers get an email when you check in.
+              </p>
+              <p className="pkg-checkin__lead" style={{ marginTop: 8, fontSize: 13, color: "#b0b0b0" }}>
+                Checking in at: <strong style={{ color: "#e8d9a8" }}>{locationLabel}</strong>
+              </p>
+            </div>
+            <Link className="pkg-checkin__back" to="/partner">
+              ← Back to portal
+            </Link>
+          </div>
+        </header>
 
-      <input
-        type="text"
-        placeholder="Search users"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        style={{ width: "100%", maxWidth: 420, marginBottom: 16, padding: 10 }}
-      />
-
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {loading ? (
-        <p>Loading users...</p>
-      ) : (
-        <div
-          style={{ border: "1px solid #ccc", borderRadius: 12, padding: 16 }}
-        >
-          {filteredUsers.length === 0 ? (
-            <p>No users found.</p>
-          ) : (
-            <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-              {filteredUsers.map((user) => (
-                <li
-                  key={user.id}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    borderBottom: "1px solid #eee",
-                    background: getCustomerBackgroundColor(user),
-                    borderRadius: 12,
-                    padding: 16,
-                    marginBottom: 8,
-                  }}
-                >
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{ display: "flex", alignItems: "center", gap: 8 }}
-                    >
-                      <strong>{user.name || "Unnamed user"}</strong>
-                      <button
-                        type="button"
-                        onClick={() => toggleExpanded(user.id)}
-                        style={{
-                          padding: 0,
-                          border: "none",
-                          background: "none",
-                          color: "#0b57d0",
-                          cursor: "pointer",
-                          textDecoration: "underline",
-                          fontSize: "0.9em",
-                        }}
-                      >
-                        {expandedUserIds.includes(user.id)
-                          ? "Hide Info"
-                          : "Info"}
-                      </button>
-                    </div>
-                    {expandedUserIds.includes(user.id) && (
-                      <div
-                        style={{
-                          marginTop: 8,
-                          fontSize: "0.9em",
-                          color: "#444",
-                        }}
-                      >
-                        <div>Email: {user.email || "Not provided"}</div>
-                        <div>Phone: {user.phoneNumber || "Not provided"}</div>
-                        <div>
-                          Address: {user.streetAddress || "Not provided"}
-                          {user.city ? `, ${user.city}` : ""}
-                          {user.state ? `, ${user.state}` : ""}
-                          {user.zipCode ? ` ${user.zipCode}` : ""}
-                        </div>
-                        <div>Total Received: {user.totalReceived}</div>
-                        <div>Total Picked Up: {user.totalPickedUp}</div>
-                        <div>Waiting: {user.packageCount}</div>
-                        <div>Status: {user.status || "Unknown"}</div>
-                      </div>
-                    )}
-                  </div>
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 12 }}
-                  >
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={packageQuantities[user.id] ?? "1"}
-                      onChange={(event) =>
-                        updatePackageQuantity(user.id, event.target.value)
-                      }
-                      onBlur={() => finalizePackageQuantity(user.id)}
-                      style={{
-                        width: 40,
-                        padding: 8,
-                        MozAppearance: "textfield",
-                        WebkitAppearance: "none",
-                        appearance: "none",
-                      }}
-                      aria-label={`Package count for ${user.name || "user"}`}
-                    />
-                    <input
-                      type="checkbox"
-                      checked={selectedUserIds.includes(user.id)}
-                      onChange={() => toggleSelection(user.id)}
-                    />
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+        <div className="pkg-checkin__legend-wrap">
+          <PartnerStatusLegend />
         </div>
-      )}
 
-      <div style={{ marginTop: 20, display: "flex", gap: 12 }}>
-        <button
-          type="button"
-          onClick={() => setShowConfirm(true)}
-          disabled={totalSelectedPackages === 0 || submitting}
-        >
-          CHECK IN PACKAGES
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate("/partner")}
-          disabled={submitting}
-        >
-          Cancel
-        </button>
+        <div className="pkg-checkin__toolbar">
+          <input
+            type="search"
+            className="pkg-checkin__search"
+            placeholder="Search by name or email…"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            aria-label="Search customers"
+          />
+          <div className="pkg-checkin__badge">
+            {totalSelectedPackages} package{totalSelectedPackages !== 1 ? "s" : ""} selected
+          </div>
+        </div>
+
+        {error ? <p className="pkg-checkin__alert" role="alert">{error}</p> : null}
+
+        {loading ? (
+          <div className="pkg-checkin__list-card">
+            <div className="pkg-checkin__loading">Loading customers…</div>
+          </div>
+        ) : (
+          <div className="pkg-checkin__list-card">
+            <div className="pkg-checkin__list-head">
+              <span>Customers ({filteredUsers.length})</span>
+              <span style={{ fontWeight: 500, textTransform: "none", letterSpacing: 0 }}>
+                Qty · Include
+              </span>
+            </div>
+            {filteredUsers.length === 0 ? (
+              <div className="pkg-checkin__empty">
+                {users.length === 0
+                  ? "No customer accounts found."
+                  : "No customers match your search."}
+              </div>
+            ) : (
+              <ul className="pkg-checkin__list">
+                {filteredUsers.map((user) => (
+                  <li
+                    key={user.id}
+                    className={`pkg-checkin__row ${rowStatusClass(user)}`}
+                  >
+                    <div className="pkg-checkin__row-main">
+                      <div>
+                        <span className="pkg-checkin__name">
+                          {user.name || "Unnamed user"}
+                        </span>
+                        <button
+                          type="button"
+                          className="pkg-checkin__info-btn"
+                          onClick={() => toggleExpanded(user.id)}
+                        >
+                          {expandedUserIds.includes(user.id)
+                            ? "Hide details"
+                            : "Details"}
+                        </button>
+                      </div>
+                      {expandedUserIds.includes(user.id) && (
+                        <div className="pkg-checkin__meta">
+                          <div className="pkg-checkin__meta-row">
+                            Email: {user.email || "—"}
+                          </div>
+                          <div className="pkg-checkin__meta-row">
+                            Phone: {user.phoneNumber || "—"}
+                          </div>
+                          <div className="pkg-checkin__meta-row">
+                            Address:{" "}
+                            {user.streetAddress || "—"}
+                            {user.city ? `, ${user.city}` : ""}
+                            {user.state ? `, ${user.state}` : ""}
+                            {user.zipCode ? ` ${user.zipCode}` : ""}
+                          </div>
+                          <div className="pkg-checkin__meta-row">
+                            At your location — waiting: {user.packageCount} ·
+                            received (lifetime): {user.totalReceived} · picked
+                            up: {user.totalPickedUp}
+                          </div>
+                          <div className="pkg-checkin__meta-row">
+                            Subscription status: {user.status || "unknown"}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="pkg-checkin__controls">
+                      <input
+                        type="number"
+                        className="pkg-checkin__qty"
+                        min="1"
+                        step="1"
+                        value={packageQuantities[user.id] ?? "1"}
+                        onChange={(event) =>
+                          updatePackageQuantity(user.id, event.target.value)
+                        }
+                        onBlur={() => finalizePackageQuantity(user.id)}
+                        aria-label={`Package count for ${user.name || "customer"}`}
+                      />
+                      <div className="pkg-checkin__select-wrap">
+                        <input
+                          type="checkbox"
+                          className="pkg-checkin__checkbox"
+                          checked={selectedUserIds.includes(user.id)}
+                          onChange={() => toggleSelection(user.id)}
+                          aria-label={`Include ${user.name || "customer"} in check-in`}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
+
+        <div className="pkg-checkin__actions">
+          <button
+            type="button"
+            className="pkg-checkin__btn-primary"
+            onClick={() => setShowConfirm(true)}
+            disabled={totalSelectedPackages === 0 || submitting}
+          >
+            Check in packages
+          </button>
+          <button
+            type="button"
+            className="pkg-checkin__btn-secondary"
+            onClick={() => navigate("/partner")}
+            disabled={submitting}
+          >
+            Cancel
+          </button>
+        </div>
       </div>
 
       {showConfirm && (() => {
-        const inactiveSelected = selectedUsers.filter((u) => u.status !== "active" && u.status !== "trial");
+        const inactiveSelected = selectedUsers.filter(
+          (u) => u.status !== "active" && u.status !== "trial",
+        );
         return (
           <div
-            style={{
-              position: "fixed",
-              inset: 0,
-              background: "rgba(0, 0, 0, 0.55)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 20,
-              zIndex: 9999
-            }}
+            className="pkg-checkin-modal__backdrop"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pkg-checkin-confirm-title"
           >
-            <div
-              style={{
-                background: "#fff",
-                padding: 28,
-                borderRadius: 16,
-                maxWidth: 440,
-                width: "100%",
-                boxShadow: "0 16px 48px rgba(0,0,0,0.2)"
-              }}
-            >
-              <h3 style={{ margin: "0 0 12px", fontSize: 17 }}>Confirm Check-In</h3>
-              <p style={{ margin: "0 0 16px", color: "#555", fontSize: 14 }}>
-                You are about to check in <strong>{totalSelectedPackages} package{totalSelectedPackages !== 1 ? "s" : ""}</strong> for <strong>{selectedUsers.length} customer{selectedUsers.length !== 1 ? "s" : ""}</strong>.
+            <div className="pkg-checkin-modal__panel">
+              <h2 id="pkg-checkin-confirm-title" className="pkg-checkin-modal__title">
+                Confirm check-in
+              </h2>
+              <p className="pkg-checkin-modal__text">
+                You are about to check in{" "}
+                <strong>
+                  {totalSelectedPackages} package
+                  {totalSelectedPackages !== 1 ? "s" : ""}
+                </strong>{" "}
+                for{" "}
+                <strong>
+                  {selectedUsers.length} customer
+                  {selectedUsers.length !== 1 ? "s" : ""}
+                </strong>
+                . Notification emails will be sent when applicable.
               </p>
 
               {inactiveSelected.length > 0 && (
-                <div style={{
-                  background: "#fff3f3",
-                  border: "1px solid #f5c2c2",
-                  borderRadius: 10,
-                  padding: "14px 16px",
-                  marginBottom: 20
-                }}>
-                  <div style={{ fontWeight: 700, color: "#c00", fontSize: 14, marginBottom: 8 }}>
-                    ⚠️ Payment Required
+                <div className="pkg-checkin-modal__warn">
+                  <div className="pkg-checkin-modal__warn-title">
+                    Payment may be required
                   </div>
                   <p style={{ margin: "0 0 8px", fontSize: 13, color: "#7a0000" }}>
-                    The following customer{inactiveSelected.length !== 1 ? "s are" : " is"} <strong>inactive</strong> and require{inactiveSelected.length === 1 ? "s" : ""} payment to continue using the service:
+                    The following customer
+                    {inactiveSelected.length !== 1 ? "s are" : " is"}{" "}
+                    <strong>inactive</strong> (trial used or subscription
+                    lapsed):
                   </p>
                   <ul style={{ margin: 0, paddingLeft: 18 }}>
                     {inactiveSelected.map((u) => (
-                      <li key={u.id} style={{ fontSize: 13, color: "#7a0000", fontWeight: 600 }}>{u.name || u.email || "Unknown user"}</li>
+                      <li
+                        key={u.id}
+                        style={{ fontSize: 13, color: "#7a0000", fontWeight: 600 }}
+                      >
+                        {u.name || u.email || "Unknown user"}
+                      </li>
                     ))}
                   </ul>
                   <p style={{ margin: "8px 0 0", fontSize: 12, color: "#a00" }}>
-                    You may still accept their package, but please inform them that a subscription is needed.
+                    You may still accept their package; remind them they need an
+                    active plan to continue.
                   </p>
                 </div>
               )}
 
-              <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
+              <div className="pkg-checkin-modal__actions">
                 <button
                   type="button"
+                  className="pkg-checkin-modal__btn-cancel"
                   onClick={() => setShowConfirm(false)}
                   disabled={submitting}
-                  style={{ padding: "9px 18px", borderRadius: 8, border: "1px solid #ccc", background: "#fff", cursor: "pointer", fontSize: 14 }}
                 >
-                  Cancel
+                  Go back
                 </button>
                 <button
                   type="button"
+                  className="pkg-checkin-modal__btn-confirm"
                   onClick={handleCheckIn}
                   disabled={submitting}
-                  style={{ padding: "9px 18px", borderRadius: 8, border: "none", background: "#121212", color: "#fff", fontWeight: 600, cursor: "pointer", fontSize: 14 }}
                 >
-                  {submitting ? "Checking in..." : "Confirm Check-In"}
+                  {submitting ? "Checking in…" : "Confirm check-in"}
                 </button>
               </div>
             </div>

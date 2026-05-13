@@ -345,9 +345,12 @@ const Profile = ({ user }) => {
           )}
         </div>
 
-        {/* ── Delivery Address ── */}
+        {/* ── Delivery Address ── (show whenever a preferred partner is set; street may be filled later) */}
         <div style={{ marginBottom: 28 }}>
-          {profileData?.prefLocation?.streetAddress ? (
+          {profileData?.prefLocation &&
+          (profileData.prefLocation.id ||
+            profileData.prefLocation.businessName ||
+            profileData.prefLocation.streetAddress) ? (
             <div
               style={{
                 background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)",
@@ -428,18 +431,39 @@ const Profile = ({ user }) => {
                     <div style={{ color: "#d4af37", fontWeight: 600 }}>
                       c/o {profileData.prefLocation.businessName}
                     </div>
-                    <div style={{ color: "#bbb" }}>
-                      {profileData.prefLocation.streetAddress}
-                    </div>
-                    <div style={{ color: "#bbb" }}>
-                      {[
+                    {profileData.prefLocation.streetAddress ? (
+                      <div style={{ color: "#bbb" }}>
+                        {profileData.prefLocation.streetAddress}
+                      </div>
+                    ) : null}
+                    {[
+                      profileData.prefLocation.city,
+                      profileData.prefLocation.state,
+                      profileData.prefLocation.zipCode,
+                    ]
+                      .filter(Boolean)
+                      .join(", ") ? (
+                      <div style={{ color: "#bbb" }}>
+                        {[
+                          profileData.prefLocation.city,
+                          profileData.prefLocation.state,
+                          profileData.prefLocation.zipCode,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </div>
+                    ) : null}
+                    {!profileData.prefLocation.streetAddress &&
+                      ![
                         profileData.prefLocation.city,
                         profileData.prefLocation.state,
                         profileData.prefLocation.zipCode,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </div>
+                      ].filter(Boolean).length && (
+                      <div style={{ color: "#888", fontSize: 13, marginTop: 6 }}>
+                        Full street address will appear here once your partner
+                        completes their profile, or set a location in settings.
+                      </div>
+                    )}
                   </div>
                   <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
                     Use this address when placing orders online. Packages are

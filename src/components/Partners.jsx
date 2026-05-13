@@ -234,29 +234,31 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+          <Link
+            to="/partner/package-check-in"
+            style={{
+              gridColumn: "1 / -1",
+              width: "100%",
+              boxSizing: "border-box",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              background: "#d4af37",
+              borderRadius: 16,
+              padding: "18px 24px",
+              textDecoration: "none",
+              fontWeight: 700,
+              fontSize: 16,
+              color: "#121212",
+              boxShadow: "0 4px 16px rgba(212,175,55,0.35)"
+            }}
+          >
+            <span style={{ fontSize: 22 }}>📦</span> Check In Packages
+          </Link>
 
-          {/* LEFT — Check In button + Activity Log */}
+          {/* LEFT — Activity Log */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <Link
-              to="/partner/package-check-in"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 10,
-                background: "#d4af37",
-                borderRadius: 16,
-                padding: "18px 24px",
-                textDecoration: "none",
-                fontWeight: 700,
-                fontSize: 16,
-                color: "#121212",
-                boxShadow: "0 4px 16px rgba(212,175,55,0.35)"
-              }}
-            >
-              <span style={{ fontSize: 22 }}>📦</span> Check In Packages
-            </Link>
-
             <div style={{
               background: "#fff",
               border: "1px solid rgba(0,0,0,0.08)",
