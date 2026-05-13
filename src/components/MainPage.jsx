@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { collection, getDocs, query, where } from "firebase/firestore";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
 import Footer from "./Footer";
 import { db } from "../firebase";
+import "./MainPage.css";
 
-// Fix leaflet default marker icons broken by webpack
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
@@ -16,33 +16,20 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-const MapFlyTo = ({ vendorMarkers, selectedVendorId }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (!selectedVendorId) return;
-    const target = vendorMarkers.find((m) => m.vendor.id === selectedVendorId);
-    if (target) map.flyTo([target.lat, target.lng], 15, { duration: 1 });
-  }, [selectedVendorId, vendorMarkers, map]);
-  return null;
-};
+const MAIN_PAGE_TITLE =
+  "Secure Package Receiving Through Local Partner Locations";
+
+const MAIN_PAGE_MESSAGE =
+  "Get your packages delivered and securely stored at a trusted local neighborhood Porch P.O. Box.";
 
 const MainPage = ({ user, userStatus }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
-  const [selectedVendorId, setSelectedVendorId] = useState(null);
-  const [partnerSearch, setPartnerSearch] = useState("");
   const [vendorMarkers, setVendorMarkers] = useState([]);
-  const [mainPageMessage, setMainPageMessage] = useState("Main Page Message");
-  const [mainPageTitle, setMainPageTitle] = useState("Main Page Title");
+
   useEffect(() => {
-    setMainPageTitle(
-      "Secure Package Receiving Through Local Partner Locations",
-    );
-    setMainPageMessage(
-      "Have your packages delivered to a trusted local Porch P.O. Box partner and pick them up at your convenience — no more porch piracy.",
-    );
     fetchActiveVendors();
   }, []);
 
@@ -108,218 +95,64 @@ const MainPage = ({ user, userStatus }) => {
         ? current.filter((id) => id !== vendorId)
         : [...current, vendorId],
     );
-    setSelectedVendorId(vendorId);
   };
 
+  const isActiveMember = user && userStatus === "active";
+
   return (
-    <div
-      style={{
-        minHeight: "100%",
-        background:
-          "radial-gradient(circle at top, rgba(212, 175, 55, 0.16), transparent 32%), linear-gradient(180deg, #f7f3e8 0%, #f4efe3 100%)",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          minHeight: "85vh",
-          padding: "32px 20px 48px",
-        }}
-      >
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
-            color: "#f5f5f5",
-            borderRadius: 24,
-            padding: "32px 28px",
-            boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)",
-            marginBottom: 28,
-          }}
-        >
-          <div style={{ maxWidth: 720 }}>
-            <div
-              style={{
-                color: "#d4af37",
-                fontSize: 12,
-                letterSpacing: 1.4,
-                textTransform: "uppercase",
-              }}
-            >
-              Porch P.O. Box
-            </div>
-            <h2
-              style={{
-                margin: "10px 0 12px",
-                fontSize: "clamp(2rem, 4vw, 3.2rem)",
-              }}
-            >
-              {mainPageTitle}
+    <div className="mp">
+      <div className="mp-inner">
+        <section className="mp-hero" aria-label="Introduction">
+          <div className="mp-hero__text">
+            <div className="mp-hero__eyebrow">Porch P.O. Box</div>
+            <h2 className="mp-hero__title">{MAIN_PAGE_TITLE}</h2>
+            <p className="mp-hero__lead">{MAIN_PAGE_MESSAGE}</p>
+          </div>
+          <div className="mp-hero__actions">
+            <Link className="mp-btn mp-btn--primary" to="/plans">
+              View plans
+            </Link>
+            <Link className="mp-btn mp-btn--ghost" to="/about">
+              How it works
+            </Link>
+            <Link className="mp-btn mp-btn--ghost" to="/contact">
+              Contact
+            </Link>
+          </div>
+        </section>
+
+        <div className="mp-grid">
+          <section className="mp-card mp-card--cream" aria-labelledby="locations-heading">
+            <div className="mp-card__label">Active locations</div>
+            <h2 id="locations-heading" className="mp-card__title">
+              Porch P.O. Boxes
             </h2>
-            <p
-              style={{
-                margin: "0 0 20px",
-                color: "#d3d3d3",
-                lineHeight: 1.6,
-                maxWidth: 620,
-              }}
-            >
-              {mainPageMessage}
-            </p>
-            {!user && (
-              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                <Link
-                  to="/register"
-                  style={{
-                    display: "inline-block",
-                    padding: "12px 24px",
-                    background: "#d4af37",
-                    color: "#121212",
-                    borderRadius: 10,
-                    fontWeight: 700,
-                    fontSize: 15,
-                    textDecoration: "none",
-                  }}
-                >
-                  Get Started Free
-                </Link>
-                <Link
-                  to="/about"
-                  style={{
-                    display: "inline-block",
-                    padding: "12px 24px",
-                    background: "rgba(255,255,255,0.08)",
-                    color: "#f5f5f5",
-                    borderRadius: 10,
-                    fontWeight: 600,
-                    fontSize: 15,
-                    textDecoration: "none",
-                    border: "1px solid rgba(255,255,255,0.15)",
-                  }}
-                >
-                  Learn More
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* How it works — only for non-logged-in users */}
-        {!user && (
-          <div style={{ width: "100%", maxWidth: 1180, marginBottom: 24 }}>
-            <div style={{ textAlign: "center", marginBottom: 20 }}>
-              <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase" }}>How It Works</div>
-              <h3 style={{ margin: "8px 0 0", color: "#181818" }}>Three simple steps</h3>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 16 }}>
-              {[
-                { icon: "📋", step: "1", title: "Sign Up", desc: "Create a free account and choose your nearest Porch P.O. Box location." },
-                { icon: "📦", step: "2", title: "Ship There", desc: "Use your partner location's address when placing orders online." },
-                { icon: "🏪", step: "3", title: "Pick Up", desc: "Get notified when your package arrives and pick it up at your convenience." },
-              ].map((item) => (
-                <div key={item.step} style={{ background: "#fff", borderRadius: 16, padding: "20px 18px", boxShadow: "0 4px 16px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.06)", textAlign: "center" }}>
-                  <div style={{ fontSize: 32, marginBottom: 10 }}>{item.icon}</div>
-                  <div style={{ fontSize: 11, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase", marginBottom: 6 }}>Step {item.step}</div>
-                  <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 8 }}>{item.title}</div>
-                  <div style={{ fontSize: 13, color: "#666", lineHeight: 1.6 }}>{item.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div style={{ width: "100%", maxWidth: 1180, display: "flex", flexWrap: "wrap", gap: 24, alignItems: "flex-start", justifyContent: "center" }}>
-          <div
-            style={{
-              flex: "1 1 320px",
-              minWidth: 280,
-              maxWidth: 420,
-              maxHeight: 420,
-              overflowY: "auto",
-              background: "#fffdf8",
-              border: "1px solid rgba(0, 0, 0, 0.08)",
-              borderRadius: 20,
-              padding: 22,
-              color: "#181818",
-              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <div style={{ marginBottom: 18 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#8a6a00",
-                  letterSpacing: 1,
-                  textTransform: "uppercase",
-                }}
-              >
-                Active Locations
-              </div>
-              <h4 style={{ margin: "8px 0 4px" }}>Porch P.O. Boxes</h4>
-              <p style={{ margin: 0, fontSize: 12, color: "#999" }}>Click a location to see it on the map</p>
-            </div>
-            <input
-              type="text"
-              placeholder="Search by name, city, or zip..."
-              value={partnerSearch}
-              onChange={(e) => setPartnerSearch(e.target.value)}
-              style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, marginBottom: 12, boxSizing: "border-box", background: "#fff" }}
-            />
             {vendorsLoading ? (
-              <p>Loading partners...</p>
+              <p className="mp-muted mp-muted--italic">Loading partners…</p>
             ) : vendorsError ? (
-              <p>{vendorsError}</p>
+              <p className="mp-error">{vendorsError}</p>
             ) : activeVendors.length === 0 ? (
-              <p>No active partners listed yet.</p>
+              <p className="mp-muted">
+                No active partner locations yet. Check back soon or{" "}
+                <Link to="/contact">contact us</Link> to learn more.
+              </p>
             ) : (
-              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                {activeVendors.filter((vendor) => {
-                  const q = partnerSearch.toLowerCase().trim();
-                  if (!q) return true;
-                  return (
-                    vendor.businessName?.toLowerCase().includes(q) ||
-                    vendor.city?.toLowerCase().includes(q) ||
-                    vendor.zipCode?.toLowerCase().includes(q)
-                  );
-                }).map((vendor) => (
-                  <li
-                    key={vendor.id}
-                    style={{
-                      borderBottom: "1px solid #ece5d5",
-                    }}
-                  >
+              <ul className="mp-vendor-list">
+                {activeVendors.map((vendor) => (
+                  <li key={vendor.id} className="mp-vendor-item">
                     <button
                       type="button"
+                      className="mp-vendor-toggle"
                       onClick={() => toggleVendorExpanded(vendor.id)}
-                      style={{
-                        width: "100%",
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        padding: "14px 0",
-                        border: "none",
-                        background: "none",
-                        cursor: "pointer",
-                        textAlign: "left",
-                        color: "#181818",
-                      }}
+                      aria-expanded={expandedVendorIds.includes(vendor.id)}
                     >
-                      <strong>📍 {vendor.businessName || "Unnamed partner"}</strong>
-                      <span style={{ fontSize: 12, color: "#8a6a00" }}>
+                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                      <span className="mp-vendor-chevron" aria-hidden>
                         {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
                       </span>
                     </button>
                     {expandedVendorIds.includes(vendor.id) && (
-                      <div
-                        style={{
-                          paddingBottom: 12,
-                          color: "#555",
-                          fontSize: "0.9em",
-                        }}
-                      >
+                      <div className="mp-vendor-detail">
                         {(vendor.streetAddress || vendor.city) && (
                           <div>
                             {[
@@ -333,7 +166,7 @@ const MainPage = ({ user, userStatus }) => {
                           </div>
                         )}
                         <div style={{ marginTop: 4 }}>
-                          Store Hours:{" "}
+                          Store hours:{" "}
                           {vendor.storeHours ||
                             vendor.store_hours ||
                             "Not provided"}
@@ -344,20 +177,13 @@ const MainPage = ({ user, userStatus }) => {
                 ))}
               </ul>
             )}
-          </div>
+          </section>
 
           {vendorMarkers.length > 0 && (
             <div
-              style={{
-                flex: "1 1 400px",
-                minWidth: 300,
-                maxWidth: 560,
-                height: 420,
-                borderRadius: 20,
-                overflow: "hidden",
-                boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-                border: "1px solid rgba(0, 0, 0, 0.08)",
-              }}
+              className="mp-card mp-map-wrap"
+              role="region"
+              aria-label="Map of partner locations"
             >
               <MapContainer
                 center={[vendorMarkers[0].lat, vendorMarkers[0].lng]}
@@ -368,7 +194,6 @@ const MainPage = ({ user, userStatus }) => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
-                <MapFlyTo vendorMarkers={vendorMarkers} selectedVendorId={selectedVendorId} />
                 {vendorMarkers.map(({ vendor, lat, lng }) => (
                   <Marker key={vendor.id} position={[lat, lng]}>
                     <Popup>
@@ -386,161 +211,59 @@ const MainPage = ({ user, userStatus }) => {
             </div>
           )}
 
-          <div
-            style={{
-              flex: "1 1 520px",
-              minWidth: 320,
-              maxWidth: 720,
-              background: "#fff",
-              border: "1px solid rgba(0, 0, 0, 0.08)",
-              borderRadius: 20,
-              padding: 28,
-              boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            <div style={{ marginBottom: 18 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#8a6a00",
-                  letterSpacing: 1,
-                  textTransform: "uppercase",
-                }}
-              >
-                {user && userStatus === "active"
-                  ? "Member Access"
-                  : "Subscription Plans"}
-              </div>
-              <h4 style={{ margin: "8px 0 6px" }}>
-                {user && userStatus === "active"
-                  ? `Welcome back${user.displayName ? ", " + user.displayName.split(" ")[0] : ""}!`
-                  : "Choose a Plan"}
-              </h4>
-              <p style={{ margin: 0, color: "#666" }}>
-                {user && userStatus === "active"
-                  ? "Your subscription is active. Use any Porch P.O. Box location to receive your packages."
-                  : "Pick the plan that fits your needs. Your first delivery is on us — no subscription required to try it."}
-              </p>
+          <section className="mp-card mp-card--white" aria-labelledby="signup-heading">
+            <div className="mp-card__label">
+              {isActiveMember ? "Member access" : "Subscription plans"}
             </div>
-            {user && userStatus === "active" ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
-                <Link to="/profile" style={{ display: "inline-block", padding: "10px 20px", background: "#121212", color: "#fff", borderRadius: 10, fontWeight: 600, textDecoration: "none", textAlign: "center" }}>
-                  View My Profile
-                </Link>
-                <Link to="/profile/settings" style={{ display: "inline-block", padding: "10px 20px", background: "#f5f5f5", color: "#333", borderRadius: 10, fontWeight: 600, textDecoration: "none", textAlign: "center", border: "1px solid #ddd" }}>
-                  Update Preferred Location
-                </Link>
-              </div>
-            ) : (
-              <OneTimeProduct user={user} />
-            )}
-          </div>
-        </div>
-
-        <div
-          className="Promotion"
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            marginTop: 24,
-            background: "linear-gradient(135deg, #d6ecff 0%, #9ed0ff 100%)",
-            border: "1px solid rgba(0, 0, 0, 0.08)",
-            borderRadius: 20,
-            padding: "24px 28px",
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-          }}
-        >
-          <div style={{ fontSize: 12, color: "#0b3f66", letterSpacing: 1, textTransform: "uppercase" }}>🎁 Promotion</div>
-          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>Try Porch P.O. Box for free!</h4>
-          <p style={{ margin: "0 0 16px", color: "#0d3555", lineHeight: 1.6 }}>
-            Sign up today and get your first package delivered to a Porch P.O. Box for free — no credit card needed to try it.
-          </p>
-          {!user && (
-            <Link
-              to="/register"
-              style={{ display: "inline-block", padding: "10px 22px", background: "#0b3f66", color: "#fff", borderRadius: 10, fontWeight: 700, textDecoration: "none", fontSize: 14 }}
-            >
-              Claim Free Delivery →
-            </Link>
-          )}
-        </div>
-        <div
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            marginTop: 24,
-            background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
-            border: "1px solid rgba(212, 175, 55, 0.2)",
-            borderRadius: 20,
-            padding: "28px 28px",
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.18)",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 20,
-          }}
-        >
-          <div style={{ maxWidth: 600 }}>
-            <div style={{ fontSize: 12, color: "#d4af37", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 8 }}>
-              🏪 Become a Partner
-            </div>
-            <h3 style={{ margin: "0 0 10px", color: "#f5f5f5", fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)" }}>
-              Own a local business? Join the Porch P.O. Box network.
-            </h3>
-            <p style={{ margin: 0, color: "#c8c8c8", lineHeight: 1.6, fontSize: 14 }}>
-              Earn extra income by accepting packages for customers in your area. No major changes to your operations — just a new way to serve your community.
+            <h2 id="signup-heading" className="mp-card__title">
+              {isActiveMember ? "Welcome to Porch P.O. Box" : "Sign up"}
+            </h2>
+            <p className="mp-card__desc">
+              {isActiveMember
+                ? "Your subscription is active. You can keep using Porch P.O. Box services from your profile."
+                : "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."}
             </p>
-          </div>
-          <Link
-            to="/partner/register"
-            style={{
-              display: "inline-block",
-              padding: "14px 28px",
-              background: "#d4af37",
-              color: "#121212",
-              borderRadius: 12,
-              fontWeight: 700,
-              fontSize: 15,
-              textDecoration: "none",
-              whiteSpace: "nowrap",
-            }}
-          >
-            Apply to Become a Partner →
-          </Link>
+            {!isActiveMember && (
+              <div style={{ marginTop: 20 }}>
+                <OneTimeProduct user={user} />
+              </div>
+            )}
+          </section>
         </div>
 
-        <div
-          className="Referral"
-          style={{
-            width: "100%",
-            maxWidth: 1180,
-            marginTop: 24,
-            background: "linear-gradient(135deg, #f3e1a2 0%, #e8c95d 100%)",
-            border: "1px solid rgba(0, 0, 0, 0.08)",
-            borderRadius: 20,
-            padding: "24px 28px",
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-          }}
-        >
-          <div style={{ fontSize: 12, color: "#6a4a00", letterSpacing: 1, textTransform: "uppercase" }}>💰 Referrals</div>
-          <h4 style={{ margin: "8px 0 6px", color: "#181818" }}>
-            Invite a partner. Earn free service for a YEAR.
-          </h4>
-          <p style={{ margin: 0, color: "#3f3210", lineHeight: 1.6 }}>
-            Know a local business that would make a great Porch P.O. Box partner? Refer them — if they join, you get a whole year of free service.
-          </p>
-          <Link
-            to="/referrals"
-            style={{
-              display: "inline-block",
-              marginTop: 14,
-              color: "#6a4a00",
-              fontWeight: 600,
-            }}
-          >
-            Submit a Referral →
-          </Link>
+        <div className="mp-banners">
+          <section className="mp-banner mp-banner--promo" aria-labelledby="promo-heading">
+            <div className="mp-banner__label">Promotion</div>
+            <h3 id="promo-heading" className="mp-banner__title">
+              Try Porch P.O. Box for free
+            </h3>
+            <p className="mp-banner__text">
+              Sign up today and get your first package delivered to a Porch P.O.
+              Box for free.
+            </p>
+            <div className="mp-banner__actions">
+              <Link className="mp-btn mp-btn--dark" to="/plans">
+                See plans
+              </Link>
+            </div>
+          </section>
+
+          <section className="mp-banner mp-banner--referral" aria-labelledby="referral-heading">
+            <div className="mp-banner__label">Referrals</div>
+            <h3 id="referral-heading" className="mp-banner__title">
+              Invite a partner — earn a year of free service
+            </h3>
+            <p className="mp-banner__text">
+              Wish you had a Porch P.O. Box nearby? Tell a local business about us.
+              If they partner with us, we will thank you with a full year of free
+              service.
+            </p>
+            <div className="mp-banner__actions">
+              <Link className="mp-btn mp-btn--gold-text" to="/referrals">
+                Submit a referral →
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
       <Footer />

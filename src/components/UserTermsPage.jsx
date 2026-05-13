@@ -6,42 +6,46 @@ const UserTermsPage = () => {
     <div style={{ maxWidth: 860, margin: "60px auto", padding: "0 20px" }}>
       <h2>User Terms and Conditions</h2>
       <p>By using Porch P.O. Box services, you agree to the following terms:</p>
-      <ol style={{ lineHeight: 1.9 }}>
+      <ol style={{ lineHeight: 1.7 }}>
         <li>
-          You agree to have your packages shipped to a Porch P.O. Box partner store using the exact address provided for your selected location.
+          You agree to have your packages shipped to a Porch P.O. Box partner
+          store.
+        </li>
+        <li>This is a paid service.</li>
+        <li>You agree to pay to have your packages kept at the store.</li>
+        <li>
+          You agree to pick up your packages within one month; after that, the
+          package is handled at the store&apos;s discretion.
+        </li>
+        <li>You agree that you  will not ship illegal items.</li>
+        <li>
+          You agree that only you will pick up your owb packages and will present ID
+          to verify your identity.
         </li>
         <li>
-          This is a paid service. A subscription is required to receive packages beyond your free trial delivery.
+          You agree that you will not share your login credentials with anyone.
         </li>
         <li>
-          You agree to pick up your packages within one month of check-in. After that period, the package is handled at the partner store's discretion, which may include disposal or donation.
+vrv rvw          credentials.
         </li>
         <li>
-          You will not ship illegal items, hazardous materials, perishable goods, items requiring refrigeration, or any items prohibited by federal, state, or local law.
+          You agree that Partners will not release your packages to anyone
+          except those with an ID that matched the named recepient on the
+          package .
         </li>
         <li>
-          You agree that packages must be of reasonable size and weight. Partner locations may refuse oversized, unusually heavy, or otherwise impractical packages.
+          You agree that Partners  provide a paid service  and are  only obligated to accept and  release packages to customers with active subscriptions in good standing. Partners are not obligated to accept or release packages for customers without active subscriptions or with suspended or canceled
+          accounts  {" "}
         </li>
         <li>
-          Porch P.O. Box and its partner locations are not liable for lost, stolen, or damaged packages once they have been checked in. You are encouraged to use shipping insurance for high-value items.
+          You agree that you are responsible for any activity that occurs under
+          your account.
         </li>
+        <li>You agree to comply with all applicable local laws and regulations.</li>
         <li>
-          You agree that only you may pick up your packages. Partners may require a valid photo ID matching the name on the package before releasing it.
-        </li>
-        <li>
-          Partners are not obligated to release packages to accounts that are not in good standing or whose subscription has lapsed.
-        </li>
-        <li>
-          You agree not to share your login credentials with anyone. Your account is personal and non-transferable.
-        </li>
-        <li>
-          You are responsible for all activity that occurs under your account.
-        </li>
-        <li>
-          You agree to comply with all applicable laws and regulations when using this service.
-        </li>
-        <li>
-          Your membership may be cancelled at any time for any reason by either you or Porch P.O. Box.
+          {" "}
+          You argree that your membership can be cancelled at any time for any
+          reason.
         </li>
       </ol>
       <p style={{ marginTop: 24 }}>

@@ -285,7 +285,7 @@ const CustomerList = ({
         >
           Active Deliveries
         </div>
-        <h2 style={{ margin: "8px 0 0" }}> Package Check In</h2>
+        <h2 style={{ margin: "8px 0 0" }}> Packages Checked In</h2>
       </div>
 
       <button
