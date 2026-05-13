@@ -83,7 +83,7 @@ const ActivityPanel = ({ partnerProfile }) => {
       ) : entries.length === 0 ? (
         <p style={{ padding: "16px 24px", color: "#aaa", fontSize: 13 }}>No activity yet.</p>
       ) : (
-        <div style={{ overflowY: "auto", flex: 1 }}>
+        <div style={{ overflowY: "auto", flex: 1, maxHeight: 340 }}>
           {entries.map((entry, i) => {
             const ts = typeStyle(entry.type);
             return (
@@ -223,26 +223,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                 </div>
               </div>
 
-              {/* Primary action */}
-              <Link
-                to="/partner/package-check-in"
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  background: "#d4af37",
-                  borderRadius: 16,
-                  padding: 16,
-                  textDecoration: "none",
-                  textAlign: "center",
-                  gap: 6,
-                }}
-              >
-                <span style={{ fontSize: 28 }}>📦</span>
-                <span style={{ color: "#121212", fontSize: 15, fontWeight: 700 }}>Check In Packages</span>
-              </Link>
-
               {/* Secondary actions */}
               <div style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 16, display: "flex", flexDirection: "column", gap: 10 }}>
                 <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8", marginBottom: 2 }}>More</div>
@@ -254,6 +234,44 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+
+          {/* LEFT — Check In button + Activity Log */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <Link
+              to="/partner/package-check-in"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 10,
+                background: "#d4af37",
+                borderRadius: 16,
+                padding: "18px 24px",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: 16,
+                color: "#121212",
+                boxShadow: "0 4px 16px rgba(212,175,55,0.35)"
+              }}
+            >
+              <span style={{ fontSize: 22 }}>📦</span> Check In Packages
+            </Link>
+
+            <div style={{
+              background: "#fff",
+              border: "1px solid rgba(0,0,0,0.08)",
+              borderRadius: 20,
+              boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
+              display: "flex",
+              flexDirection: "column",
+              maxHeight: 420,
+              overflow: "hidden"
+            }}>
+              <ActivityPanel partnerProfile={partnerProfile} />
+            </div>
+          </div>
+
+          {/* RIGHT — Package check-in list */}
           <div style={{
             background: "#fff",
             border: "1px solid rgba(0,0,0,0.08)",
@@ -266,18 +284,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
               partnerLocationName={partnerProfile.businessName || partnerProfile.streetAddress || "Unnamed partner"}
               onPackagesDelivered={handlePackagesDelivered}
             />
-          </div>
-
-          <div style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.08)",
-            borderRadius: 20,
-            boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
-            minHeight: 400,
-            display: "flex",
-            flexDirection: "column"
-          }}>
-            <ActivityPanel partnerProfile={partnerProfile} />
           </div>
         </div>
       </div>
