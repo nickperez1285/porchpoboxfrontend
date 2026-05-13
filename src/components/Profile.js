@@ -429,6 +429,9 @@ const Profile = ({ user }) => {
                       {[profileData.prefLocation.streetAddress, profileData.prefLocation.city, profileData.prefLocation.state].filter(Boolean).join(", ")}
                     </div>
                   )}
+                  <div style={{ marginTop: 8 }}>
+                    <Link to="/profile/settings" style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}>Change location</Link>
+                  </div>
                 </>
               ) : (
                 <Link to="/profile/settings" style={{ fontSize: 13, color: "#b8860b", fontWeight: 600 }}>

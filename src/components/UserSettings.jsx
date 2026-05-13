@@ -201,6 +201,9 @@ const UserSettings = ({ user }) => {
 
           <div style={{ gridColumn: "1 / -1", border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
             <h3 style={{ marginTop: 0 }}>Preferred Location</h3>
+            <p style={{ fontSize: 13, color: "#888", margin: "0 0 14px" }}>
+              This is where your packages will be delivered. It was automatically set when your first package was checked in. You can change it anytime.
+            </p>
             {profileData?.prefLocation ? (
               <>
                 <div style={{ fontWeight: 600, fontSize: 17, marginBottom: 4 }}>
@@ -213,7 +216,7 @@ const UserSettings = ({ user }) => {
                 )}
               </>
             ) : (
-              <p style={{ color: "#888", margin: 0 }}>No preferred location set.</p>
+              <p style={{ color: "#888", margin: 0 }}>No preferred location set yet. It will be set automatically when a partner checks in your first package.</p>
             )}
             <button
               type="button"

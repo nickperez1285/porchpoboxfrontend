@@ -158,12 +158,8 @@ function App() {
         const userData = userDoc.exists() ? userDoc.data() : {};
         setUserStatus(userData.status || "");
         await loadPartnerProfile(currentUser);
-        // Show pref location modal for regular users who haven't set it yet
+        // Never auto-show the pref location modal — it gets set automatically on first check-in
         const isAdminUser = currentUser.uid === ADMIN_UID;
-        const isPartner = (await getDoc(doc(db, "partners", currentUser.uid))).exists();
-        if (!isAdminUser && !isPartner && userDoc.exists() && !userData.prefLocation) {
-          setShowPrefModal(true);
-        }
       } finally {
         setAuthLoading(false);
       }
@@ -175,9 +171,6 @@ function App() {
   return (
     <>
       <BrowserRouter>
-        {showPrefModal && user && (
-          <PrefLocationModal user={user} onDone={() => setShowPrefModal(false)} />
-        )}
         <Header
           authLoading={authLoading}
           isAdmin={isAdmin}

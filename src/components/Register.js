@@ -198,11 +198,6 @@ const Register = () => {
         displayName: name
       });
 
-      await sendWelcomeEmail({
-        name,
-        email
-      });
-
       await setDoc(doc(db, "users", user.uid), {
         name: name,
         phoneNumber: phoneNumber,
