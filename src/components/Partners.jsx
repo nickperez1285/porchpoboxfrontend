@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
@@ -9,28 +9,19 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
   const [packageCountTotal, setPackageCountTotal] = useState(0);
 
   useEffect(() => {
-    const loadPackageCountTotal = async () => {
-      if (!partnerProfile?.id || !partnerProfile.approved) {
-        setPackageCountTotal(0);
-        return;
-      }
-
-      try {
-        const snapshot = await getDocs(
-          collection(db, "partners", partnerProfile.id, "packageCounts"),
-        );
-        const total = snapshot.docs.reduce(
-          (sum, entry) => sum + (entry.data().count || 0),
-          0,
-        );
-        setPackageCountTotal(total);
-      } catch (error) {
-        console.error("Error loading vendor package totals:", error);
-        setPackageCountTotal(0);
-      }
-    };
-
-    loadPackageCountTotal();
+    if (!partnerProfile?.id || !partnerProfile.approved) {
+      setPackageCountTotal(0);
+      return;
+    }
+    const unsub = onSnapshot(
+      doc(db, "partners", partnerProfile.id),
+      (snap) => {
+        const count = snap.exists() ? Math.max(0, Number(snap.data().packageCheckInCount) || 0) : 0;
+        setPackageCountTotal(count);
+      },
+      (err) => { console.error("Error loading package count:", err); setPackageCountTotal(0); }
+    );
+    return () => unsub();
   }, [partnerProfile]);
 
   const handlePackagesDelivered = (deliveredCount) => {
