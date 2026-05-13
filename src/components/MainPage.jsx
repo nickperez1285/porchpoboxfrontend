@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  getDoc,
+  doc,
+  query,
+  where,
+} from "firebase/firestore";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -28,6 +35,7 @@ const MainPage = ({ user, userStatus }) => {
   const [vendorsError, setVendorsError] = useState("");
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [vendorMarkers, setVendorMarkers] = useState([]);
+  const [userWaitingCount, setUserWaitingCount] = useState(null);
 
   useEffect(() => {
     fetchActiveVendors();
@@ -89,6 +97,32 @@ const MainPage = ({ user, userStatus }) => {
     }
   };
 
+  // Fetch aggregate waiting package count for members
+  useEffect(() => {
+    if (!user || !user.uid || activeVendors.length === 0) return;
+
+    const fetchUserStats = async () => {
+      try {
+        let totalWaiting = 0;
+        await Promise.all(
+          activeVendors.map(async (vendor) => {
+            const countSnap = await getDoc(
+              doc(db, "partners", vendor.id, "packageCounts", user.uid),
+            );
+            if (countSnap.exists()) {
+              totalWaiting += Number(countSnap.data().count) || 0;
+            }
+          }),
+        );
+        setUserWaitingCount(totalWaiting);
+      } catch (err) {
+        console.error("Error fetching user stats for main page:", err);
+      }
+    };
+
+    fetchUserStats();
+  }, [user, activeVendors]);
+
   const toggleVendorExpanded = (vendorId) => {
     setExpandedVendorIds((current) =>
       current.includes(vendorId)
@@ -97,7 +131,8 @@ const MainPage = ({ user, userStatus }) => {
     );
   };
 
-  const isActiveMember = user && userStatus === "active";
+  const isActiveMember =
+    user && (userStatus === "active" || userStatus === "trial");
 
   return (
     <div className="mp">
@@ -122,7 +157,10 @@ const MainPage = ({ user, userStatus }) => {
         </section>
 
         <div className="mp-grid">
-          <section className="mp-card mp-card--cream" aria-labelledby="locations-heading">
+          <section
+            className="mp-card mp-card--cream"
+            aria-labelledby="locations-heading"
+          >
             <div className="mp-card__label">Active locations</div>
             <h2 id="locations-heading" className="mp-card__title">
               Porch P.O. Boxes
@@ -146,7 +184,9 @@ const MainPage = ({ user, userStatus }) => {
                       onClick={() => toggleVendorExpanded(vendor.id)}
                       aria-expanded={expandedVendorIds.includes(vendor.id)}
                     >
-                      <strong>{vendor.businessName || "Unnamed partner"}</strong>
+                      <strong>
+                        {vendor.businessName || "Unnamed partner"}
+                      </strong>
                       <span className="mp-vendor-chevron" aria-hidden>
                         {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
                       </span>
@@ -211,7 +251,10 @@ const MainPage = ({ user, userStatus }) => {
             </div>
           )}
 
-          <section className="mp-card mp-card--white" aria-labelledby="signup-heading">
+          <section
+            className="mp-card mp-card--white"
+            aria-labelledby="signup-heading"
+          >
             <div className="mp-card__label">
               {isActiveMember ? "Member access" : "Subscription plans"}
             </div>
@@ -219,9 +262,21 @@ const MainPage = ({ user, userStatus }) => {
               {isActiveMember ? "Welcome to Porch P.O. Box" : "Sign up"}
             </h2>
             <p className="mp-card__desc">
-              {isActiveMember
-                ? "Your subscription is active. You can keep using Porch P.O. Box services from your profile."
-                : "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."}
+              {isActiveMember ? (
+                <>
+                  Your subscription is active.
+                  {userWaitingCount !== null && (
+                    <strong>
+                      {" "}
+                      You currently have {userWaitingCount} package
+                      {userWaitingCount !== 1 ? "s" : ""} waiting for pickup.
+                    </strong>
+                  )}
+                  &nbsp;You can manage your deliveries from your profile.
+                </>
+              ) : (
+                "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."
+              )}
             </p>
             {!isActiveMember && (
               <div style={{ marginTop: 20 }}>
@@ -232,7 +287,10 @@ const MainPage = ({ user, userStatus }) => {
         </div>
 
         <div className="mp-banners">
-          <section className="mp-banner mp-banner--promo" aria-labelledby="promo-heading">
+          <section
+            className="mp-banner mp-banner--promo"
+            aria-labelledby="promo-heading"
+          >
             <div className="mp-banner__label">Promotion</div>
             <h3 id="promo-heading" className="mp-banner__title">
               Try Porch P.O. Box for free
@@ -248,15 +306,18 @@ const MainPage = ({ user, userStatus }) => {
             </div>
           </section>
 
-          <section className="mp-banner mp-banner--referral" aria-labelledby="referral-heading">
+          <section
+            className="mp-banner mp-banner--referral"
+            aria-labelledby="referral-heading"
+          >
             <div className="mp-banner__label">Referrals</div>
             <h3 id="referral-heading" className="mp-banner__title">
               Invite a partner — earn a year of free service
             </h3>
             <p className="mp-banner__text">
-              Wish you had a Porch P.O. Box nearby? Tell a local business about us.
-              If they partner with us, we will thank you with a full year of free
-              service.
+              Wish you had a Porch P.O. Box nearby? Tell a local business about
+              us. If they partner with us, we will thank you with a full year of
+              free service.
             </p>
             <div className="mp-banner__actions">
               <Link className="mp-btn mp-btn--gold-text" to="/referrals">

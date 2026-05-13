@@ -60,13 +60,15 @@ const ActivityPanel = ({ partnerProfile }) => {
   };
 
   const typeStyle = (type) => {
-    if (type === "check-in")   return { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" };
-    if (type === "delivery")   return { bg: "#fff3cd", color: "#856404", label: "Delivered" };
+    if (type === "check-in") return { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" };
+    if (type === "delivery") return { bg: "#fff3cd", color: "#856404", label: "Delivered" };
+    if (type === "subscription") return { bg: "#e7f1ff", color: "#0b57d0", label: "Subscribed" };
     if (type === "payout-paid") return { bg: "#d4edda", color: "#0f5132", label: "Payout Paid" };
     return { bg: "#f0f0f0", color: "#444", label: type };
   };
 
   const isPayout = (type) => type === "payout-paid";
+  const isSubscription = (type) => type === "subscription";
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -108,10 +110,19 @@ const ActivityPanel = ({ partnerProfile }) => {
                   {!isPayout(entry.type) && entry.customerEmail && (
                     <div style={{ fontSize: 11, color: "#aaa" }}>{entry.customerEmail}</div>
                   )}
+                  {!isPayout(entry.type) && isSubscription(entry.type) && (
+                    <div style={{ fontSize: 10, color: "#0b57d0", fontWeight: 600, marginTop: 2 }}>
+                      Subscribed at your location
+                    </div>
+                  )}
                 </div>
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
                   <div style={{ fontSize: 13, fontWeight: 700, color: "#222" }}>
-                    {isPayout(entry.type) ? `$${entry.amount}` : `${entry.packageCount} pkg${entry.packageCount !== 1 ? "s" : ""}`}
+                    {isPayout(entry.type)
+                      ? `$${entry.amount}`
+                      : isSubscription(entry.type)
+                        ? "Subscribed"
+                        : `${entry.packageCount} pkg${entry.packageCount !== 1 ? "s" : ""}`}
                   </div>
                   <div style={{ fontSize: 11, color: "#bbb", marginTop: 2 }}>{fmt(entry.timestamp)}</div>
                 </div>
