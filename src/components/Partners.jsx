@@ -1,9 +1,128 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { doc, onSnapshot } from "firebase/firestore";
+import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
+
+const ActivityPanel = ({ partnerProfile }) => {
+  const [entries, setEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!partnerProfile?.id) return;
+    let activityEntries = [];
+    let payoutEntries = [];
+    const unsubscribes = [];
+
+    const merge = () => {
+      const all = [...activityEntries, ...payoutEntries].sort((a, b) => {
+        const ta = a.timestamp?.toDate?.() || new Date(0);
+        const tb = b.timestamp?.toDate?.() || new Date(0);
+        return tb - ta;
+      });
+      setEntries(all.slice(0, 30));
+      setLoading(false);
+    };
+
+    unsubscribes.push(onSnapshot(
+      collection(db, "partners", partnerProfile.id, "activityLog"),
+      (snap) => { activityEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() })); merge(); },
+      () => setLoading(false)
+    ));
+
+    unsubscribes.push(onSnapshot(
+      query(collection(db, "partners", partnerProfile.id, "payouts"), orderBy("createdAt", "desc")),
+      (snap) => {
+        payoutEntries = snap.docs
+          .filter((d) => d.data().status === "paid")
+          .map((d) => ({
+            id: `payout-${d.id}`,
+            type: "payout-paid",
+            timestamp: d.data().paidAt || d.data().createdAt,
+            month: d.data().month,
+            amount: d.data().amount,
+            subscriberCount: d.data().subscriberCount
+          }));
+        merge();
+      },
+      () => {}
+    ));
+
+    return () => unsubscribes.forEach((u) => u());
+  }, [partnerProfile?.id]);
+
+  const fmt = (ts) => {
+    if (!ts) return "—";
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric" }) + " " +
+      d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+  };
+
+  const typeStyle = (type) => {
+    if (type === "check-in")   return { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" };
+    if (type === "delivery")   return { bg: "#fff3cd", color: "#856404", label: "Delivered" };
+    if (type === "payout-paid") return { bg: "#d4edda", color: "#0f5132", label: "Payout Paid" };
+    return { bg: "#f0f0f0", color: "#444", label: type };
+  };
+
+  const isPayout = (type) => type === "payout-paid";
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 24px 12px", borderBottom: "1px solid #f0f0f0" }}>
+        <div>
+          <div style={{ fontSize: 11, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase" }}>Live</div>
+          <div style={{ fontWeight: 700, fontSize: 16, marginTop: 2 }}>Activity Log</div>
+        </div>
+        <Link to="/partner/activity-log" style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}>View All →</Link>
+      </div>
+
+      {loading ? (
+        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: 13 }}>Loading...</p>
+      ) : entries.length === 0 ? (
+        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: 13 }}>No activity yet.</p>
+      ) : (
+        <div style={{ overflowY: "auto", flex: 1 }}>
+          {entries.map((entry, i) => {
+            const ts = typeStyle(entry.type);
+            return (
+              <div key={entry.id} style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                padding: "10px 24px",
+                borderBottom: "1px solid #f5f5f5",
+                background: i % 2 === 0 ? "#fff" : "#fafafa",
+                gap: 12
+              }}>
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 2 }}>
+                    <span style={{ background: ts.bg, color: ts.color, borderRadius: 999, padding: "2px 8px", fontSize: 11, fontWeight: 600, whiteSpace: "nowrap" }}>
+                      {ts.label}
+                    </span>
+                  </div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#333", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {isPayout(entry.type) ? entry.month : (entry.customerName || "Unknown")}
+                  </div>
+                  {!isPayout(entry.type) && entry.customerEmail && (
+                    <div style={{ fontSize: 11, color: "#aaa" }}>{entry.customerEmail}</div>
+                  )}
+                </div>
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#222" }}>
+                    {isPayout(entry.type) ? `$${entry.amount}` : `${entry.packageCount} pkg${entry.packageCount !== 1 ? "s" : ""}`}
+                  </div>
+                  <div style={{ fontSize: 11, color: "#bbb", marginTop: 2 }}>{fmt(entry.timestamp)}</div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Partners = ({ user, partnerProfile, authLoading }) => {
   const [packageCountTotal, setPackageCountTotal] = useState(0);
@@ -65,7 +184,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
     }
 
     return (
-      <div style={{ maxWidth: 1080, margin: "60px auto", padding: "0 20px" }}>
+      <div style={{ maxWidth: 1280, margin: "60px auto", padding: "0 20px" }}>
         <div
           style={{
             background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
@@ -134,20 +253,32 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
           </div>
         </div>
 
-        <div
-          style={{
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, alignItems: "start" }}>
+          <div style={{
             background: "#fff",
-            border: "1px solid rgba(0, 0, 0, 0.08)",
+            border: "1px solid rgba(0,0,0,0.08)",
             borderRadius: 20,
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
-          }}
-        >
-          <PartnerStatusLegend />
-          <CustomerList
-            vendorId={partnerProfile.id}
-            partnerLocationName={partnerProfile.businessName || partnerProfile.streetAddress || "Unnamed partner"}
-            onPackagesDelivered={handlePackagesDelivered}
-          />
+            boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
+          }}>
+            <PartnerStatusLegend />
+            <CustomerList
+              vendorId={partnerProfile.id}
+              partnerLocationName={partnerProfile.businessName || partnerProfile.streetAddress || "Unnamed partner"}
+              onPackagesDelivered={handlePackagesDelivered}
+            />
+          </div>
+
+          <div style={{
+            background: "#fff",
+            border: "1px solid rgba(0,0,0,0.08)",
+            borderRadius: 20,
+            boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
+            minHeight: 400,
+            display: "flex",
+            flexDirection: "column"
+          }}>
+            <ActivityPanel partnerProfile={partnerProfile} />
+          </div>
         </div>
       </div>
     );

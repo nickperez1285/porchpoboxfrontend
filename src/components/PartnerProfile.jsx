@@ -351,7 +351,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
         {(() => {
           const currentMonthEarnings = (prefCount || 0) * PAYOUT_RATE;
           const totalPaid = payouts.filter((p) => p.status === "paid").reduce((s, p) => s + (p.amount || 0), 0);
-          const pendingPayout = payouts.find((p) => p.status === "pending");
           return (
             <div style={{ border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
               <h3 style={{ marginTop: 0, marginBottom: 16 }}>💰 Payout Tracking</h3>
@@ -360,11 +359,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                   <div style={{ fontSize: 11, color: "#1a7f37", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>This Month</div>
                   <div style={{ fontSize: 28, fontWeight: 700, color: "#1a7f37" }}>${currentMonthEarnings}</div>
                   <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>{prefCount || 0} subscribers × $5</div>
-                </div>
-                <div style={{ background: "#fff8e1", borderRadius: 12, padding: 14 }}>
-                  <div style={{ fontSize: 11, color: "#856404", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Pending</div>
-                  <div style={{ fontSize: 28, fontWeight: 700, color: "#856404" }}>${pendingPayout ? pendingPayout.amount : currentMonthEarnings}</div>
-                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>awaiting payment</div>
                 </div>
                 <div style={{ background: "#f8f5ea", borderRadius: 12, padding: 14 }}>
                   <div style={{ fontSize: 11, color: "#8a6a00", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 6 }}>Total Paid</div>
