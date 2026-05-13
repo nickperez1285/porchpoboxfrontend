@@ -188,10 +188,6 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
         });
       await Promise.all(deliveryPromises);
 
-      await updateDoc(doc(db, "partners", vendorId), {
-        packageCheckInCount: increment(-totalPackages)
-      });
-
       setSelectedUserIds([]);
       setPackageQuantities({});
 

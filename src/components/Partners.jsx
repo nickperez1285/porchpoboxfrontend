@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { collection, doc, onSnapshot, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import { db } from "../firebase";
@@ -133,10 +133,10 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
       return;
     }
     const unsub = onSnapshot(
-      doc(db, "partners", partnerProfile.id),
+      collection(db, "partners", partnerProfile.id, "packageCounts"),
       (snap) => {
-        const count = snap.exists() ? Math.max(0, Number(snap.data().packageCheckInCount) || 0) : 0;
-        setPackageCountTotal(count);
+        const total = snap.docs.reduce((sum, d) => sum + (Number(d.data().count) || 0), 0);
+        setPackageCountTotal(Math.max(0, total));
       },
       (err) => { console.error("Error loading package count:", err); setPackageCountTotal(0); }
     );
