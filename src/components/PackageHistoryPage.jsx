@@ -32,7 +32,6 @@ const PackageHistoryPage = ({ user }) => {
             query(
               collection(db, "activityLog"),
               where("userId", "==", user.uid),
-              orderBy("timestamp", "desc"),
             ),
           );
           globalLogSnap.docs.forEach((d) => {
@@ -71,7 +70,6 @@ const PackageHistoryPage = ({ user }) => {
                 query(
                   collection(db, "partners", partner.id, "activityLog"),
                   where("customerId", "==", user.uid),
-                  orderBy("timestamp", "desc"),
                 ),
               );
               logSnap.docs.forEach((d) => {
@@ -257,7 +255,7 @@ const PackageHistoryPage = ({ user }) => {
                   : "#1a7f37";
               return (
                 <div
-                  key={`${entry.partnerId}-${entry.id}`}
+                  key={entry.id}
                   style={{
                     background: "#fff",
                     border: "1px solid #ebebeb",

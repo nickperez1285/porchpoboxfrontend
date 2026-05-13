@@ -132,7 +132,10 @@ const MainPage = ({ user, userStatus }) => {
   };
 
   const isActiveMember =
-    user && (userStatus === "active" || userStatus === "trial");
+    user &&
+    (userStatus === "active" ||
+      userStatus === "trial" ||
+      userStatus === "member");
 
   return (
     <div className="mp">
