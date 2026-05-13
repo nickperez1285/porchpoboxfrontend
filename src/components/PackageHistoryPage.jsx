@@ -7,7 +7,6 @@ import {
   doc,
   query,
   where,
-  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -15,6 +14,17 @@ const PackageHistoryPage = ({ user }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ received: 0, pickedUp: 0, waiting: 0 });
+
+  // Helper function to determine styling and label for activity types
+  const getTypeStyle = (type) => {
+    if (type === "check-in")
+      return { background: "#fff8e1", color: "#856404", label: "📦 Received" };
+    if (type === "delivery")
+      return { background: "#d4edda", color: "#1a7f37", label: "✓ Picked Up" };
+    if (type === "subscription" || type === "signup")
+      return { background: "#e7f1ff", color: "#0b57d0", label: "✓ Account" };
+    return { background: "#f0f0f0", color: "#444", label: type }; // Default
+  };
 
   useEffect(() => {
     if (!user?.uid) return;
@@ -255,7 +265,7 @@ const PackageHistoryPage = ({ user }) => {
                   : "#1a7f37";
               return (
                 <div
-                  key={entry.id}
+                  key={`${entry.partnerId}-${entry.id}`}
                   style={{
                     background: "#fff",
                     border: "1px solid #ebebeb",
