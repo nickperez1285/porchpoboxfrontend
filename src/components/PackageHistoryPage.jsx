@@ -255,14 +255,10 @@ const PackageHistoryPage = ({ user }) => {
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {entries.map((entry) => {
-              const isCheckIn = entry.type === "check-in";
-              const isSubscription = entry.type === "subscription";
-              const isSignup = entry.type === "signup";
-              const accent = isCheckIn
-                ? "#d4af37"
-                : isSubscription || isSignup
-                  ? "#0b57d0"
-                  : "#1a7f37";
+              const ts = getTypeStyle(entry.type);
+              const isAccount =
+                entry.type === "subscription" || entry.type === "signup";
+              const accent = entry.type === "check-in" ? "#d4af37" : ts.color;
               return (
                 <div
                   key={`${entry.partnerId}-${entry.id}`}
@@ -297,23 +293,11 @@ const PackageHistoryPage = ({ user }) => {
                           letterSpacing: 0.8,
                           padding: "2px 8px",
                           borderRadius: 999,
-                          background: isCheckIn
-                            ? "#fff8e1"
-                            : isSubscription || isSignup
-                              ? "#e7f1ff"
-                              : "#d4edda",
-                          color: isCheckIn
-                            ? "#856404"
-                            : isSubscription || isSignup
-                              ? "#0b57d0"
-                              : "#1a7f37",
+                          background: ts.background,
+                          color: ts.color,
                         }}
                       >
-                        {isCheckIn
-                          ? "📦 Received"
-                          : isSubscription || isSignup
-                            ? "✓ Account"
-                            : "✓ Picked Up"}
+                        {ts.label}
                       </span>
                       <span style={{ fontSize: 13, color: "#aaa" }}>
                         {formatTime(entry.timestamp)}
@@ -322,7 +306,7 @@ const PackageHistoryPage = ({ user }) => {
                     <div
                       style={{ fontWeight: 600, fontSize: 15, color: "#222" }}
                     >
-                      {isSubscription || isSignup
+                      {isAccount
                         ? "🏠 Account Activity"
                         : `📍 ${entry.partnerName}`}
                     </div>
@@ -339,16 +323,19 @@ const PackageHistoryPage = ({ user }) => {
                       style={{
                         fontSize: 22,
                         fontWeight: 800,
-                        color: isCheckIn
-                          ? "#b8860b"
-                          : isSubscription || isSignup
-                            ? "#0b57d0"
-                            : "#1a7f37",
+                        color:
+                          entry.type === "check-in"
+                            ? "#b8860b"
+                            : isAccount
+                              ? "#0b57d0"
+                              : "#1a7f37",
                       }}
                     >
-                      {isSubscription || isSignup ? (
+                      {isAccount ? (
                         <span style={{ fontSize: 15, fontWeight: 700 }}>
-                          {isSubscription ? "Subscribed" : "Signed Up"}
+                          {entry.type === "subscription"
+                            ? "Subscribed"
+                            : "Signed Up"}
                         </span>
                       ) : (
                         <>
