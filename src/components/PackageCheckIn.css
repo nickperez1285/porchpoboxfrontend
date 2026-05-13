@@ -173,36 +173,63 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 14px 14px;
-  margin-bottom: 6px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
   border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
-  background: #fafafa;
-  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
 }
 
 .pkg-checkin__row:last-child {
   margin-bottom: 0;
 }
 
-.pkg-checkin__row:hover {
-  border-color: rgba(212, 175, 55, 0.35);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+/* Same fills as PartnerStatusLegend — stronger borders + left stripe for scanability */
+.pkg-checkin__row--active {
+  background-color: #d4edda;
+  border: 2px solid #6bbf7e;
+  border-left: 10px solid #157347;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 2px 8px rgba(21, 115, 71, 0.12);
 }
 
-.pkg-checkin__row--active {
-  border-left: 4px solid #28a745;
-  padding-left: 11px;
+.pkg-checkin__row--active:hover {
+  border-color: #4fa864;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 4px 14px rgba(21, 115, 71, 0.22);
 }
 
 .pkg-checkin__row--trial {
-  border-left: 4px solid #e8c547;
-  padding-left: 11px;
+  background-color: #fff6bf;
+  border: 2px solid #e6cc4a;
+  border-left: 10px solid #b8860b;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.75) inset,
+    0 2px 8px rgba(184, 134, 11, 0.15);
+}
+
+.pkg-checkin__row--trial:hover {
+  border-color: #d4b82e;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 4px 14px rgba(184, 134, 11, 0.22);
 }
 
 .pkg-checkin__row--inactive {
-  border-left: 4px solid #e85d5d;
-  padding-left: 11px;
+  background-color: #ffd9d9;
+  border: 2px solid #f09090;
+  border-left: 10px solid #b02a37;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 2px 8px rgba(176, 42, 55, 0.14);
+}
+
+.pkg-checkin__row--inactive:hover {
+  border-color: #e56b6b;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 4px 14px rgba(176, 42, 55, 0.22);
 }
 
 .pkg-checkin__row-main {

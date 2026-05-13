@@ -29,11 +29,12 @@ const PartnerStatusLegend = () => {
     >
       <div
         style={{
-          fontSize: 10,
+          fontSize: 11,
           color: "#8a6a00",
           letterSpacing: 1,
           textTransform: "uppercase",
-          marginBottom: 6,
+          marginBottom: 8,
+          fontWeight: 700,
         }}
       >
         Customer Status Legend
@@ -51,17 +52,20 @@ const PartnerStatusLegend = () => {
             style={{
               display: "flex",
               alignItems: "center",
-              gap: 6,
-              fontSize: 11,
+              gap: 8,
+              fontSize: 12,
+              fontWeight: 500,
+              color: "#333",
             }}
           >
             <span
               style={{
-                width: 10,
-                height: 10,
+                width: 14,
+                height: 14,
                 borderRadius: 999,
                 background: item.color,
-                border: "1px solid rgba(0, 0, 0, 0.18)",
+                border: "2px solid rgba(0, 0, 0, 0.22)",
+                boxShadow: "0 1px 2px rgba(0,0,0,0.08)",
                 flexShrink: 0,
               }}
             />
