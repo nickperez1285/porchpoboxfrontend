@@ -72,19 +72,13 @@ describe("Profile", () => {
       ]
     });
 
-    onSnapshot.mockImplementation((target, onNext) => {
-      if (String(target).includes("mock-db/users/user-1/packageHistory")) {
-        onNext({
-          docs: []
-        });
+    onSnapshot.mockImplementation((target, onNext, onError) => {
+      if (String(target).includes("users/user-1/packageHistory")) {
+        onNext({ docs: [] });
       } else if (String(target).includes("partners/partner-1/packageCounts/user-1")) {
         onNext({
           exists: () => true,
-          data: () => ({
-            count: 0,
-            totalReceived: 1,
-            totalPickedUp: 1
-          })
+          data: () => ({ count: 0, totalReceived: 1, totalPickedUp: 1 })
         });
       } else {
         onNext({
@@ -94,11 +88,11 @@ describe("Profile", () => {
             status: "trial",
             phoneNumber: "555-123-4567",
             packagesCheckedIn: 1,
-            packagesDelivered: 1
+            packagesDelivered: 1,
+            referralCode: "CA120525"
           })
         });
       }
-
       return jest.fn();
     });
 
@@ -114,9 +108,9 @@ describe("Profile", () => {
       </MemoryRouter>
     );
 
-    expect(await screen.findByText("Main Street Partner")).toBeInTheDocument();
+    expect(await screen.findByText(/Main Street Partner/)).toBeInTheDocument();
 
-    const totalReceivedEl = screen.getByText("Total Received").parentElement;
+    const totalReceivedEl = screen.getByText("Received").parentElement;
     const waitingEl = screen.getByText("Waiting").parentElement;
 
     expect(within(totalReceivedEl).getByText("1")).toBeInTheDocument();

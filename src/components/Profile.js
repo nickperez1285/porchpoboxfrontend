@@ -325,27 +325,37 @@ const Profile = ({ user }) => {
         <div style={{ gridColumn: "1 / -1" }}>
           {profileData?.prefLocation?.streetAddress ? (
             <div style={{
-              background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
-              borderRadius: 16,
-              padding: "24px 28px",
+              background: "linear-gradient(135deg, #121212 0%, #1a1a1a 100%)",
+              borderRadius: 20,
+              padding: "28px 32px",
               color: "#f5f5f5",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.18)",
+              boxShadow: "0 0 0 3px #d4af37, 0 12px 40px rgba(0,0,0,0.32)",
               position: "relative",
               overflow: "hidden"
             }}>
-              <div style={{ position: "absolute", top: 0, right: 0, width: 180, height: 180, background: "radial-gradient(circle, rgba(212,175,55,0.08), transparent 70%)" }} />
+              <div style={{ position: "absolute", top: 0, right: 0, width: 220, height: 220, background: "radial-gradient(circle, rgba(212,175,55,0.13), transparent 70%)" }} />
+              <div style={{ position: "absolute", bottom: 0, left: 0, width: 140, height: 140, background: "radial-gradient(circle, rgba(212,175,55,0.07), transparent 70%)" }} />
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
                 <div>
-                  <div style={{ fontSize: 11, color: "#d4af37", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 12 }}>
-                    📦 Your Package Delivery Address
+                  <div style={{ fontSize: 11, color: "#d4af37", letterSpacing: 1.8, textTransform: "uppercase", marginBottom: 16, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ fontSize: 16 }}>📦</span> Your Package Delivery Address
                   </div>
-                  <div style={{ fontFamily: "monospace", lineHeight: 1.9, fontSize: 15 }}>
-                    <div style={{ fontWeight: 700, fontSize: 16 }}>{user.displayName || profileData?.name || "Your Name"}</div>
-                    <div style={{ color: "#d4af37" }}>c/o {profileData.prefLocation.businessName}</div>
-                    <div>{profileData.prefLocation.streetAddress}</div>
-                    <div>{[profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")}</div>
+                  <div style={{
+                    fontFamily: "monospace",
+                    lineHeight: 2,
+                    fontSize: 15,
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(212,175,55,0.25)",
+                    borderRadius: 12,
+                    padding: "14px 18px",
+                    marginBottom: 12
+                  }}>
+                    <div style={{ fontWeight: 700, fontSize: 17 }}>{user.displayName || profileData?.name || "Your Name"}</div>
+                    <div style={{ color: "#d4af37", fontWeight: 600 }}>c/o {profileData.prefLocation.businessName}</div>
+                    <div style={{ color: "#ccc" }}>{profileData.prefLocation.streetAddress}</div>
+                    <div style={{ color: "#ccc" }}>{[profileData.prefLocation.city, profileData.prefLocation.state, profileData.prefLocation.zipCode].filter(Boolean).join(", ")}</div>
                   </div>
-                  <p style={{ margin: "12px 0 0", fontSize: 12, color: "#888" }}>
+                  <p style={{ margin: 0, fontSize: 12, color: "#888" }}>
                     Use this address when placing orders online. Your packages will be held securely until you pick them up.
                   </p>
                 </div>
@@ -370,7 +380,8 @@ const Profile = ({ user }) => {
                     cursor: "pointer",
                     fontSize: 13,
                     whiteSpace: "nowrap",
-                    alignSelf: "flex-start"
+                    alignSelf: "flex-start",
+                    boxShadow: "0 4px 12px rgba(212,175,55,0.4)"
                   }}
                 >
                   📋 Copy Address
