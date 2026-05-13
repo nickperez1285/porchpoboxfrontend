@@ -110,8 +110,8 @@ describe("Profile", () => {
 
     expect(await screen.findByText(/Main Street Partner/)).toBeInTheDocument();
 
-    const totalReceivedEl = screen.getByText("Received").parentElement;
-    const waitingEl = screen.getByText("Waiting").parentElement;
+    const totalReceivedEl = screen.getAllByText("Received")[0].parentElement;
+    const waitingEl = screen.getAllByText("Waiting")[0].parentElement;
 
     expect(within(totalReceivedEl).getByText("1")).toBeInTheDocument();
     expect(within(waitingEl).getByText("0")).toBeInTheDocument();

@@ -179,10 +179,7 @@ const CustomerList = ({ vendorId, partnerLocationName, onPackagesDelivered }) =>
           if (remainingCount <= 0) {
             await setDoc(
               packageCountRef,
-              {
-                count: 0,
-                holdForResubscribe: user.status !== "active" && user.packageCount > 1
-              },
+              { count: 0, holdForResubscribe: false },
               { merge: true }
             );
           } else {
