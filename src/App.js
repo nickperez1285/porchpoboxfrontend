@@ -32,7 +32,6 @@ import ReferralForm from "./components/ReferralForm";
 import PlansPage from "./components/PlansPage";
 import About from "./components/About";
 import TermsIndex from "./components/TermsIndex";
-import PrefLocationModal from "./components/PrefLocationModal";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -120,7 +119,6 @@ function App() {
   const [userStatus, setUserStatus] = useState("");
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const [showPrefModal, setShowPrefModal] = useState(false);
   const isAdmin = user?.uid === ADMIN_UID;
 
   const loadPartnerProfile = async (currentUser) => {
@@ -159,7 +157,6 @@ function App() {
         setUserStatus(userData.status || "");
         await loadPartnerProfile(currentUser);
         // Never auto-show the pref location modal — it gets set automatically on first check-in
-        const isAdminUser = currentUser.uid === ADMIN_UID;
       } finally {
         setAuthLoading(false);
       }
