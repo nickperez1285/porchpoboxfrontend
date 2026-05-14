@@ -9,7 +9,7 @@ import {
   query,
   serverTimestamp,
   updateDoc,
-  where
+  where,
 } from "firebase/firestore";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
@@ -43,47 +43,58 @@ const Admin = () => {
       await updateDoc(doc(db, "partners", vendorId), {
         approved,
         status: approved ? "approved" : "deactivated",
-        approvedAt: approved ? serverTimestamp() : null
+        approvedAt: approved ? serverTimestamp() : null,
       });
 
       if (approved && vendor && !vendor.approved) {
         try {
-          const response = await fetch(`${API_BASE_URL}/api/notifications/partner-approved`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
+          const response = await fetch(
+            `${API_BASE_URL}/api/notifications/partner-approved`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                businessName: vendor.businessName,
+                email: vendor.email,
+                streetAddress: vendor.streetAddress,
+                city: vendor.city,
+                state: vendor.state,
+                zipCode: vendor.zipCode,
+                referredBy: vendor.referredBy || "",
+              }),
             },
-            body: JSON.stringify({
-              businessName: vendor.businessName,
-              email: vendor.email,
-              streetAddress: vendor.streetAddress,
-              city: vendor.city,
-              state: vendor.state,
-              zipCode: vendor.zipCode,
-              referredBy: vendor.referredBy || ""
-            })
-          });
+          );
 
           if (!response.ok) {
             const errorBody = await response.json().catch(() => null);
             console.error(
               "Partner approval email failed:",
-              errorBody?.message || `HTTP ${response.status}`
+              errorBody?.message || `HTTP ${response.status}`,
             );
-            setError("Partner approved, but the welcome email could not be sent.");
+            setError(
+              "Partner approved, but the welcome email could not be sent.",
+            );
           }
         } catch (emailError) {
           console.error("Partner approval email failed:", emailError);
-          setError("Partner approved, but the welcome email could not be sent.");
+          setError(
+            "Partner approved, but the welcome email could not be sent.",
+          );
         }
       }
 
       setVendors((currentVendors) =>
         currentVendors.map((vendor) =>
           vendor.id === vendorId
-            ? { ...vendor, approved, status: approved ? "approved" : "deactivated" }
-            : vendor
-        )
+            ? {
+                ...vendor,
+                approved,
+                status: approved ? "approved" : "deactivated",
+              }
+            : vendor,
+        ),
       );
     } catch (updateError) {
       console.error("Error updating vendor status:", updateError);
@@ -97,7 +108,7 @@ const Admin = () => {
     setExpandedCustomerIds((current) =>
       current.includes(customerId)
         ? current.filter((id) => id !== customerId)
-        : [...current, customerId]
+        : [...current, customerId],
     );
   };
 
@@ -105,7 +116,7 @@ const Admin = () => {
     setExpandedVendorIds((current) =>
       current.includes(vendorId)
         ? current.filter((id) => id !== vendorId)
-        : [...current, vendorId]
+        : [...current, vendorId],
     );
   };
 
@@ -114,18 +125,18 @@ const Admin = () => {
       try {
         const [customerSnapshot, vendorSnapshot] = await Promise.all([
           getDocs(collection(db, "users")),
-          getDocs(collection(db, "partners"))
+          getDocs(collection(db, "partners")),
         ]);
 
         const vendorDocs = vendorSnapshot.docs.map((entry) => ({
           id: entry.id,
-          ...entry.data()
+          ...entry.data(),
         }));
 
         const vendorPackageSnapshots = await Promise.all(
           vendorDocs.map((vendor) =>
-            getDocs(collection(db, "partners", vendor.id, "packageCounts"))
-          )
+            getDocs(collection(db, "partners", vendor.id, "packageCounts")),
+          ),
         );
 
         const customerPackageCounts = {};
@@ -155,8 +166,8 @@ const Admin = () => {
             id: entry.id,
             ...entry.data(),
             packageCount: customerPackageCounts[entry.id] || 0,
-            packageLocations: customerPackageLocations[entry.id] || []
-          }))
+            packageLocations: customerPackageLocations[entry.id] || [],
+          })),
         );
 
         setVendors(
@@ -164,26 +175,45 @@ const Admin = () => {
             ...vendor,
             packageCountTotal: vendorPackageSnapshots[index].docs.reduce(
               (sum, entry) => sum + (entry.data().count || 0),
-              0
-            )
-          }))
+              0,
+            ),
+          })),
         );
 
         // Load referrer names for vendors that have a referredBy code
         const vendorsWithReferral = vendorDocs.filter((v) => v.referredBy);
         if (vendorsWithReferral.length > 0) {
           const referrerSnap = await getDocs(
-            query(collection(db, "users"), where("referralCode", "in", vendorsWithReferral.map((v) => v.referredBy)))
+            query(
+              collection(db, "users"),
+              where(
+                "referralCode",
+                "in",
+                vendorsWithReferral.map((v) => v.referredBy),
+              ),
+            ),
           );
           const referrerMap = {};
           referrerSnap.docs.forEach((d) => {
-            referrerMap[d.data().referralCode] = d.data().name || d.data().email || "Unknown";
+            referrerMap[d.data().referralCode] =
+              d.data().name || d.data().email || "Unknown";
           });
-          setVendors((prev) => prev.map((v) => v.referredBy ? { ...v, referrerName: referrerMap[v.referredBy] || v.referredBy } : v));
+          setVendors((prev) =>
+            prev.map((v) =>
+              v.referredBy
+                ? {
+                    ...v,
+                    referrerName: referrerMap[v.referredBy] || v.referredBy,
+                  }
+                : v,
+            ),
+          );
         }
       } catch (fetchError) {
         console.error("Error loading admin data:", fetchError);
-        setError("Unable to load admin data. Firestore rules must allow your admin UID to read users and partners.");
+        setError(
+          "Unable to load admin data. Firestore rules must allow your admin UID to read users and partners.",
+        );
       } finally {
         setLoading(false);
       }
@@ -201,10 +231,12 @@ const Admin = () => {
     const unsubscribes = [];
 
     const merge = () => {
-      const all = [...signupEntries, ...Object.values(logMap).flat()].filter((e) => {
-        const t = e.timestamp?.toDate?.() || null;
-        return t && t >= startOfDay;
-      });
+      const all = [...signupEntries, ...Object.values(logMap).flat()].filter(
+        (e) => {
+          const t = e.timestamp?.toDate?.() || null;
+          return t && t >= startOfDay;
+        },
+      );
       all.sort((a, b) => {
         const ta = a.timestamp?.toDate?.() || new Date(0);
         const tb = b.timestamp?.toDate?.() || new Date(0);
@@ -222,8 +254,11 @@ const Admin = () => {
 
         const signupUnsub = onSnapshot(
           collection(db, "activityLog"),
-          (snap) => { signupEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() })); merge(); },
-          (err) => console.error("Today signup log error:", err)
+          (snap) => {
+            signupEntries = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+            merge();
+          },
+          (err) => console.error("Today signup log error:", err),
         );
         unsubscribes.push(signupUnsub);
 
@@ -233,13 +268,14 @@ const Admin = () => {
             collection(db, "partners", partnerId, "activityLog"),
             (snap) => {
               logMap[partnerId] = snap.docs.map((d) => ({
-                id: d.id, partnerId,
+                id: d.id,
+                partnerId,
                 partnerName: partnerMap[partnerId],
-                ...d.data()
+                ...d.data(),
               }));
               merge();
             },
-            (err) => console.error("Today partner log error:", err)
+            (err) => console.error("Today partner log error:", err),
           );
           unsubscribes.push(unsub);
         });
@@ -266,7 +302,7 @@ const Admin = () => {
     }
 
     return customersCopy.sort((left, right) =>
-      (left.name || "").localeCompare(right.name || "")
+      (left.name || "").localeCompare(right.name || ""),
     );
   }, [customerSortBy, customers]);
 
@@ -316,7 +352,14 @@ const Admin = () => {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px", textAlign: "center" }}>
+      <div
+        style={{
+          maxWidth: 960,
+          margin: "80px auto",
+          padding: "0 20px",
+          textAlign: "center",
+        }}
+      >
         <p style={{ color: "#888", fontSize: 16 }}>Loading admin data...</p>
       </div>
     );
@@ -325,7 +368,15 @@ const Admin = () => {
   if (error) {
     return (
       <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
-        <div style={{ background: "#fff3cd", border: "1px solid #f0c040", borderRadius: 12, padding: 20, color: "#7a5c00" }}>
+        <div
+          style={{
+            background: "#fff3cd",
+            border: "1px solid #f0c040",
+            borderRadius: 12,
+            padding: 20,
+            color: "#7a5c00",
+          }}
+        >
           {error}
         </div>
       </div>
@@ -334,9 +385,11 @@ const Admin = () => {
 
   const totalCustomerPackages = customers.reduce(
     (sum, customer) => sum + (customer.packageCount || 0),
-    0
+    0,
   );
-  const approvedVendorCount = vendors.filter((vendor) => vendor.approved).length;
+  const approvedVendorCount = vendors.filter(
+    (vendor) => vendor.approved,
+  ).length;
 
   return (
     <div style={{ maxWidth: 1180, margin: "60px auto", padding: "0 20px" }}>
@@ -347,7 +400,7 @@ const Admin = () => {
           borderRadius: 24,
           padding: "30px 28px",
           marginBottom: 24,
-          boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)"
+          boxShadow: "0 16px 36px rgba(0, 0, 0, 0.18)",
         }}
       >
         <div
@@ -356,7 +409,7 @@ const Admin = () => {
             flexWrap: "wrap",
             justifyContent: "space-between",
             gap: 20,
-            alignItems: "flex-start"
+            alignItems: "flex-start",
           }}
         >
           <div style={{ maxWidth: 560 }}>
@@ -365,12 +418,14 @@ const Admin = () => {
                 color: "#d4af37",
                 fontSize: 12,
                 letterSpacing: 1.2,
-                textTransform: "uppercase"
+                textTransform: "uppercase",
               }}
             >
               Admin Portal
             </div>
-            <h2 style={{ margin: "10px 0 8px" }}>Customer and Partner Oversight</h2>
+            <h2 style={{ margin: "10px 0 8px" }}>
+              Customer and Partner Oversight
+            </h2>
             <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
               Review all customer and partner records, monitor package volume,
               and manage partner approval status from a single dashboard.
@@ -382,7 +437,7 @@ const Admin = () => {
               display: "grid",
               gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))",
               gap: 14,
-              flex: "1 1 360px"
+              flex: "1 1 360px",
             }}
           >
             <div
@@ -390,55 +445,122 @@ const Admin = () => {
                 background: "rgba(255, 255, 255, 0.06)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 16,
-                padding: 16
+                padding: 16,
               }}
             >
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  color: "#c8c8c8",
+                }}
+              >
                 Customers
               </div>
-              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{customers.length}</div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+                {customers.length}
+              </div>
             </div>
             <div
               style={{
                 background: "rgba(255, 255, 255, 0.06)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 16,
-                padding: 16
+                padding: 16,
               }}
             >
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  color: "#c8c8c8",
+                }}
+              >
                 Approved Partners
               </div>
-              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{approvedVendorCount}</div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+                {approvedVendorCount}
+              </div>
             </div>
             <div
               style={{
                 background: "rgba(255, 255, 255, 0.06)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
                 borderRadius: 16,
-                padding: 16
+                padding: 16,
               }}
             >
-              <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 1, color: "#c8c8c8" }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  textTransform: "uppercase",
+                  letterSpacing: 1,
+                  color: "#c8c8c8",
+                }}
+              >
                 Packages
               </div>
-              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>{totalCustomerPackages}</div>
+              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+                {totalCustomerPackages}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div style={{ marginBottom: 20, display: "flex", gap: 12, alignItems: "center" }}>
-        <Link to="/admin/activity-log" style={{ padding: "8px 16px", background: "rgba(255,255,255,0.08)", color: "#d4af37", borderRadius: 8, fontWeight: 600, fontSize: 13, border: "1px solid rgba(212,175,55,0.3)", textDecoration: "none" }}>
+      <div
+        style={{
+          marginBottom: 20,
+          display: "flex",
+          gap: 12,
+          alignItems: "center",
+        }}
+      >
+        <Link
+          to="/admin/activity-log"
+          style={{
+            padding: "8px 16px",
+            background: "rgba(255,255,255,0.08)",
+            color: "#d4af37",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 13,
+            border: "1px solid rgba(212,175,55,0.3)",
+            textDecoration: "none",
+          }}
+        >
           📋 Full Activity Log
         </Link>
-        <Link to="/admin/payouts" style={{ padding: "8px 16px", background: "rgba(255,255,255,0.08)", color: "#d4af37", borderRadius: 8, fontWeight: 600, fontSize: 13, border: "1px solid rgba(212,175,55,0.3)", textDecoration: "none" }}>
+        <Link
+          to="/admin/payouts"
+          style={{
+            padding: "8px 16px",
+            background: "rgba(255,255,255,0.08)",
+            color: "#d4af37",
+            borderRadius: 8,
+            fontWeight: 600,
+            fontSize: 13,
+            border: "1px solid rgba(212,175,55,0.3)",
+            textDecoration: "none",
+          }}
+        >
           💰 Payout Management
         </Link>
         <button
           type="button"
           onClick={handleLogout}
-          style={{ padding: "8px 16px", background: "#f5f5f5", color: "#555", borderRadius: 8, border: "1px solid #ddd", cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+          style={{
+            padding: "8px 16px",
+            background: "#f5f5f5",
+            color: "#555",
+            borderRadius: 8,
+            border: "1px solid #ddd",
+            cursor: "pointer",
+            fontWeight: 600,
+            fontSize: 13,
+          }}
         >
           Logout
         </button>
@@ -449,7 +571,7 @@ const Admin = () => {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
           gap: 24,
-          alignItems: "start"
+          alignItems: "start",
         }}
       >
         <section
@@ -458,7 +580,7 @@ const Admin = () => {
             border: "1px solid rgba(0, 0, 0, 0.08)",
             borderRadius: 20,
             padding: 24,
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
           }}
         >
           <div style={{ marginBottom: 18 }}>
@@ -467,14 +589,21 @@ const Admin = () => {
                 fontSize: 12,
                 color: "#8a6a00",
                 letterSpacing: 1,
-                textTransform: "uppercase"
+                textTransform: "uppercase",
               }}
             >
               Customers
             </div>
             <h3 style={{ margin: "8px 0 0" }}>Customer Accounts</h3>
           </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 18 }}>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 10,
+              marginBottom: 18,
+            }}
+          >
             <button
               type="button"
               onClick={() => setCustomerSortBy("name")}
@@ -483,7 +612,7 @@ const Admin = () => {
                 color: customerSortBy === "name" ? "#fff" : "#111",
                 border: "1px solid #ccc",
                 borderRadius: 999,
-                padding: "8px 14px"
+                padding: "8px 14px",
               }}
             >
               Sort by Name
@@ -492,11 +621,12 @@ const Admin = () => {
               type="button"
               onClick={() => setCustomerSortBy("packageCount")}
               style={{
-                background: customerSortBy === "packageCount" ? "#111" : "#f0f0f0",
+                background:
+                  customerSortBy === "packageCount" ? "#111" : "#f0f0f0",
                 color: customerSortBy === "packageCount" ? "#fff" : "#111",
                 border: "1px solid #ccc",
                 borderRadius: 999,
-                padding: "8px 14px"
+                padding: "8px 14px",
               }}
             >
               Sort by Package Count
@@ -511,7 +641,7 @@ const Admin = () => {
                 padding: 0,
                 margin: 0,
                 maxHeight: 720,
-                overflowY: "auto"
+                overflowY: "auto",
               }}
             >
               {sortedCustomers.map((customer) => (
@@ -522,38 +652,113 @@ const Admin = () => {
                     border: "1px solid #e8e8e8",
                     borderRadius: 12,
                     marginBottom: 10,
-                    background: getCustomerBackgroundColor(customer)
+                    background: getCustomerBackgroundColor(customer),
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 15 }}>{customer.name || "Unnamed user"}</div>
-                      <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{customer.email || ""}</div>
+                      <div style={{ fontWeight: 600, fontSize: 15 }}>
+                        {customer.name || "Unnamed user"}
+                      </div>
+                      <div
+                        style={{ fontSize: 12, color: "#666", marginTop: 2 }}
+                      >
+                        {customer.email || ""}
+                      </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
                       {customer.packageCount > 0 && (
-                        <span style={{ background: "#121212", color: "#fff", borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>
+                        <span
+                          style={{
+                            background: "#121212",
+                            color: "#fff",
+                            borderRadius: 999,
+                            padding: "3px 10px",
+                            fontSize: 12,
+                            fontWeight: 700,
+                          }}
+                        >
                           📦 {customer.packageCount}
                         </span>
                       )}
                       <button
                         type="button"
                         onClick={() => toggleCustomerExpanded(customer.id)}
-                        style={{ padding: "4px 10px", border: "1px solid #ccc", background: "#f5f5f5", borderRadius: 6, color: "#444", cursor: "pointer", fontSize: 12 }}
+                        style={{
+                          padding: "4px 10px",
+                          border: "1px solid #ccc",
+                          background: "#f5f5f5",
+                          borderRadius: 6,
+                          color: "#444",
+                          cursor: "pointer",
+                          fontSize: 12,
+                        }}
                       >
-                        {expandedCustomerIds.includes(customer.id) ? "Hide ▲" : "Info ▼"}
+                        {expandedCustomerIds.includes(customer.id)
+                          ? "Hide ▲"
+                          : "Info ▼"}
                       </button>
                     </div>
                   </div>
                   {expandedCustomerIds.includes(customer.id) && (
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 13, color: "#444" }}>
-                      <div><span style={{ color: "#888" }}>Status:</span> {customer.status || "inactive"}</div>
-                      <div><span style={{ color: "#888" }}>Days Left:</span> {getDaysLeft(customer.subscriptionEndsAt)}</div>
-                      <div><span style={{ color: "#888" }}>Subscribed:</span> {formatDate(customer.subscribedAt)}</div>
-                      <div><span style={{ color: "#888" }}>Ends:</span> {formatDate(customer.subscriptionEndsAt)}</div>
-                      <div><span style={{ color: "#888" }}>Phone:</span> {customer.phoneNumber || "—"}</div>
-                      <div><span style={{ color: "#888" }}>Location:</span> {customer.packageLocations?.length ? customer.packageLocations.join(", ") : "—"}</div>
-                      <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#888" }}>Address:</span> {[customer.streetAddress, customer.city, customer.state, customer.zipCode].filter(Boolean).join(", ") || "—"}</div>
+                    <div
+                      style={{
+                        marginTop: 12,
+                        paddingTop: 12,
+                        borderTop: "1px solid rgba(0,0,0,0.08)",
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "6px 16px",
+                        fontSize: 13,
+                        color: "#444",
+                      }}
+                    >
+                      <div>
+                        <span style={{ color: "#888" }}>Status:</span>{" "}
+                        {customer.status || "inactive"}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Days Left:</span>{" "}
+                        {getDaysLeft(customer.subscriptionEndsAt)}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Subscribed:</span>{" "}
+                        {formatDate(customer.subscribedAt)}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Ends:</span>{" "}
+                        {formatDate(customer.subscriptionEndsAt)}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Phone:</span>{" "}
+                        {customer.phoneNumber || "—"}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Location:</span>{" "}
+                        {customer.packageLocations?.length
+                          ? customer.packageLocations.join(", ")
+                          : "—"}
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <span style={{ color: "#888" }}>Address:</span>{" "}
+                        {[
+                          customer.streetAddress,
+                          customer.city,
+                          customer.state,
+                          customer.zipCode,
+                        ]
+                          .filter(Boolean)
+                          .join(", ") || "—"}
+                      </div>
                     </div>
                   )}
                 </li>
@@ -568,7 +773,7 @@ const Admin = () => {
             border: "1px solid rgba(0, 0, 0, 0.08)",
             borderRadius: 20,
             padding: 24,
-            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)"
+            boxShadow: "0 12px 28px rgba(0, 0, 0, 0.08)",
           }}
         >
           <div style={{ marginBottom: 18 }}>
@@ -577,7 +782,7 @@ const Admin = () => {
                 fontSize: 12,
                 color: "#8a6a00",
                 letterSpacing: 1,
-                textTransform: "uppercase"
+                textTransform: "uppercase",
               }}
             >
               Partners
@@ -593,7 +798,7 @@ const Admin = () => {
                 padding: 0,
                 margin: 0,
                 maxHeight: 720,
-                overflowY: "auto"
+                overflowY: "auto",
               }}
             >
               {vendors.map((vendor) => (
@@ -605,71 +810,211 @@ const Admin = () => {
                     borderRadius: 12,
                     marginBottom: 10,
                     background: vendor.approved ? "#fff" : "#fff8f8",
-                    borderLeft: !vendor.approved && vendor.status !== "deactivated" ? "3px solid #f0a500" : vendor.status === "deactivated" ? "3px solid #dc3545" : "1px solid #e8e8e8"
+                    borderLeft:
+                      !vendor.approved && vendor.status !== "deactivated"
+                        ? "3px solid #f0a500"
+                        : vendor.status === "deactivated"
+                          ? "3px solid #dc3545"
+                          : "1px solid #e8e8e8",
                   }}
                 >
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 15 }}>{vendor.businessName || "Unnamed partner"}</div>
+                      <div style={{ fontWeight: 600, fontSize: 15 }}>
+                        {vendor.businessName || "Unnamed partner"}
+                      </div>
                       {vendor.referrerName && (
-                        <div style={{ fontSize: 12, color: "#6d28d9", marginTop: 2 }}>
-                          <span style={{ fontWeight: 600 }}>Referrer:</span> {vendor.referrerName}
+                        <div
+                          style={{
+                            fontSize: 12,
+                            color: "#6d28d9",
+                            marginTop: 2,
+                          }}
+                        >
+                          <span style={{ fontWeight: 600 }}>Referrer:</span>{" "}
+                          {vendor.referrerName}
                         </div>
                       )}
                       <div style={{ fontSize: 12, marginTop: 2 }}>
-                        <span style={{
-                          background: vendor.status === "deactivated" ? "#ffd9d9" : vendor.approved ? "#d4edda" : "#fff3cd",
-                          color: vendor.status === "deactivated" ? "#c00" : vendor.approved ? "#1a7f37" : "#856404",
-                          borderRadius: 999, padding: "2px 8px", fontSize: 11, fontWeight: 600
-                        }}>
-                          {vendor.status === "deactivated" ? "Deactivated" : vendor.approved ? "Approved" : "Pending Review"}
+                        <span
+                          style={{
+                            background:
+                              vendor.status === "deactivated"
+                                ? "#ffd9d9"
+                                : vendor.approved
+                                  ? "#d4edda"
+                                  : "#fff3cd",
+                            color:
+                              vendor.status === "deactivated"
+                                ? "#c00"
+                                : vendor.approved
+                                  ? "#1a7f37"
+                                  : "#856404",
+                            borderRadius: 999,
+                            padding: "2px 8px",
+                            fontSize: 11,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {vendor.status === "deactivated"
+                            ? "Deactivated"
+                            : vendor.approved
+                              ? "Approved"
+                              : "Pending Review"}
                         </span>
                       </div>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <div
+                      style={{ display: "flex", alignItems: "center", gap: 10 }}
+                    >
                       {vendor.packageCountTotal > 0 && (
-                        <span style={{ background: "#121212", color: "#fff", borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 700 }}>
+                        <span
+                          style={{
+                            background: "#121212",
+                            color: "#fff",
+                            borderRadius: 999,
+                            padding: "3px 10px",
+                            fontSize: 12,
+                            fontWeight: 700,
+                          }}
+                        >
                           📦 {vendor.packageCountTotal}
                         </span>
                       )}
-                      <Link to={`/admin/partner/${vendor.id}`} style={{ padding: "4px 10px", border: "1px solid #0b57d0", borderRadius: 6, color: "#0b57d0", fontSize: 12, fontWeight: 600, textDecoration: "none" }}>
+                      <Link
+                        to={`/admin/partner/${vendor.id}`}
+                        style={{
+                          padding: "4px 10px",
+                          border: "1px solid #0b57d0",
+                          borderRadius: 6,
+                          color: "#0b57d0",
+                          fontSize: 12,
+                          fontWeight: 600,
+                          textDecoration: "none",
+                        }}
+                      >
                         Portal
                       </Link>
                       <button
                         type="button"
                         onClick={() => toggleVendorExpanded(vendor.id)}
-                        style={{ padding: "4px 10px", border: "1px solid #ccc", background: "#f5f5f5", borderRadius: 6, color: "#444", cursor: "pointer", fontSize: 12 }}
+                        style={{
+                          padding: "4px 10px",
+                          border: "1px solid #ccc",
+                          background: "#f5f5f5",
+                          borderRadius: 6,
+                          color: "#444",
+                          cursor: "pointer",
+                          fontSize: 12,
+                        }}
                       >
-                        {expandedVendorIds.includes(vendor.id) ? "Hide ▲" : "Info ▼"}
+                        {expandedVendorIds.includes(vendor.id)
+                          ? "Hide ▲"
+                          : "Info ▼"}
                       </button>
                     </div>
                   </div>
                   {expandedVendorIds.includes(vendor.id) && (
-                    <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid rgba(0,0,0,0.08)", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "6px 16px", fontSize: 13, color: "#444" }}>
-                      <div><span style={{ color: "#888" }}>Email:</span> {vendor.email || "—"}</div>
-                      <div><span style={{ color: "#888" }}>Phone:</span> {vendor.phoneNumber || "—"}</div>
-                      <div><span style={{ color: "#888" }}>Hours:</span> {vendor.storeHours || "—"}</div>
-                      <div style={{ gridColumn: "1 / -1" }}><span style={{ color: "#888" }}>Address:</span> {[vendor.streetAddress, vendor.city, vendor.state, vendor.zipCode].filter(Boolean).join(", ") || "—"}</div>
+                    <div
+                      style={{
+                        marginTop: 12,
+                        paddingTop: 12,
+                        borderTop: "1px solid rgba(0,0,0,0.08)",
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "6px 16px",
+                        fontSize: 13,
+                        color: "#444",
+                      }}
+                    >
+                      <div>
+                        <span style={{ color: "#888" }}>Email:</span>{" "}
+                        {vendor.email || "—"}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Phone:</span>{" "}
+                        {vendor.phoneNumber || "—"}
+                      </div>
+                      <div>
+                        <span style={{ color: "#888" }}>Hours:</span>{" "}
+                        {vendor.storeHours || "—"}
+                      </div>
+                      <div style={{ gridColumn: "1 / -1" }}>
+                        <span style={{ color: "#888" }}>Address:</span>{" "}
+                        {[
+                          vendor.streetAddress,
+                          vendor.city,
+                          vendor.state,
+                          vendor.zipCode,
+                        ]
+                          .filter(Boolean)
+                          .join(", ") || "—"}
+                      </div>
                     </div>
                   )}
                   <div style={{ marginTop: 12, display: "flex", gap: 8 }}>
                     {!vendor.approved ? (
                       <button
                         type="button"
-                        onClick={() => updateVendorApproval(vendor.id, true)}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Activate ${vendor.businessName || "this partner"} and send the welcome instructions email?`,
+                            )
+                          ) {
+                            updateVendorApproval(vendor.id, true);
+                          }
+                        }}
                         disabled={updatingVendorId === vendor.id}
-                        style={{ padding: "7px 16px", background: "#1a7f37", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+                        style={{
+                          padding: "7px 16px",
+                          background: "#1a7f37",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 8,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          fontSize: 13,
+                        }}
                       >
-                        {updatingVendorId === vendor.id ? "Updating..." : "✓ Approve"}
+                        {updatingVendorId === vendor.id
+                          ? "Updating..."
+                          : "✓ Activate"}
                       </button>
                     ) : (
                       <button
                         type="button"
-                        onClick={() => updateVendorApproval(vendor.id, false)}
+                        onClick={() => {
+                          if (
+                            window.confirm(
+                              `Are you sure you want to deactivate ${vendor.businessName || "this partner"}? They will no longer be able to access the portal.`,
+                            )
+                          ) {
+                            updateVendorApproval(vendor.id, false);
+                          }
+                        }}
                         disabled={updatingVendorId === vendor.id}
-                        style={{ padding: "7px 16px", background: "#dc3545", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
+                        style={{
+                          padding: "7px 16px",
+                          background: "#dc3545",
+                          color: "#fff",
+                          border: "none",
+                          borderRadius: 8,
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          fontSize: 13,
+                        }}
                       >
-                        {updatingVendorId === vendor.id ? "Updating..." : "Deactivate"}
+                        {updatingVendorId === vendor.id
+                          ? "Updating..."
+                          : "Deactivate"}
                       </button>
                     )}
                   </div>
@@ -687,27 +1032,68 @@ const Admin = () => {
           border: "1px solid rgba(0,0,0,0.08)",
           borderRadius: 20,
           padding: 24,
-          boxShadow: "0 12px 28px rgba(0,0,0,0.08)"
+          boxShadow: "0 12px 28px rgba(0,0,0,0.08)",
         }}
       >
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 18, flexWrap: "wrap", gap: 12 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 18,
+            flexWrap: "wrap",
+            gap: 12,
+          }}
+        >
           <div>
-            <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase" }}>Live</div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#8a6a00",
+                letterSpacing: 1,
+                textTransform: "uppercase",
+              }}
+            >
+              Live
+            </div>
             <h3 style={{ margin: "6px 0 0" }}>Today's Activity</h3>
           </div>
-          <Link to="/admin/activity-log" style={{ fontSize: 14, color: "#0b57d0", fontWeight: 600 }}>
+          <Link
+            to="/admin/activity-log"
+            style={{ fontSize: 14, color: "#0b57d0", fontWeight: 600 }}
+          >
             View Complete Log →
           </Link>
         </div>
         {todayEntries.length === 0 ? (
-          <p style={{ color: "#888", margin: 0 }}>No activity recorded today yet.</p>
+          <p style={{ color: "#888", margin: 0 }}>
+            No activity recorded today yet.
+          </p>
         ) : (
           <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+            <table
+              style={{
+                width: "100%",
+                borderCollapse: "collapse",
+                fontSize: 14,
+              }}
+            >
               <thead>
                 <tr style={{ background: "#f8f5ea", textAlign: "left" }}>
                   {["Time", "Type", "Partner", "User", "Packages"].map((h) => (
-                    <th key={h} style={{ padding: "10px 14px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>{h}</th>
+                    <th
+                      key={h}
+                      style={{
+                        padding: "10px 14px",
+                        fontWeight: 600,
+                        color: "#8a6a00",
+                        textTransform: "uppercase",
+                        fontSize: 11,
+                        letterSpacing: 1,
+                      }}
+                    >
+                      {h}
+                    </th>
                   ))}
                 </tr>
               </thead>
@@ -715,29 +1101,100 @@ const Admin = () => {
                 {todayEntries.map((entry, i) => {
                   const isSignup = entry.type === "signup";
                   const typeColors = {
-                    "check-in": { bg: "#e6f4ea", color: "#1a7f37", label: "Check In" },
-                    "delivery": { bg: "#fff3cd", color: "#856404", label: "Delivered" },
-                    "signup":   { bg: "#e8f0fe", color: "#1a56db", label: "Sign Up" },
-                    "subscription": { bg: "#f3e8ff", color: "#6d28d9", label: "Subscription" }
+                    "check-in": {
+                      bg: "#e6f4ea",
+                      color: "#1a7f37",
+                      label: "Check In",
+                    },
+                    delivery: {
+                      bg: "#fff3cd",
+                      color: "#856404",
+                      label: "Delivered",
+                    },
+                    signup: {
+                      bg: "#e8f0fe",
+                      color: "#1a56db",
+                      label: "Sign Up",
+                    },
+                    subscription: {
+                      bg: "#f3e8ff",
+                      color: "#6d28d9",
+                      label: "Subscription",
+                    },
                   };
-                  const ts = typeColors[entry.type] || { bg: "#f0f0f0", color: "#444", label: entry.type };
-                  const time = entry.timestamp?.toDate ? entry.timestamp.toDate().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "—";
+                  const ts = typeColors[entry.type] || {
+                    bg: "#f0f0f0",
+                    color: "#444",
+                    label: entry.type,
+                  };
+                  const time = entry.timestamp?.toDate
+                    ? entry.timestamp.toDate().toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })
+                    : "—";
                   return (
-                    <tr key={`${entry.partnerId || "g"}-${entry.id}`} style={{ borderTop: "1px solid #eee", background: i % 2 === 0 ? "#fff" : "#fafafa" }}>
-                      <td style={{ padding: "10px 14px", color: "#555", whiteSpace: "nowrap" }}>{time}</td>
-                      <td style={{ padding: "10px 14px" }}>
-                        <span style={{ background: ts.bg, color: ts.color, borderRadius: 999, padding: "3px 10px", fontSize: 12, fontWeight: 600 }}>{ts.label}</span>
+                    <tr
+                      key={`${entry.partnerId || "g"}-${entry.id}`}
+                      style={{
+                        borderTop: "1px solid #eee",
+                        background: i % 2 === 0 ? "#fff" : "#fafafa",
+                      }}
+                    >
+                      <td
+                        style={{
+                          padding: "10px 14px",
+                          color: "#555",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {time}
                       </td>
                       <td style={{ padding: "10px 14px" }}>
-                        {isSignup ? <span style={{ color: "#aaa" }}>—</span> : (
-                          <Link to={`/admin/partner/${entry.partnerId}`} style={{ color: "#0b57d0", fontWeight: 600 }}>{entry.partnerName}</Link>
+                        <span
+                          style={{
+                            background: ts.bg,
+                            color: ts.color,
+                            borderRadius: 999,
+                            padding: "3px 10px",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}
+                        >
+                          {ts.label}
+                        </span>
+                      </td>
+                      <td style={{ padding: "10px 14px" }}>
+                        {isSignup ? (
+                          <span style={{ color: "#aaa" }}>—</span>
+                        ) : (
+                          <Link
+                            to={`/admin/partner/${entry.partnerId}`}
+                            style={{ color: "#0b57d0", fontWeight: 600 }}
+                          >
+                            {entry.partnerName}
+                          </Link>
                         )}
                       </td>
                       <td style={{ padding: "10px 14px" }}>
-                        <div style={{ fontWeight: 600 }}>{isSignup ? entry.userName : entry.customerName || "Unknown"}</div>
-                        <div style={{ fontSize: 12, color: "#888" }}>{isSignup ? entry.userEmail : entry.customerEmail}</div>
+                        <div style={{ fontWeight: 600 }}>
+                          {isSignup
+                            ? entry.userName
+                            : entry.customerName || "Unknown"}
+                        </div>
+                        <div style={{ fontSize: 12, color: "#888" }}>
+                          {isSignup ? entry.userEmail : entry.customerEmail}
+                        </div>
                       </td>
-                      <td style={{ padding: "10px 14px", color: isSignup ? "#aaa" : "#111", fontWeight: 600 }}>{isSignup ? "—" : entry.packageCount}</td>
+                      <td
+                        style={{
+                          padding: "10px 14px",
+                          color: isSignup ? "#aaa" : "#111",
+                          fontWeight: 600,
+                        }}
+                      >
+                        {isSignup ? "—" : entry.packageCount}
+                      </td>
                     </tr>
                   );
                 })}
