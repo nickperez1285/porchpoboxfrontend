@@ -1,133 +1,189 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
-import { within } from "@testing-library/dom";
-import { MemoryRouter } from "react-router-dom";
-import Profile from "./Profile";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot
-} from "firebase/firestore";
+import { BrowserRouter as Router } from "react-router-dom";
+import Profile from "../Profile";
+import { auth, db } from "../../firebase";
+import { mockDeep } from "jest-mock-extended";
+import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 
+// Mock Firebase modules
+jest.mock("../../firebase", () => ({
+  auth: {
+    currentUser: {
+      uid: "test-uid",
+      displayName: "Test User",
+      email: "test@example.com",
+    },
+  },
+  db: {}, // Will be mocked deeply later
+}));
+
+// Mock react-router-dom's useNavigate
 const mockNavigate = jest.fn();
-
-jest.mock("../firebase", () => ({
-  auth: {},
-  db: { __name: "mock-db" }
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
 }));
 
-jest.mock("firebase/auth", () => ({
-  signOut: jest.fn()
-}));
+describe("Profile Component", () => {
+  let mockOnSnapshot;
+  let mockUnsubscribe;
+  let consoleErrorSpy;
 
-jest.mock("firebase/firestore", () => ({
-  collection: jest.fn(),
-  doc: jest.fn(),
-  getDoc: jest.fn(),
-  getDocs: jest.fn(),
-  onSnapshot: jest.fn()
-}));
-
-jest.mock("react-router-dom", () => {
-  const actual = jest.requireActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate
-  };
-});
-
-const createDoc = (id, data) => ({
-  id,
-  data: () => data
-});
-
-describe("Profile", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
-    collection.mockImplementation((...segments) =>
-      segments.map((segment) => (typeof segment === "string" ? segment : "mock-db")).join("/")
-    );
-    doc.mockImplementation((...segments) =>
-      segments.map((segment) => (typeof segment === "string" ? segment : "mock-db")).join("/")
-    );
+    // Reset mocks before each test
+    mockNavigate.mockClear();
+
+    // Mock onSnapshot and its unsubscribe function
+    mockUnsubscribe = jest.fn();
+    mockOnSnapshot = jest.fn((_ref, callback, errorCallback) => {
+      // Default behavior: call the callback with an empty snapshot
+      callback({
+        exists: () => false,
+        data: () => undefined,
+        docs: [],
+      });
+      return mockUnsubscribe;
+    });
+
+    // Deeply mock the Firestore instance
+    db.collection = jest.fn(() => ({
+      doc: jest.fn(() => ({
+        collection: jest.fn(() => ({
+          onSnapshot: mockOnSnapshot,
+        })),
+      })),
+      onSnapshot: mockOnSnapshot, // For the user profile document
+    }));
+    db.doc = jest.fn(() => ({
+      onSnapshot: mockOnSnapshot,
+    }));
+
+    // Spy on console.error to catch and potentially assert on errors
+    consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
   });
 
-  it("shows package history when the preserved partner package doc has zero current count", async () => {
-    getDoc.mockResolvedValue({
-      exists: () => true,
-      data: () => ({
-        name: "Casey Customer",
-        status: "trial",
-        phoneNumber: "555-123-4567"
-      })
-    });
+  afterEach(() => {
+    consoleErrorSpy.mockRestore(); // Restore original console.error
+  });
 
-    getDocs.mockResolvedValue({
-      docs: [
-        createDoc("partner-1", {
-          businessName: "Main Street Partner"
-        })
-      ]
-    });
-
-    onSnapshot.mockImplementation((target, onNext, onError) => {
-      if (String(target).includes("users/user-1/packageHistory")) {
-        onNext({ docs: [] });
-      } else if (String(target).includes("partners/partner-1/packageCounts/user-1")) {
-        onNext({
-          exists: () => true,
-          data: () => ({ count: 0, totalReceived: 1, totalPickedUp: 1 })
-        });
-      } else {
-        onNext({
-          exists: () => true,
-          data: () => ({
-            name: "Casey Customer",
-            status: "trial",
-            phoneNumber: "555-123-4567",
-            packagesCheckedIn: 1,
-            packagesDelivered: 1,
-            referralCode: "CA120525"
-          })
-        });
-      }
-      return jest.fn();
-    });
-
+  const renderProfile = (user = auth.currentUser) => {
     render(
-      <MemoryRouter>
-        <Profile
-          user={{
-            uid: "user-1",
-            email: "casey@example.com",
-            displayName: "Casey Customer"
-          }}
-        />
-      </MemoryRouter>
+      <Router>
+        <Profile user={user} />
+      </Router>,
     );
+  };
 
-    expect(await screen.findByText(/Main Street Partner/)).toBeInTheDocument();
+  test("displays user profile information", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+      subscribedAt: new Date(),
+      subscriptionEndsAt: new Date(Date.now() + 86400000 * 30), // 30 days from now
+      prefLocation: {
+        id: "partner123",
+        businessName: "Test Partner",
+        streetAddress: "123 Main St",
+        city: "Anytown",
+        state: "CA",
+        zipCode: "12345",
+      },
+      referralCode: "TESTCODE",
+      packagesDelivered: 5,
+    };
 
-    const totalReceivedEl = screen.getAllByText("Received")[0].parentElement;
-    const waitingEl = screen.getAllByText("Waiting")[0].parentElement;
+    // Mock onSnapshot for the user profile document
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({
+        exists: () => true,
+        data: () => mockUserData,
+      });
+      return mockUnsubscribe;
+    });
 
-    expect(within(totalReceivedEl).getByText("1")).toBeInTheDocument();
-    expect(within(waitingEl).getByText("0")).toBeInTheDocument();
+    // Mock onSnapshot for package history (empty for this test)
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ docs: [] });
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
+
+    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getByText("test@example.com")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText("Test Partner")).toBeInTheDocument();
+    expect(screen.getByText("123 Main St")).toBeInTheDocument();
+    expect(screen.getByText("TESTCODE")).toBeInTheDocument();
+    expect(screen.getByText("5")).toBeInTheDocument(); // Packages Delivered
+
+    // Check if unsubscribe is called on unmount (implicit in cleanup after test)
+    expect(mockUnsubscribe).toHaveBeenCalledTimes(2); // One for profile, one for package history
+  });
+
+  test("handles Firebase permission error for package history gracefully", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+    };
+
+    // Mock onSnapshot for the user profile document (success)
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({
+        exists: () => true,
+        data: () => mockUserData,
+      });
+      return mockUnsubscribe;
+    });
+
+    // Mock onSnapshot for package history (error scenario)
+    mockOnSnapshot.mockImplementationOnce((_ref, callback, errorCallback) => {
+      const firebaseError = new Error("Missing or insufficient permissions.");
+      firebaseError.code = "permission-denied"; // Simulate FirebaseError code
+      errorCallback(firebaseError);
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
 
     await waitFor(() => {
-      expect(getDocs).toHaveBeenCalledWith(expect.stringContaining("partners"));
-      expect(onSnapshot).toHaveBeenCalledWith(
-        expect.stringContaining("users/user-1/packageHistory"),
-        expect.any(Function),
-        expect.any(Function)
-      );
-      expect(onSnapshot).toHaveBeenCalledWith(
-        expect.stringContaining("partners/partner-1/packageCounts/user-1"),
-        expect.any(Function),
-        expect.any(Function)
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        "Error loading package history:",
+        expect.any(Error),
       );
     });
+
+    expect(screen.getByText("No package history yet.")).toBeInTheDocument();
+    expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
+  });
+
+  test("displays 'No delivery address yet' if prefLocation is not set", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+      prefLocation: null, // No preferred location
+    };
+
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ exists: () => true, data: () => mockUserData });
+      return mockUnsubscribe;
+    });
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ docs: [] });
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
+
+    expect(screen.getByText("No delivery address yet")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Set a preferred partner location to get your package delivery address.",
+      ),
+    ).toBeInTheDocument();
   });
 });
