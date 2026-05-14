@@ -335,14 +335,15 @@ const Profile = ({ user }) => {
                 <div>
                   <div
                     style={{
-                      fontSize: 11,
+                      fontSize: 14,
                       color: "#d4af37",
-                      letterSpacing: 1.8,
+                      letterSpacing: 2,
                       textTransform: "uppercase",
-                      marginBottom: 16,
+                      marginBottom: 18,
                       display: "flex",
                       alignItems: "center",
                       gap: 8,
+                      fontWeight: 800,
                     }}
                   >
                     <span>📦</span> Your Package Delivery Address
@@ -351,16 +352,16 @@ const Profile = ({ user }) => {
                     style={{
                       fontFamily: "'Courier New', monospace",
                       lineHeight: 2,
-                      fontSize: 15,
-                      background: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(212,175,55,0.3)",
+                      fontSize: 17,
+                      background: "rgba(255,255,255,0.08)",
+                      border: "1px solid rgba(212,175,55,0.5)",
                       borderRadius: 12,
                       padding: "16px 20px",
                       marginBottom: 14,
                     }}
                   >
                     <div
-                      style={{ fontWeight: 700, fontSize: 17, color: "#fff" }}
+                      style={{ fontWeight: 800, fontSize: 19, color: "#fff" }}
                     >
                       {user.displayName || profileData?.name || "Your Name"}
                     </div>
