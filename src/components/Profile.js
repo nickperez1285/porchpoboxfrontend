@@ -1,7 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  onSnapshot,
+  query,
+  where,
+} from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
 
@@ -92,100 +99,34 @@ const Profile = ({ user }) => {
     const subscribeToPackageHistory = async () => {
       setPackagesLoading(true);
       try {
-        const partnersSnapshot = await getDocs(collection(db, "partners"));
-        if (isCancelled) return () => {};
-
-        const partnersList = partnersSnapshot.docs.map((entry) => ({
-          id: entry.id,
-          ...entry.data(),
-        }));
-        const partnerHistoryMap = new Map();
-        const userHistoryMap = new Map();
-        let userHistoryInitialized = false;
-
-        const syncPackageHistory = () => {
-          const nextHistory = [];
-          partnersList.forEach((partner) => {
-            const userOwnedHistory = userHistoryMap.get(partner.id);
-            const partnerOwnedHistory = partnerHistoryMap.get(partner.id);
-            const historyEntry = userOwnedHistory || partnerOwnedHistory;
-            if (historyEntry) {
-              nextHistory.push({
-                partnerId: partner.id,
-                partnerName:
-                  historyEntry.partnerName ||
-                  partner.businessName ||
-                  "Unknown Partner",
-                totalReceived: Number(historyEntry.totalReceived) || 0,
-                totalPickedUp: Number(historyEntry.totalPickedUp) || 0,
-                currentWaiting: partnerOwnedHistory
-                  ? Number(partnerOwnedHistory.currentWaiting) || 0
-                  : Number(historyEntry.currentWaiting) || 0,
-              });
-            }
-          });
-          setPackageHistory(nextHistory);
-          if (userHistoryInitialized) setPackagesLoading(false);
-        };
-
-        const partnerUnsubscribes = partnersList.map((partner) =>
-          onSnapshot(
-            doc(db, "partners", partner.id, "packageCounts", user.uid),
-            (snapshot) => {
-              if (snapshot.exists()) {
-                const data = snapshot.data();
-                partnerHistoryMap.set(partner.id, {
-                  partnerName: partner.businessName || "Unknown Partner",
-                  totalReceived: Number(data.totalReceived) || 0,
-                  totalPickedUp: Number(data.totalPickedUp) || 0,
-                  currentWaiting: Number(data.count) || 0,
-                });
-              } else {
-                partnerHistoryMap.delete(partner.id);
-              }
-              if (!isCancelled) syncPackageHistory();
-            },
-            (error) => {
-              if (error?.code !== "permission-denied")
-                console.error(
-                  `Error loading packages for partner ${partner.id}:`,
-                  error,
-                );
-              if (!isCancelled) syncPackageHistory();
-            },
-          ),
-        );
-
+        // Instead of listening to all partners, listen only to the user's specific history
         const userHistoryUnsubscribe = onSnapshot(
           collection(db, "users", user.uid, "packageHistory"),
           (snapshot) => {
-            userHistoryMap.clear();
-            snapshot.docs.forEach((entry) => {
+            const nextHistory = snapshot.docs.map((entry) => {
               const data = entry.data();
-              userHistoryMap.set(data.partnerId || entry.id, {
+              return {
+                partnerId: data.partnerId || entry.id,
                 partnerName: data.partnerName || "Unknown Partner",
                 totalReceived: Number(data.totalReceived) || 0,
                 totalPickedUp: Number(data.totalPickedUp) || 0,
                 currentWaiting: Number(data.currentWaiting) || 0,
-              });
+              };
             });
-            userHistoryInitialized = true;
-            if (!isCancelled) syncPackageHistory();
+
+            setPackageHistory(nextHistory);
+            setPackagesLoading(false);
           },
           (error) => {
             console.error("Error loading package history:", error);
-            userHistoryInitialized = true;
+            setPackagesLoading(false);
             if (!isCancelled) {
               setPackageHistory([]);
-              syncPackageHistory();
             }
           },
         );
 
         return () => {
-          partnerUnsubscribes.forEach((u) => {
-            if (typeof u === "function") u();
-          });
           if (typeof userHistoryUnsubscribe === "function")
             userHistoryUnsubscribe();
         };
@@ -459,11 +400,14 @@ const Profile = ({ user }) => {
                         profileData.prefLocation.state,
                         profileData.prefLocation.zipCode,
                       ].filter(Boolean).length && (
-                      <div style={{ color: "#888", fontSize: 13, marginTop: 6 }}>
-                        Full street address will appear here once your partner
-                        completes their profile, or set a location in settings.
-                      </div>
-                    )}
+                        <div
+                          style={{ color: "#888", fontSize: 13, marginTop: 6 }}
+                        >
+                          Full street address will appear here once your partner
+                          completes their profile, or set a location in
+                          settings.
+                        </div>
+                      )}
                   </div>
                   <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
                     Use this address when placing orders online. Packages are
@@ -561,9 +505,21 @@ const Profile = ({ user }) => {
         >
           {/* Package History */}
           <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16,
+              }}
+            >
               <SectionLabel>Package History</SectionLabel>
-              <Link to="/profile/packages" style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}>View Full History →</Link>
+              <Link
+                to="/profile/packages"
+                style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}
+              >
+                View Full History →
+              </Link>
             </div>
             <div
               style={{
@@ -650,7 +606,7 @@ const Profile = ({ user }) => {
                       background: "#fafafa",
                       border: "1px solid #f0f0f0",
                       textDecoration: "none",
-                      display: "block"
+                      display: "block",
                     }}
                   >
                     <div
@@ -671,12 +627,44 @@ const Profile = ({ user }) => {
                       }}
                     >
                       <div>
-                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Received</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: "#333" }}>{pkg.totalPickedUp}</div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "#bbb",
+                            marginBottom: 2,
+                          }}
+                        >
+                          Received
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: "#333",
+                          }}
+                        >
+                          {pkg.totalPickedUp}
+                        </div>
                       </div>
                       <div>
-                        <div style={{ fontSize: 11, color: "#bbb", marginBottom: 2 }}>Waiting</div>
-                        <div style={{ fontSize: 15, fontWeight: 700, color: pkg.currentWaiting > 0 ? "#b8860b" : "#333" }}>{pkg.currentWaiting}</div>
+                        <div
+                          style={{
+                            fontSize: 11,
+                            color: "#bbb",
+                            marginBottom: 2,
+                          }}
+                        >
+                          Waiting
+                        </div>
+                        <div
+                          style={{
+                            fontSize: 15,
+                            fontWeight: 700,
+                            color: pkg.currentWaiting > 0 ? "#b8860b" : "#333",
+                          }}
+                        >
+                          {pkg.currentWaiting}
+                        </div>
                       </div>
                     </div>
                   </Link>
