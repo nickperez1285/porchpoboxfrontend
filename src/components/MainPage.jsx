@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import {
   collection,
@@ -36,6 +36,27 @@ const MainPage = ({ user, userStatus }) => {
   const [expandedVendorIds, setExpandedVendorIds] = useState([]);
   const [vendorMarkers, setVendorMarkers] = useState([]);
   const [userWaitingCount, setUserWaitingCount] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredVendors = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return activeVendors;
+    return activeVendors.filter((v) => {
+      const city = (v.city || "").toLowerCase();
+      const zip = (v.zipCode || "").toLowerCase();
+      return city.includes(term) || zip.includes(term);
+    });
+  }, [activeVendors, searchTerm]);
+
+  const filteredMarkers = useMemo(() => {
+    const term = searchTerm.toLowerCase().trim();
+    if (!term) return vendorMarkers;
+    return vendorMarkers.filter(({ vendor }) => {
+      const city = (vendor.city || "").toLowerCase();
+      const zip = (vendor.zipCode || "").toLowerCase();
+      return city.includes(term) || zip.includes(term);
+    });
+  }, [vendorMarkers, searchTerm]);
 
   useEffect(() => {
     fetchActiveVendors();
@@ -168,6 +189,27 @@ const MainPage = ({ user, userStatus }) => {
             <h2 id="locations-heading" className="mp-card__title">
               Porch P.O. Boxes
             </h2>
+
+            {!vendorsLoading && !vendorsError && activeVendors.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <input
+                  type="search"
+                  placeholder="Filter by city or zip..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "10px 14px",
+                    borderRadius: "10px",
+                    border: "1px solid #ddd",
+                    fontSize: "14px",
+                    boxSizing: "border-box",
+                    outline: "none",
+                  }}
+                />
+              </div>
+            )}
+
             {vendorsLoading ? (
               <p className="mp-muted mp-muted--italic">Loading partners…</p>
             ) : vendorsError ? (
@@ -177,9 +219,11 @@ const MainPage = ({ user, userStatus }) => {
                 No active partner locations yet. Check back soon or{" "}
                 <Link to="/contact">contact us</Link> to learn more.
               </p>
+            ) : filteredVendors.length === 0 ? (
+              <p className="mp-muted">No locations match your search.</p>
             ) : (
               <ul className="mp-vendor-list">
-                {activeVendors.map((vendor) => (
+                {filteredVendors.map((vendor) => (
                   <li key={vendor.id} className="mp-vendor-item">
                     <button
                       type="button"
@@ -222,14 +266,14 @@ const MainPage = ({ user, userStatus }) => {
             )}
           </section>
 
-          {vendorMarkers.length > 0 && (
+          {filteredMarkers.length > 0 && (
             <div
               className="mp-card mp-map-wrap"
               role="region"
               aria-label="Map of partner locations"
             >
               <MapContainer
-                center={[vendorMarkers[0].lat, vendorMarkers[0].lng]}
+                center={[filteredMarkers[0].lat, filteredMarkers[0].lng]}
                 zoom={12}
                 style={{ width: "100%", height: "100%" }}
               >
@@ -237,7 +281,7 @@ const MainPage = ({ user, userStatus }) => {
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 />
-                {vendorMarkers.map(({ vendor, lat, lng }) => (
+                {filteredMarkers.map(({ vendor, lat, lng }) => (
                   <Marker key={vendor.id} position={[lat, lng]}>
                     <Popup>
                       <strong>{vendor.businessName}</strong>
