@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { updateEmail, updateProfile } from "firebase/auth";
 import { doc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
 const EditProfile = ({ user }) => {
   const navigate = useNavigate();
@@ -73,7 +74,7 @@ const EditProfile = ({ user }) => {
         streetAddress,
         city,
         state,
-        zipCode
+        zipCode,
       });
 
       navigate("/profile");
@@ -86,79 +87,97 @@ const EditProfile = ({ user }) => {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: "80px auto", textAlign: "center" }}>
-      <h2>Edit Profile</h2>
-      
+    <RegPage
+      title="Edit Profile"
+      subtitle="Update your account information and mailing address."
+    >
       {loading ? (
         <p>Loading profile data...</p>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          style={{ display: "flex", flexDirection: "column", gap: 10 }}
-        >
-          <input
+        <form onSubmit={handleSubmit} className="reg-form">
+          <RegField
+            id="edit-name"
+            label="Full Name"
             type="text"
             placeholder="Full Name"
             value={name}
             onChange={(event) => setName(event.target.value)}
             required
           />
-          <input
+          <RegField
+            id="edit-email"
+            label="Email"
             type="email"
             placeholder="Email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
-          <input
+          <RegField
+            id="edit-phone"
+            label="Phone Number"
             type="text"
             placeholder="Phone Number"
             value={phoneNumber}
             onChange={(event) => setPhoneNumber(event.target.value)}
             required
           />
-          <input
+          <RegField
+            id="edit-street"
+            label="Street Address"
             type="text"
             placeholder="Street Address"
             value={streetAddress}
             onChange={(event) => setStreetAddress(event.target.value)}
             required
           />
-          <input
+          <RegField
+            id="edit-city"
+            label="City"
             type="text"
             placeholder="City"
             value={city}
             onChange={(event) => setCity(event.target.value)}
             required
           />
-          <input
-            type="text"
-            placeholder="State"
-            value={state}
-            onChange={(event) => setState(event.target.value.toUpperCase())}
-            maxLength={2}
-            required
-          />
-          <input
-            type="text"
-            placeholder="Zip Code"
-            value={zipCode}
-            onChange={(event) => setZipCode(event.target.value.replace(/\D/g, ""))}
-            maxLength={5}
-            required
-          />
+          <div className="reg-row-2">
+            <RegField
+              id="edit-state"
+              label="State"
+              type="text"
+              placeholder="State"
+              value={state}
+              onChange={(event) => setState(event.target.value.toUpperCase())}
+              maxLength={2}
+              required
+            />
+            <RegField
+              id="edit-zip"
+              label="Zip Code"
+              type="text"
+              placeholder="Zip Code"
+              value={zipCode}
+              onChange={(event) =>
+                setZipCode(event.target.value.replace(/\D/g, ""))
+              }
+              maxLength={5}
+              required
+            />
+          </div>
 
-          {error && <p style={{ color: "red" }}>{error}</p>}
+          <RegAlert variant="error">{error}</RegAlert>
 
-          <div style={{ display: "flex", justifyContent: "center", gap: 12 }}>
-            <button type="submit" disabled={saving}>
+          <div className="reg-actions">
+            <button type="submit" className="reg-btn-primary" disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
             </button>
-            <Link to="/profile">Cancel</Link>
+            <Link to="/profile" className="reg-btn-secondary">
+              Cancel
+            </Link>
           </div>
         </form>
       )}
-    </div>
+    </RegPage>
   );
 };
 

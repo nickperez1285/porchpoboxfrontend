@@ -10,6 +10,7 @@ import {
   onAuthStateChanged,
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
 const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   const navigate = useNavigate();
@@ -96,9 +97,10 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "100px auto", textAlign: "center" }}>
-      <h2>{title}</h2>
-
+    <RegPage
+      title={title}
+      subtitle="Welcome back to Porch P.O. Box. Sign in to manage your deliveries."
+    >
       {/* Google Sign-In Button */}
       <button
         type="button"
@@ -106,13 +108,12 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         disabled={loading}
         style={{
           width: "100%",
-          padding: "10px 16px",
-          marginTop: "20px",
-          marginBottom: "20px",
+          padding: "14px 16px",
+          marginBottom: "12px",
           backgroundColor: "#ffffff",
-          border: "1px solid #dadce0",
-          borderRadius: "4px",
-          fontSize: "14px",
+          border: "1px solid #ddd",
+          borderRadius: "12px",
+          fontSize: "15px",
           fontWeight: "500",
           cursor: loading ? "not-allowed" : "pointer",
           display: "flex",
@@ -169,14 +170,18 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         onSubmit={handleLogin}
         style={{ display: "flex", flexDirection: "column", gap: 10 }}
       >
-        <input
+        <RegField
+          id="login-email"
+          label="Email Address"
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           disabled={loading}
         />
-        <input
+        <RegField
+          id="login-password"
+          label="Password"
           type="password"
           placeholder="Password"
           value={password}
@@ -184,25 +189,42 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
           disabled={loading}
         />
 
-        {error && <p style={{ color: "#d32f2f", fontSize: "14px" }}>{error}</p>}
+        <RegAlert variant="error">{error}</RegAlert>
 
-        <button type="submit" disabled={loading}>
+        <button
+          type="submit"
+          className="reg-btn-primary"
+          disabled={loading}
+          style={{ width: "100%", marginTop: 10 }}
+        >
           {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
 
-      <p
+      <div
         style={{
-          marginTop: 16,
+          marginTop: 24,
+          textAlign: "center",
           display: "flex",
           justifyContent: "center",
-          gap: 12,
+          gap: 20,
+          fontSize: 14,
         }}
       >
-        <Link to="/forgot-password">Forgot Password?</Link>
-        <Link to="/register">Create Account</Link>
-      </p>
-    </div>
+        <Link
+          to="/forgot-password"
+          style={{ color: "#666", textDecoration: "none" }}
+        >
+          Forgot Password?
+        </Link>
+        <Link
+          to="/register"
+          style={{ color: "#0b57d0", fontWeight: 700, textDecoration: "none" }}
+        >
+          Create Account
+        </Link>
+      </div>
+    </RegPage>
   );
 };
 

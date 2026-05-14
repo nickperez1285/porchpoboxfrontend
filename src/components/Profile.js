@@ -162,6 +162,7 @@ const Profile = ({ user }) => {
   const urgentColor =
     daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
 
+  const [addressCopied, setAddressCopied] = useState(false);
   const displayReferral =
     profileData?.referralCode ||
     (user?.email ? user.email.substring(0, 2).toUpperCase() + "26" : "—");
@@ -413,6 +414,9 @@ const Profile = ({ user }) => {
                 <button
                   type="button"
                   onClick={() => {
+                    setAddressCopied(true);
+                    setTimeout(() => setAddressCopied(false), 2000); // Reset after 2 seconds
+
                     const addr = [
                       user.displayName || profileData?.name || "",
                       `c/o ${profileData.prefLocation.businessName}`,
@@ -425,9 +429,7 @@ const Profile = ({ user }) => {
                         .filter(Boolean)
                         .join(", "),
                     ].join("\n");
-                    navigator.clipboard
-                      .writeText(addr)
-                      .then(() => alert("Address copied to clipboard!"));
+                    navigator.clipboard.writeText(addr);
                   }}
                   style={{
                     padding: "11px 20px",
@@ -443,7 +445,7 @@ const Profile = ({ user }) => {
                     boxShadow: "0 4px 16px rgba(212,175,55,0.45)",
                   }}
                 >
-                  📋 Copy Address
+                  {addressCopied ? "✅ Copied!" : "📋 Copy Address"}
                 </button>
               </div>
             </div>
