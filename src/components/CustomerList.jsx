@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../firebase";
 import API_BASE_URL from "../config/api";
-import {
-  collection,
-  doc,
-  increment,
-  onSnapshot,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 
 const CustomerList = ({
   vendorId,

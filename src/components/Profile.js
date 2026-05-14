@@ -1,14 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
-import {
-  collection,
-  doc,
-  getDocs,
-  onSnapshot,
-  query,
-  where,
-} from "firebase/firestore";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
 
@@ -96,47 +89,9 @@ const Profile = ({ user }) => {
   useEffect(() => {
     let isCancelled = false;
 
-    const subscribeToPackageHistory = async () => {
-      setPackagesLoading(true);
-      try {
-        // Instead of listening to all partners, listen only to the user's specific history
-        const userHistoryUnsubscribe = onSnapshot(
-          collection(db, "users", user.uid, "packageHistory"),
-          (snapshot) => {
-            const nextHistory = snapshot.docs.map((entry) => {
-              const data = entry.data();
-              return {
-                partnerId: data.partnerId || entry.id,
-                partnerName: data.partnerName || "Unknown Partner",
-                totalReceived: Number(data.totalReceived) || 0,
-                totalPickedUp: Number(data.totalPickedUp) || 0,
-                currentWaiting: Number(data.currentWaiting) || 0,
-              };
-            });
+    if (!user?.uid) return;
 
-            setPackageHistory(nextHistory);
-            setPackagesLoading(false);
-          },
-          (error) => {
-            console.error("Error loading package history:", error);
-            setPackagesLoading(false);
-            if (!isCancelled) {
-              setPackageHistory([]);
-            }
-          },
-        );
-
-        return () => {
-          if (typeof userHistoryUnsubscribe === "function")
-            userHistoryUnsubscribe();
-        };
-      } catch (error) {
-        console.error("Error loading package history:", error);
-        setPackagesLoading(false);
-        return () => {};
-      }
-    };
-
+    // 1. Subscribe to User Profile
     const unsubscribeProfile = onSnapshot(
       doc(db, "users", user.uid),
       (snapshot) => {
@@ -147,10 +102,24 @@ const Profile = ({ user }) => {
       },
     );
 
-    let unsubscribePackageHistory = () => {};
-    subscribeToPackageHistory().then((u) => {
-      unsubscribePackageHistory = u;
-    });
+    // 2. Subscribe to Package History
+    setPackagesLoading(true);
+    const unsubscribePackageHistory = onSnapshot(
+      collection(db, "users", user.uid, "packageHistory"),
+      (snapshot) => {
+        const nextHistory = snapshot.docs.map((entry) => ({
+          partnerId: entry.id,
+          ...entry.data(),
+        }));
+        setPackageHistory(nextHistory);
+        setPackagesLoading(false);
+      },
+      (error) => {
+        console.error("Error loading package history:", error);
+        setPackagesLoading(false);
+        setPackageHistory([]);
+      },
+    );
 
     return () => {
       isCancelled = true;
