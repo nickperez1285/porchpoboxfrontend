@@ -187,52 +187,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
               Manage your location details and account contact information.
             </p>
           </div>
-
-          <div
-            style={{
-              minWidth: isMobile ? "100%" : 180,
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: 14,
-              padding: "14px 20px",
-              textAlign: "center",
-            }}
-          >
-            <div
-              style={{
-                fontSize: 11,
-                color: "#888",
-                textTransform: "uppercase",
-                letterSpacing: 1,
-                marginBottom: 8,
-              }}
-            >
-              Account Status
-            </div>
-            <span
-              style={{
-                display: "inline-block",
-                background: "#d4edda",
-                color: "#1a7f37",
-                borderRadius: 999,
-                padding: "4px 14px",
-                fontWeight: 700,
-                fontSize: 13,
-              }}
-            >
-              ✓ Approved
-            </span>
-            <div
-              style={{
-                marginTop: 10,
-                fontSize: 12,
-                color: "#d4af37",
-                fontWeight: 600,
-              }}
-            >
-              Partner Location
-            </div>
-          </div>
         </div>
       </div>
 
@@ -354,7 +308,11 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             </div>
           </div>
           <div
-            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
+              gap: 16,
+            }}
           >
             <div>
               <div
@@ -404,6 +362,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
+              flexWrap: "wrap",
               marginBottom: 16,
             }}
           >
@@ -417,7 +376,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               gap: 14,
               marginBottom: 8,
             }}
@@ -812,6 +771,8 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                           background: "#fafafa",
                           borderRadius: 10,
                           border: "1px solid #eee",
+                          flexWrap: "wrap",
+                          gap: 10,
                         }}
                       >
                         <div>

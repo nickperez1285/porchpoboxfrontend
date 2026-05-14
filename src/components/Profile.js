@@ -73,6 +73,13 @@ const Profile = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
   const [packageHistory, setPackageHistory] = useState([]);
   const [packagesLoading, setPackagesLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const currentPackagesWaiting = packageHistory.reduce(
     (sum, entry) => sum + (Number(entry.currentWaiting) || 0),
@@ -185,12 +192,13 @@ const Profile = ({ user }) => {
             boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
             display: "flex",
             flexWrap: "wrap",
-            justifyContent: "space-between",
+            justifyContent: isMobile ? "center" : "space-between",
             alignItems: "center",
             gap: 20,
+            textAlign: isMobile ? "center" : "left",
           }}
         >
-          <div>
+          <div style={{ minWidth: isMobile ? "100%" : "auto" }}>
             <div
               style={{
                 fontSize: 11,
@@ -215,7 +223,7 @@ const Profile = ({ user }) => {
                 border: "1px solid rgba(255,255,255,0.1)",
                 borderRadius: 14,
                 padding: "14px 20px",
-                minWidth: 180,
+                minWidth: isMobile ? "100%" : 180,
                 textAlign: "center",
               }}
             >
