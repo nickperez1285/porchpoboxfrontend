@@ -162,6 +162,10 @@ const Profile = ({ user }) => {
   const urgentColor =
     daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
 
+  const displayReferral =
+    profileData?.referralCode ||
+    (user?.email ? user.email.substring(0, 2).toUpperCase() + "26" : "—");
+
   return (
     <div
       style={{
@@ -699,14 +703,14 @@ const Profile = ({ user }) => {
                     fontFamily: "monospace",
                   }}
                 >
-                  {profileData?.referralCode || "—"}
+                  {displayReferral}
                 </span>
-                {profileData?.referralCode && (
+                {displayReferral !== "—" && (
                   <button
                     type="button"
                     onClick={() =>
                       navigator.clipboard
-                        .writeText(profileData.referralCode)
+                        .writeText(displayReferral)
                         .then(() => alert("Referral code copied!"))
                     }
                     style={{

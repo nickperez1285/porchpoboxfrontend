@@ -2,11 +2,16 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  updateProfile,
+} from "firebase/auth";
 import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 import {
   isPasswordValid,
-  passwordRequirementsText
+  passwordRequirementsText,
 } from "../utils/passwordValidation";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
@@ -28,8 +33,16 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const generateReferralCode = (fullName) => {
-    const prefix = (fullName || "US").replace(/\s+/g, "").substring(0, 2).toUpperCase();
+  const generateReferralCode = (fullName, userEmail) => {
+    const namePrefix = (fullName || "")
+      .replace(/\s+/g, "")
+      .substring(0, 2)
+      .toUpperCase();
+    // Use the email-based fallback if the name prefix is unavailable
+    if (!namePrefix && userEmail) {
+      return userEmail.substring(0, 2).toUpperCase() + "26";
+    }
+    const prefix = namePrefix || "US";
     const now = new Date();
     const dd = String(now.getDate()).padStart(2, "0");
     const mm = String(now.getMonth() + 1).padStart(2, "0");
@@ -37,37 +50,49 @@ const Register = () => {
     return `${prefix}${dd}${mm}${yy}`;
   };
 
-  const logSignup = async ({ name: userName, email: userEmail, authProvider }) => {
+  const logSignup = async ({
+    name: userName,
+    email: userEmail,
+    authProvider,
+  }) => {
     try {
       await fetch(`${API_BASE_URL}/api/notifications/user-signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: userName, email: userEmail, authProvider: authProvider || "email" })
+        body: JSON.stringify({
+          name: userName,
+          email: userEmail,
+          authProvider: authProvider || "email",
+        }),
       });
     } catch (err) {
       console.error("Failed to log signup:", err);
     }
   };
 
-  const sendWelcomeEmail = async ({ name: userName, email: userEmail, authProvider }) => {
+  const sendWelcomeEmail = async ({
+    name: userName,
+    email: userEmail,
+    authProvider,
+  }) => {
     try {
       const welcomeResponse = await fetch("/api/notifications/user-welcome", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: userName,
           email: userEmail,
-          authProvider: authProvider || "email"
-        })
+          authProvider: authProvider || "email",
+        }),
       });
 
       if (!welcomeResponse.ok) {
         const errorBody = await welcomeResponse.json().catch(() => null);
         console.error(
           "Welcome email failed:",
-          errorBody?.message || `HTTP ${welcomeResponse.status}`
+          errorBody?.message || `HTTP ${welcomeResponse.status}`,
         );
       }
     } catch (emailError) {
@@ -77,7 +102,9 @@ const Register = () => {
 
   const handleGoogleSignIn = async () => {
     if (!termsAccepted) {
-      setError("You must agree to the terms and conditions before creating an account.");
+      setError(
+        "You must agree to the terms and conditions before creating an account.",
+      );
       return;
     }
 
@@ -101,7 +128,7 @@ const Register = () => {
 
       // Create new user profile with Google information
       const displayName = user.displayName || "";
-      
+
       await setDoc(userDocRef, {
         name: displayName,
         email: user.email,
@@ -116,31 +143,39 @@ const Register = () => {
         packagesDelivered: 0,
         subscribedAt: null,
         subscriptionEndsAt: null,
-        referralCode: generateReferralCode(displayName),
+        referralCode: generateReferralCode(displayName, user.email),
         notificationsEnabled: true,
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-user-v1",
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       await sendWelcomeEmail({
         name: displayName,
         email: user.email,
-        authProvider: "google"
+        authProvider: "google",
       });
-      await logSignup({ name: displayName, email: user.email, authProvider: "google" });
+      await logSignup({
+        name: displayName,
+        email: user.email,
+        authProvider: "google",
+      });
 
       navigate("/profile");
     } catch (err) {
       console.error("Google sign-in error:", err);
-      
+
       if (err.code === "auth/popup-closed-by-user") {
         setError("Sign-in was cancelled. Please try again.");
       } else if (err.code === "auth/account-exists-with-different-credential") {
-        setError("An account with this email already exists. Please use email/password login or a different email.");
+        setError(
+          "An account with this email already exists. Please use email/password login or a different email.",
+        );
       } else {
-        setError(err.message || "Failed to sign in with Google. Please try again.");
+        setError(
+          err.message || "Failed to sign in with Google. Please try again.",
+        );
       }
     } finally {
       setLoading(false);
@@ -148,10 +183,14 @@ const Register = () => {
   };
 
   const validate = () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
-    if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, ""))) return "Phone number must have 10 digits.";
-    if (!/^[A-Za-z]{2}$/.test(state.trim())) return "State must be a 2-letter abbreviation (e.g. CA).";
-    if (!/^\d{5}$/.test(zipCode.trim())) return "ZIP code must be exactly 5 digits.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Please enter a valid email address.";
+    if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, "")))
+      return "Phone number must have 10 digits.";
+    if (!/^[A-Za-z]{2}$/.test(state.trim()))
+      return "State must be a 2-letter abbreviation (e.g. CA).";
+    if (!/^\d{5}$/.test(zipCode.trim()))
+      return "ZIP code must be exactly 5 digits.";
     return "";
   };
 
@@ -180,7 +219,9 @@ const Register = () => {
     }
 
     if (!termsAccepted) {
-      setError("You must agree to the terms and conditions before creating an account.");
+      setError(
+        "You must agree to the terms and conditions before creating an account.",
+      );
       setLoading(false);
       return;
     }
@@ -189,13 +230,13 @@ const Register = () => {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
 
       const user = userCredential.user;
 
       await updateProfile(user, {
-        displayName: name
+        displayName: name,
       });
 
       await setDoc(doc(db, "users", user.uid), {
@@ -211,12 +252,12 @@ const Register = () => {
         packagesDelivered: 0,
         subscribedAt: null,
         subscriptionEndsAt: null,
-        referralCode: generateReferralCode(name),
+        referralCode: generateReferralCode(name, email),
         notificationsEnabled: true,
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-user-v1",
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       await sendWelcomeEmail({ name, email, authProvider: "email" });
@@ -237,16 +278,33 @@ const Register = () => {
       subtitle="Join Porch P.O. Box with your contact details and mailing address."
     >
       {fromGoogle && (
-        <div style={{ background: "#fff8e1", border: "1px solid #f0c040", borderRadius: 10, padding: "12px 16px", marginBottom: 16, fontSize: 14, color: "#7a5c00" }}>
-          Please complete registration and agree to the terms before signing in with Google.
+        <div
+          style={{
+            background: "#fff8e1",
+            border: "1px solid #f0c040",
+            borderRadius: 10,
+            padding: "12px 16px",
+            marginBottom: 16,
+            fontSize: 14,
+            color: "#7a5c00",
+          }}
+        >
+          Please complete registration and agree to the terms before signing in
+          with Google.
         </div>
       )}
       <form className="reg-form" onSubmit={handleRegister} noValidate>
         <p className="reg-section-label">Account</p>
-        
+
         {/* Google Sign-In Option */}
-        <div className="reg-google-signin-section" style={{ marginBottom: "20px" }}>
-          <label className="reg-terms-checkbox-row" htmlFor="register-terms-agree-google">
+        <div
+          className="reg-google-signin-section"
+          style={{ marginBottom: "20px" }}
+        >
+          <label
+            className="reg-terms-checkbox-row"
+            htmlFor="register-terms-agree-google"
+          >
             <input
               id="register-terms-agree-google"
               type="checkbox"
@@ -256,7 +314,7 @@ const Register = () => {
             />
             <span>I agree to the terms and conditions.</span>
           </label>
-          
+
           <button
             type="button"
             className="reg-btn-google"
@@ -277,7 +335,7 @@ const Register = () => {
               justifyContent: "center",
               gap: "8px",
               opacity: loading || !termsAccepted ? 0.6 : 1,
-              transition: "background-color 0.2s"
+              transition: "background-color 0.2s",
             }}
             onMouseEnter={(e) => {
               if (!loading && termsAccepted) {
@@ -289,18 +347,39 @@ const Register = () => {
             }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
             </svg>
             Sign up with Google
           </button>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "20px 0" }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            margin: "20px 0",
+          }}
+        >
           <hr style={{ flex: 1 }} />
-          <span style={{ color: "#666", fontSize: "14px" }}>or continue with email</span>
+          <span style={{ color: "#666", fontSize: "14px" }}>
+            or continue with email
+          </span>
           <hr style={{ flex: 1 }} />
         </div>
 
@@ -409,7 +488,10 @@ const Register = () => {
         <p className="reg-hint">
           Review terms: <Link to="/terms/user">User Terms and Conditions</Link>
         </p>
-        <label className="reg-terms-checkbox-row" htmlFor="register-terms-agree">
+        <label
+          className="reg-terms-checkbox-row"
+          htmlFor="register-terms-agree"
+        >
           <input
             id="register-terms-agree"
             type="checkbox"
@@ -443,7 +525,7 @@ const Register = () => {
               transition: "opacity 0.2s",
               display: "inline-flex",
               alignItems: "center",
-              justifyContent: "center"
+              justifyContent: "center",
             }}
             onMouseEnter={(e) => {
               if (!loading && termsAccepted) {
@@ -455,10 +537,22 @@ const Register = () => {
             }}
           >
             <svg width="32" height="32" viewBox="0 0 24 24">
-              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
             </svg>
           </button>
         </div>
