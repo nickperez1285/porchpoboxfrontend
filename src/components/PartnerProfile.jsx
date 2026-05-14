@@ -165,7 +165,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             flexWrap: "wrap",
             justifyContent: "space-between",
             gap: 20,
-            alignItems: "flex-start",
+            alignItems: "center",
           }}
         >
           <div>
@@ -190,37 +190,47 @@ const PartnerProfile = ({ user, partnerProfile }) => {
 
           <div
             style={{
-              minWidth: isMobile ? "100%" : 220,
-              background: "rgba(255, 255, 255, 0.06)",
+              minWidth: isMobile ? "100%" : 180,
+              background: "rgba(255, 255, 255, 0.05)",
               border: "1px solid rgba(255, 255, 255, 0.1)",
               borderRadius: 14,
-              padding: 16,
-              textAlign: "center", // Center content within this box
+              padding: "14px 20px",
+              textAlign: "center",
             }}
           >
             <div
               style={{
-                fontSize: 12,
+                fontSize: 11,
+                color: "#888",
                 textTransform: "uppercase",
                 letterSpacing: 1,
-                color: "#c8c8c8",
-                marginBottom: 4,
-              }}
-            >
-              Contact Email
-            </div>
-            <div
-              style={{
-                fontSize: 24,
-                fontWeight: 700,
-                color: "#d4af37",
                 marginBottom: 8,
               }}
             >
-              ✉️
+              Account Status
             </div>
-            <div style={{ marginTop: 8, fontSize: 18, fontWeight: 600 }}>
-              {user.email || partnerProfile.email || "Not available"}
+            <span
+              style={{
+                display: "inline-block",
+                background: "#d4edda",
+                color: "#1a7f37",
+                borderRadius: 999,
+                padding: "4px 14px",
+                fontWeight: 700,
+                fontSize: 13,
+              }}
+            >
+              ✓ Approved
+            </span>
+            <div
+              style={{
+                marginTop: 10,
+                fontSize: 12,
+                color: "#d4af37",
+                fontWeight: 600,
+              }}
+            >
+              Partner Location
             </div>
           </div>
         </div>
@@ -242,7 +252,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           }}
         >
           <h3 style={{ marginTop: 0 }}>Business Information</h3>
-          <div style={{ marginBottom: 18 }}>
+          <div style={{ marginBottom: 14 }}>
             <div
               style={{
                 fontSize: 12,
@@ -257,7 +267,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
               {partnerProfile.businessName || "Not provided"}
             </div>
           </div>
-          <div>
+          <div style={{ marginBottom: 14 }}>
             <div
               style={{
                 fontSize: 12,
@@ -270,6 +280,21 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             </div>
             <div style={{ marginTop: 4, fontSize: 18 }}>
               {partnerProfile.phoneNumber || "Not provided"}
+            </div>
+          </div>
+          <div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#666",
+                textTransform: "uppercase",
+                letterSpacing: 0.8,
+              }}
+            >
+              Contact Email
+            </div>
+            <div style={{ marginTop: 4, fontSize: 18 }}>
+              {user.email || partnerProfile.email || "Not available"}
             </div>
           </div>
         </div>
