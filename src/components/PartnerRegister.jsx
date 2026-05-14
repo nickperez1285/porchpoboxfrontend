@@ -6,10 +6,10 @@ import API_BASE_URL from "../config/api";
 import { auth, db } from "../firebase";
 import {
   isPasswordValid,
-  passwordRequirementsText
+  passwordRequirementsText,
 } from "../utils/passwordValidation";
 import StoreHoursScrollPicker, {
-  DEFAULT_STORE_HOURS
+  DEFAULT_STORE_HOURS,
 } from "./StoreHoursScrollPicker";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 
@@ -32,10 +32,14 @@ const PartnerRegister = () => {
   const [error, setError] = useState("");
 
   const validate = () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return "Please enter a valid email address.";
-    if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, ""))) return "Phone number must have 10 digits.";
-    if (!/^[A-Za-z]{2}$/.test(state.trim())) return "State must be a 2-letter abbreviation (e.g. CA).";
-    if (!/^\d{5}$/.test(zipCode.trim())) return "ZIP code must be exactly 5 digits.";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return "Please enter a valid email address.";
+    if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, "")))
+      return "Phone number must have 10 digits.";
+    if (!/^[A-Za-z]{2}$/.test(state.trim()))
+      return "State must be a 2-letter abbreviation (e.g. CA).";
+    if (!/^\d{5}$/.test(zipCode.trim()))
+      return "ZIP code must be exactly 5 digits.";
     return "";
   };
 
@@ -64,7 +68,9 @@ const PartnerRegister = () => {
     }
 
     if (!termsAccepted) {
-      setError("You must agree to the terms and conditions before creating an account.");
+      setError(
+        "You must agree to the terms and conditions before creating an account.",
+      );
       setLoading(false);
       return;
     }
@@ -73,13 +79,13 @@ const PartnerRegister = () => {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
 
       const user = userCredential.user;
 
       await updateProfile(user, {
-        displayName: businessName
+        displayName: businessName,
       });
 
       await setDoc(doc(db, "partners", user.uid), {
@@ -93,11 +99,12 @@ const PartnerRegister = () => {
         storeHours,
         approved: false,
         status: "pending",
-        referredBy: wasReferred === "yes" ? referralCode.trim().toUpperCase() : "",
+        referredBy:
+          wasReferred === "yes" ? referralCode.trim().toUpperCase() : "",
         termsAccepted: true,
         termsAcceptedAt: serverTimestamp(),
         termsVersion: "2026-04-28-partner-v1",
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       try {
@@ -106,7 +113,7 @@ const PartnerRegister = () => {
           {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
             },
             body: JSON.stringify({
               business_name: businessName,
@@ -122,15 +129,15 @@ const PartnerRegister = () => {
               zip_code: zipCode,
               zipCode,
               store_hours: storeHours,
-              storeHours
-            })
-          }
+              storeHours,
+            }),
+          },
         );
 
         if (!notificationResponse.ok) {
           const errorBody = await notificationResponse.json().catch(() => null);
           throw new Error(
-            errorBody?.message || "Partner notification email failed."
+            errorBody?.message || "Partner notification email failed.",
           );
         }
       } catch (emailError) {
@@ -155,7 +162,20 @@ const PartnerRegister = () => {
       subtitle="Tell us about your business. We will review your application before you can sign in."
     >
       <form className="reg-form" onSubmit={handleRegister} noValidate>
-        <p className="reg-section-label">Business</p>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Business Details
+        </div>
         <RegField
           id="vendor-business"
           label="Business name"
@@ -187,8 +207,21 @@ const PartnerRegister = () => {
           placeholder="contact@yourbusiness.com"
         />
 
-        <hr className="reg-divider" />
-        <p className="reg-section-label">Location</p>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Physical Location
+        </div>
         <RegField
           id="vendor-street"
           label="Street address"
@@ -233,17 +266,70 @@ const PartnerRegister = () => {
 
         <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
 
-        <hr className="reg-divider" />
-        <p className="reg-section-label">Referral</p>
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 8 }}>
-          <label style={{ fontSize: 14, color: "#444" }}>Were you referred by someone?</label>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Referral Info
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            marginBottom: 8,
+          }}
+        >
+          <label style={{ fontSize: 14, color: "#444" }}>
+            Were you referred by someone?
+          </label>
           <div style={{ display: "flex", gap: 16 }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14 }}>
-              <input type="radio" name="wasReferred" value="yes" checked={wasReferred === "yes"} onChange={() => setWasReferred("yes")} />
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+                fontSize: 14,
+              }}
+            >
+              <input
+                type="radio"
+                name="wasReferred"
+                value="yes"
+                checked={wasReferred === "yes"}
+                onChange={() => setWasReferred("yes")}
+              />
               Yes
             </label>
-            <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer", fontSize: 14 }}>
-              <input type="radio" name="wasReferred" value="no" checked={wasReferred === "no"} onChange={() => { setWasReferred("no"); setReferralCode(""); }} />
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+                fontSize: 14,
+              }}
+            >
+              <input
+                type="radio"
+                name="wasReferred"
+                value="no"
+                checked={wasReferred === "no"}
+                onChange={() => {
+                  setWasReferred("no");
+                  setReferralCode("");
+                }}
+              />
               No
             </label>
           </div>
@@ -261,8 +347,21 @@ const PartnerRegister = () => {
           )}
         </div>
 
-        <hr className="reg-divider" />
-        <p className="reg-section-label">Password</p>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Security
+        </div>
         <RegField
           id="vendor-password"
           label="Password"
@@ -282,11 +381,31 @@ const PartnerRegister = () => {
           autoComplete="new-password"
         />
 
-        <p className="reg-hint">{passwordRequirementsText}</p>
-        <p className="reg-hint">
-          Review terms: <Link to="/terms/partner">Partner Terms and Conditions</Link>
+        <p
+          style={{
+            fontSize: 12,
+            color: "#888",
+            marginBottom: 12,
+            lineHeight: 1.4,
+          }}
+        >
+          {passwordRequirementsText}
         </p>
-        <label className="reg-terms-checkbox-row" htmlFor="vendor-register-terms-agree">
+        <p style={{ fontSize: 13, marginBottom: 16 }}>
+          Review terms:{" "}
+          <Link to="/terms/partner">Partner Terms and Conditions</Link>
+        </p>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontSize: 14,
+            cursor: "pointer",
+            marginBottom: 24,
+          }}
+          htmlFor="vendor-register-terms-agree"
+        >
           <input
             id="vendor-register-terms-agree"
             type="checkbox"
@@ -300,7 +419,23 @@ const PartnerRegister = () => {
         <RegAlert variant="error">{error}</RegAlert>
 
         <div className="reg-actions">
-          <button type="submit" className="reg-btn-primary" disabled={loading}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "16px",
+              background: "#121212",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: 700,
+              fontSize: 16,
+              cursor: loading ? "not-allowed" : "pointer",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              transition: "transform 0.1s",
+            }}
+          >
             {loading ? "Creating partner…" : "Submit application"}
           </button>
         </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { db } from "../firebase";
 import API_BASE_URL from "../config/api";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -15,6 +15,22 @@ const CustomerList = ({
   const [deliveringUserId, setDeliveringUserId] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [packageQuantities, setPackageQuantities] = useState({});
+  const [sortBy, setSortBy] = useState("name");
+
+  const sortedUsers = useMemo(() => {
+    const sorted = [...users];
+    if (sortBy === "packageCount") {
+      sorted.sort((a, b) => {
+        if ((b.packageCount || 0) !== (a.packageCount || 0)) {
+          return (b.packageCount || 0) - (a.packageCount || 0);
+        }
+        return (a.name || "").localeCompare(b.name || "");
+      });
+    } else {
+      sorted.sort((a, b) => (a.name || "").localeCompare(b.name || ""));
+    }
+    return sorted;
+  }, [users, sortBy]);
 
   useEffect(() => {
     if (!vendorId) {
@@ -248,6 +264,45 @@ const CustomerList = ({
         <h2 style={{ margin: "8px 0 0" }}> Packages Checked In</h2>
       </div>
 
+      <div
+        style={{ display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }}
+      >
+        <button
+          type="button"
+          onClick={() => setSortBy("name")}
+          style={{
+            padding: "6px 14px",
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            cursor: "pointer",
+            background: sortBy === "name" ? "#111" : "#fff",
+            color: sortBy === "name" ? "#fff" : "#111",
+            transition: "all 0.2s",
+          }}
+        >
+          Sort by Name
+        </button>
+        <button
+          type="button"
+          onClick={() => setSortBy("packageCount")}
+          style={{
+            padding: "6px 14px",
+            fontSize: 12,
+            fontWeight: 600,
+            borderRadius: 8,
+            border: "1px solid #ccc",
+            cursor: "pointer",
+            background: sortBy === "packageCount" ? "#111" : "#fff",
+            color: sortBy === "packageCount" ? "#fff" : "#111",
+            transition: "all 0.2s",
+          }}
+        >
+          Sort by Packages
+        </button>
+      </div>
+
       <button
         type="button"
         onClick={() => handleDeliverSelected()}
@@ -278,7 +333,7 @@ const CustomerList = ({
         </p>
       ) : (
         <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-          {users.map((user) => (
+          {sortedUsers.map((user) => (
             <li
               key={user.id}
               style={{
