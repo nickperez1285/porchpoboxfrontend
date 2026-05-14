@@ -319,7 +319,7 @@ const CustomerList = ({
       >
         {deliveringUserId
           ? "Delivering..."
-          : `Deliver Selected (${selectedUserIds.length})`}
+          : `Mark Selected as Delivered (${selectedUserIds.length})`}
       </button>
 
       {loading ? (

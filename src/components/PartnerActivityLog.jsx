@@ -1,12 +1,33 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { db } from "../firebase";
+
+const formatTimestamp = (value) => {
+  if (!value) return "Unknown time";
+  const date = value?.toDate ? value.toDate() : new Date(value);
+  return date.toLocaleString();
+};
+
+const getTypeStyle = (type) => {
+  if (type === "check-in")
+    return { background: "#e6f4ea", color: "#1a7f37", label: "Check In" };
+  if (type === "delivery")
+    return { background: "#fff3cd", color: "#856404", label: "Delivered" };
+  if (type === "subscription")
+    return { background: "#e7f1ff", color: "#0b57d0", label: "Subscribed" };
+  if (type === "payout-created")
+    return { background: "#e8f5e9", color: "#1a7f37", label: "Payout Created" };
+  if (type === "payout-paid")
+    return { background: "#d4edda", color: "#0f5132", label: "Payout Paid" };
+  return { background: "#f0f0f0", color: "#444", label: type };
+};
 
 const PartnerActivityLog = ({ partnerProfile }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     if (!partnerProfile?.id) return;
@@ -27,15 +48,25 @@ const PartnerActivityLog = ({ partnerProfile }) => {
     const actUnsub = onSnapshot(
       collection(db, "partners", partnerProfile.id, "activityLog"),
       (snapshot) => {
-        activityEntries = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        activityEntries = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
         merge();
       },
-      (err) => { console.error("Error loading activity log:", err); setError("Unable to load activity log."); setLoading(false); }
+      (err) => {
+        console.error("Error loading activity log:", err);
+        setError("Unable to load activity log.");
+        setLoading(false);
+      },
     );
     unsubscribes.push(actUnsub);
 
     const payoutUnsub = onSnapshot(
-      query(collection(db, "partners", partnerProfile.id, "payouts"), orderBy("createdAt", "desc")),
+      query(
+        collection(db, "partners", partnerProfile.id, "payouts"),
+        orderBy("createdAt", "desc"),
+      ),
       (snapshot) => {
         payoutEntries = snapshot.docs
           .filter((doc) => doc.data().status === "paid")
@@ -47,34 +78,38 @@ const PartnerActivityLog = ({ partnerProfile }) => {
               timestamp: d.paidAt || d.createdAt,
               month: d.month,
               amount: d.amount,
-              subscriberCount: d.subscriberCount
+              subscriberCount: d.subscriberCount,
             };
           });
         merge();
       },
-      (err) => console.error("Error loading payouts:", err)
+      (err) => console.error("Error loading payouts:", err),
     );
     unsubscribes.push(payoutUnsub);
 
     return () => unsubscribes.forEach((u) => u());
   }, [partnerProfile?.id]);
 
-  const formatTimestamp = (value) => {
-    if (!value) return "Unknown time";
-    const date = value?.toDate ? value.toDate() : new Date(value);
-    return date.toLocaleString();
-  };
+  const filteredEntries = useMemo(() => {
+    const term = search.toLowerCase().trim();
+    if (!term) return entries;
+    return entries.filter((entry) => {
+      const typeInfo = getTypeStyle(entry.type);
+      const label = (typeInfo.label || "").toLowerCase();
+      const name = (entry.customerName || "").toLowerCase();
+      const email = (entry.customerEmail || "").toLowerCase();
+      const month = (entry.month || "").toLowerCase();
+      return (
+        label.includes(term) ||
+        name.includes(term) ||
+        email.includes(term) ||
+        month.includes(term)
+      );
+    });
+  }, [entries, search]);
 
-  const getTypeStyle = (type) => {
-    if (type === "check-in") return { background: "#e6f4ea", color: "#1a7f37", label: "Check In" };
-    if (type === "delivery") return { background: "#fff3cd", color: "#856404", label: "Delivered" };
-    if (type === "subscription") return { background: "#e7f1ff", color: "#0b57d0", label: "Subscribed" };
-    if (type === "payout-created") return { background: "#e8f5e9", color: "#1a7f37", label: "Payout Created" };
-    if (type === "payout-paid") return { background: "#d4edda", color: "#0f5132", label: "Payout Paid" };
-    return { background: "#f0f0f0", color: "#444", label: type };
-  };
-
-  const isPayoutType = (type) => ["payout-created", "payout-paid"].includes(type);
+  const isPayoutType = (type) =>
+    ["payout-created", "payout-paid"].includes(type);
   const isSubscription = (type) => type === "subscription";
 
   return (
@@ -89,17 +124,46 @@ const PartnerActivityLog = ({ partnerProfile }) => {
           boxShadow: "0 16px 36px rgba(0,0,0,0.18)",
         }}
       >
-        <div style={{ color: "#d4af37", fontSize: 12, letterSpacing: 1.2, textTransform: "uppercase" }}>
+        <div
+          style={{
+            color: "#d4af37",
+            fontSize: 12,
+            letterSpacing: 1.2,
+            textTransform: "uppercase",
+          }}
+        >
           Partner Portal
         </div>
-        <h2 style={{ margin: "10px 0 6px" }}>{partnerProfile.businessName} — Activity Log</h2>
+        <h2 style={{ margin: "10px 0 6px" }}>
+          {partnerProfile.businessName} — Activity Log
+        </h2>
         <p style={{ margin: 0, color: "#d6d6d6", lineHeight: 1.6 }}>
-          Package check-ins, deliveries, customer subscriptions at your location, and payouts.
+          Package check-ins, deliveries, customer subscriptions at your
+          location, and payouts.
         </p>
       </div>
 
       <div style={{ marginBottom: 16 }}>
         <Link to="/partner">← Back to Partner Portal</Link>
+      </div>
+
+      <div style={{ marginBottom: 20 }}>
+        <input
+          type="search"
+          placeholder="Search activity by name, email, or type..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={{
+            width: "100%",
+            padding: "12px 16px",
+            borderRadius: 14,
+            border: "1px solid #ddd",
+            fontSize: 14,
+            outline: "none",
+            boxSizing: "border-box",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+          }}
+        />
       </div>
 
       {loading ? (
@@ -108,6 +172,8 @@ const PartnerActivityLog = ({ partnerProfile }) => {
         <p style={{ color: "red" }}>{error}</p>
       ) : entries.length === 0 ? (
         <p style={{ color: "#666" }}>No activity recorded yet.</p>
+      ) : filteredEntries.length === 0 ? (
+        <p style={{ color: "#666" }}>No activity found matching "{search}".</p>
       ) : (
         <div
           style={{
@@ -118,24 +184,75 @@ const PartnerActivityLog = ({ partnerProfile }) => {
             overflow: "hidden",
           }}
         >
-          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}>
+          <table
+            style={{ width: "100%", borderCollapse: "collapse", fontSize: 14 }}
+          >
             <thead>
               <tr style={{ background: "#f8f5ea", textAlign: "left" }}>
-                <th style={{ padding: "14px 18px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>Date &amp; Time</th>
-                <th style={{ padding: "14px 18px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>Type</th>
-                <th style={{ padding: "14px 18px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>Details</th>
-                <th style={{ padding: "14px 18px", fontWeight: 600, color: "#8a6a00", textTransform: "uppercase", fontSize: 11, letterSpacing: 1 }}>Packages / Subscriptions</th>
+                <th
+                  style={{
+                    padding: "14px 18px",
+                    fontWeight: 600,
+                    color: "#8a6a00",
+                    textTransform: "uppercase",
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  }}
+                >
+                  Date &amp; Time
+                </th>
+                <th
+                  style={{
+                    padding: "14px 18px",
+                    fontWeight: 600,
+                    color: "#8a6a00",
+                    textTransform: "uppercase",
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  }}
+                >
+                  Type
+                </th>
+                <th
+                  style={{
+                    padding: "14px 18px",
+                    fontWeight: 600,
+                    color: "#8a6a00",
+                    textTransform: "uppercase",
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  }}
+                >
+                  Details
+                </th>
+                <th
+                  style={{
+                    padding: "14px 18px",
+                    fontWeight: 600,
+                    color: "#8a6a00",
+                    textTransform: "uppercase",
+                    fontSize: 11,
+                    letterSpacing: 1,
+                  }}
+                >
+                  Packages / Subscriptions
+                </th>
               </tr>
             </thead>
             <tbody>
-              {entries.map((entry, i) => {
+              {filteredEntries.map((entry, i) => {
                 const typeStyle = getTypeStyle(entry.type);
                 return (
                   <tr
                     key={entry.id}
-                    style={{ borderTop: "1px solid #eee", background: i % 2 === 0 ? "#fff" : "#fafafa" }}
+                    style={{
+                      borderTop: "1px solid #eee",
+                      background: i % 2 === 0 ? "#fff" : "#fafafa",
+                    }}
                   >
-                    <td style={{ padding: "12px 18px", color: "#444" }}>{formatTimestamp(entry.timestamp)}</td>
+                    <td style={{ padding: "12px 18px", color: "#444" }}>
+                      {formatTimestamp(entry.timestamp)}
+                    </td>
                     <td style={{ padding: "12px 18px" }}>
                       <span
                         style={{
@@ -153,16 +270,35 @@ const PartnerActivityLog = ({ partnerProfile }) => {
                     <td style={{ padding: "12px 18px" }}>
                       {isPayoutType(entry.type) ? (
                         <div>
-                          <div style={{ fontWeight: 600 }}>{entry.month || "—"}</div>
-                          <div style={{ fontSize: 12, color: "#888" }}>{entry.subscriberCount} subscriber{entry.subscriberCount !== 1 ? "s" : ""}</div>
+                          <div style={{ fontWeight: 600 }}>
+                            {entry.month || "—"}
+                          </div>
+                          <div style={{ fontSize: 12, color: "#888" }}>
+                            {entry.subscriberCount} subscriber
+                            {entry.subscriberCount !== 1 ? "s" : ""}
+                          </div>
                         </div>
                       ) : (
                         <div>
-                          <div style={{ fontWeight: 600 }}>{entry.customerName || "Unknown"}</div>
-                          {entry.customerEmail && <div style={{ fontSize: 12, color: "#888" }}>{entry.customerEmail}</div>}
+                          <div style={{ fontWeight: 600 }}>
+                            {entry.customerName || "Unknown"}
+                          </div>
+                          {entry.customerEmail && (
+                            <div style={{ fontSize: 12, color: "#888" }}>
+                              {entry.customerEmail}
+                            </div>
+                          )}
                           {isSubscription(entry.type) && (
-                            <div style={{ fontSize: 12, color: "#0b57d0", marginTop: 4, fontWeight: 600 }}>
-                              Subscribed using your location as their delivery address
+                            <div
+                              style={{
+                                fontSize: 12,
+                                color: "#0b57d0",
+                                marginTop: 4,
+                                fontWeight: 600,
+                              }}
+                            >
+                              Subscribed using your location as their delivery
+                              address
                             </div>
                           )}
                         </div>
