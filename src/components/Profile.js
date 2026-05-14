@@ -98,7 +98,14 @@ const Profile = ({ user }) => {
         if (!isCancelled && snapshot.exists()) setProfileData(snapshot.data());
       },
       (error) => {
-        console.error("Error loading user profile:", error);
+        if (error.code === "permission-denied") {
+          console.error(
+            "CRITICAL: Permission denied reading user doc. Check /users/{userId} rule.",
+            error,
+          );
+        } else {
+          console.error("Error loading user profile:", error);
+        }
       },
     );
 
@@ -115,7 +122,14 @@ const Profile = ({ user }) => {
         setPackagesLoading(false);
       },
       (error) => {
-        console.error("Error loading package history:", error);
+        if (error.code === "permission-denied") {
+          console.error(
+            "CRITICAL: Permission denied reading packageHistory. Check /users/{userId}/packageHistory rule.",
+            error,
+          );
+        } else {
+          console.error("Error loading package history:", error);
+        }
         setPackagesLoading(false);
         setPackageHistory([]);
       },
