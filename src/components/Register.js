@@ -183,7 +183,7 @@ const Register = () => {
   };
 
   const validate = () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
       return "Please enter a valid email address.";
     if (!/^\d{10}$/.test(phoneNumber.replace(/\D/g, "")))
       return "Phone number must have 10 digits.";
