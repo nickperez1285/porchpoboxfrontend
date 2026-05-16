@@ -163,6 +163,24 @@ const Profile = ({ user }) => {
     daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
 
   const [addressCopied, setAddressCopied] = useState(false);
+
+  const handleShareReferral = () => {
+    const shareData = {
+      title: "Join Porch P.O. Box",
+      text: `Get your packages delivered securely to a local business! Use my referral code: ${displayReferral}`,
+      url: window.location.origin,
+    };
+
+    if (navigator.share) {
+      navigator
+        .share(shareData)
+        .catch((err) => console.log("Error sharing", err));
+    } else {
+      navigator.clipboard.writeText(shareData.text);
+      alert("Referral info copied to clipboard!");
+    }
+  };
+
   const displayReferral =
     profileData?.referralCode ||
     (user?.email ? user.email.substring(0, 2).toUpperCase() + "26" : "—");
@@ -728,6 +746,24 @@ const Profile = ({ user }) => {
                     }}
                   >
                     Copy
+                  </button>
+                )}
+                {displayReferral !== "—" && (
+                  <button
+                    type="button"
+                    onClick={handleShareReferral}
+                    style={{
+                      padding: "4px 10px",
+                      background: "#121212",
+                      border: "none",
+                      borderRadius: 6,
+                      fontWeight: 700,
+                      fontSize: 11,
+                      cursor: "pointer",
+                      color: "#fff",
+                    }}
+                  >
+                    Share
                   </button>
                 )}
               </div>
