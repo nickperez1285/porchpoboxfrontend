@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { collection, getDocs } from "firebase/firestore";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import { db } from "../firebase";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import "./PackageCheckIn.css";
@@ -131,28 +131,19 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setError("");
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/notifications/package-check-in`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            vendorName:
-              partnerProfile.businessName ||
-              partnerProfile.streetAddress ||
-              "Your Porch P.O. Box Location",
-            partnerId: partnerProfile.id,
-            recipients: selectedUsers.map((user) => ({
-              id: user.id,
-              name: user.name || "Customer",
-              email: user.email,
-              packageCount: getNormalizedPackageQuantity(user.id),
-            })),
-          }),
-        },
-      );
+      const response = await apiPost("/api/notifications/package-check-in", {
+        vendorName:
+          partnerProfile.businessName ||
+          partnerProfile.streetAddress ||
+          "Your Porch P.O. Box Location",
+        partnerId: partnerProfile.id,
+        recipients: selectedUsers.map((user) => ({
+          id: user.id,
+          name: user.name || "Customer",
+          email: user.email,
+          packageCount: getNormalizedPackageQuantity(user.id),
+        })),
+      });
 
       if (!response.ok) {
         const responseText = await response.text();

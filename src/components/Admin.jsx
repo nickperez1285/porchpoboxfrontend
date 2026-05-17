@@ -11,7 +11,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import { auth, db } from "../firebase";
 
 const Admin = () => {
@@ -48,24 +48,15 @@ const Admin = () => {
 
       if (approved && vendor && !vendor.approved) {
         try {
-          const response = await fetch(
-            `${API_BASE_URL}/api/notifications/partner-approved`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                businessName: vendor.businessName,
-                email: vendor.email,
-                streetAddress: vendor.streetAddress,
-                city: vendor.city,
-                state: vendor.state,
-                zipCode: vendor.zipCode,
-                referredBy: vendor.referredBy || "",
-              }),
-            },
-          );
+          const response = await apiPost("/api/notifications/partner-approved", {
+            businessName: vendor.businessName,
+            email: vendor.email,
+            streetAddress: vendor.streetAddress,
+            city: vendor.city,
+            state: vendor.state,
+            zipCode: vendor.zipCode,
+            referredBy: vendor.referredBy || "",
+          });
 
           if (!response.ok) {
             const errorBody = await response.json().catch(() => null);

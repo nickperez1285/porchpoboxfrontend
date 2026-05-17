@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import API_BASE_URL from "../config/api";
+import { apiGet, apiPost } from "../utils/apiClient";
 
 const SESSION_CHECK_RETRY_MS = 1500;
 const SESSION_CHECK_MAX_ATTEMPTS = 3;
@@ -27,7 +27,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
       try {
         let session = null;
         for (let attempt = 1; attempt <= SESSION_CHECK_MAX_ATTEMPTS; attempt += 1) {
-          const response = await fetch(`${API_BASE_URL}/api/checkout-session/${sessionId}`);
+          const response = await apiGet(`/api/checkout-session/${sessionId}`);
           const payload = await response.json().catch(() => null);
           if (!response.ok || !payload?.success) throw new Error(payload?.message || "Unable to verify checkout session.");
           session = payload.session;
@@ -42,10 +42,9 @@ const CheckoutSuccess = ({ user, authLoading }) => {
         const isComplete = session.mode === "subscription" && session.status === "complete";
         if (!isPaid && !isComplete) throw new Error("Payment has not completed yet.");
 
-        const finalizeResponse = await fetch(`${API_BASE_URL}/api/finalize-checkout-session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ sessionId, userId: user.uid })
+        const finalizeResponse = await apiPost("/api/finalize-checkout-session", {
+          sessionId,
+          userId: user.uid,
         });
         const finalizePayload = await finalizeResponse.json().catch(() => null);
         if (!finalizeResponse.ok || !finalizePayload?.success) throw new Error(finalizePayload?.message || "Unable to activate subscription.");

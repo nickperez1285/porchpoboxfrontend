@@ -11,7 +11,12 @@ import {
 } from "firebase/firestore";
 
 jest.mock("../firebase", () => ({
-  db: { __name: "mock-db" }
+  db: { __name: "mock-db" },
+  auth: {
+    currentUser: {
+      getIdToken: jest.fn().mockResolvedValue("test-token"),
+    },
+  },
 }));
 
 jest.mock("firebase/firestore", () => ({
@@ -103,6 +108,9 @@ describe("CustomerList", () => {
         "http://localhost:3001/api/notifications/package-delivery",
         expect.objectContaining({
           method: "POST",
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-token",
+          }),
           body: JSON.stringify({
             partnerId: "partner-1",
             partnerName: "Main Street",

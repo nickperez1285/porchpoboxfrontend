@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import { auth, db } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -56,14 +56,10 @@ const Register = () => {
     authProvider,
   }) => {
     try {
-      await fetch(`${API_BASE_URL}/api/notifications/user-signup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: userName,
-          email: userEmail,
-          authProvider: authProvider || "email",
-        }),
+      await apiPost("/api/notifications/user-signup", {
+        name: userName,
+        email: userEmail,
+        authProvider: authProvider || "email",
       });
     } catch (err) {
       console.error("Failed to log signup:", err);

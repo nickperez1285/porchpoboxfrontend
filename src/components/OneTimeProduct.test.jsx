@@ -7,6 +7,11 @@ import { getDoc } from "firebase/firestore";
 // Mock Firebase and Firestore
 jest.mock("../firebase", () => ({
   db: { __name: "mock-db" },
+  auth: {
+    currentUser: {
+      getIdToken: jest.fn().mockResolvedValue("test-token"),
+    },
+  },
 }));
 
 jest.mock("firebase/firestore", () => ({
@@ -112,6 +117,9 @@ describe("OneTimeProduct (ProductList)", () => {
       expect(global.fetch).toHaveBeenCalledWith(
         expect.stringContaining("/api/create-checkout-session"),
         expect.objectContaining({
+          headers: expect.objectContaining({
+            Authorization: "Bearer test-token",
+          }),
           body: expect.stringContaining('"priceId":"price_monthly_123"'),
         }),
       );

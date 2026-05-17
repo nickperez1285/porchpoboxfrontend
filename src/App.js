@@ -37,8 +37,6 @@ import PartnerOnboarding from "./components/PartnerOnboarding";
 import { auth, db } from "./firebase";
 import "./App.css";
 
-const ADMIN_UID = "6wVTCBAw4EVHHIFWnFLL57z8qHx2";
-
 const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   const location = useLocation();
   const linkStyle = {
@@ -119,9 +117,9 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
 function App() {
   const [user, setUser] = useState(null);
   const [userStatus, setUserStatus] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [partnerProfile, setPartnerProfile] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
-  const isAdmin = user?.uid === ADMIN_UID;
 
   const loadPartnerProfile = async (currentUser) => {
     if (!currentUser) {
@@ -148,6 +146,7 @@ function App() {
 
       if (!currentUser) {
         setUserStatus("");
+        setIsAdmin(false);
         setPartnerProfile(null);
         setAuthLoading(false);
         return;
@@ -157,6 +156,7 @@ function App() {
         const userDoc = await getDoc(doc(db, "users", currentUser.uid));
         const userData = userDoc.exists() ? userDoc.data() : {};
         setUserStatus(userData.status || "");
+        setIsAdmin(userData.isAdmin === true);
         await loadPartnerProfile(currentUser);
         // Never auto-show the pref location modal — it gets set automatically on first check-in
       } finally {

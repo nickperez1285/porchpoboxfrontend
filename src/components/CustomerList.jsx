@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { db } from "../firebase";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import { collection, onSnapshot } from "firebase/firestore";
 
 const CustomerList = ({
@@ -160,20 +160,11 @@ const CustomerList = ({
         .filter((recipient) => recipient.packageCount > 0);
 
       if (deliveryPayload.length > 0) {
-        const response = await fetch(
-          `${API_BASE_URL}/api/notifications/package-delivery`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              partnerId: vendorId,
-              partnerName: partnerLocationName,
-              recipients: deliveryPayload,
-            }),
-          },
-        );
+        const response = await apiPost("/api/notifications/package-delivery", {
+          partnerId: vendorId,
+          partnerName: partnerLocationName,
+          recipients: deliveryPayload,
+        });
 
         if (!response.ok) {
           const responseText = await response.text();

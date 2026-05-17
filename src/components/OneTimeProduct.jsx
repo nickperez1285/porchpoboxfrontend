@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import PrefLocationModal from "./PrefLocationModal";
 
 const PLAN_CONFIG = [
@@ -77,17 +77,11 @@ const ProductList = ({ user }) => {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/create-checkout-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          priceId: selectedPlan.priceId,
-          isSubscription: true,
-          userId: user.uid,
-          email: user.email
-        })
+      const response = await apiPost("/api/create-checkout-session", {
+        priceId: selectedPlan.priceId,
+        isSubscription: true,
+        userId: user.uid,
+        email: user.email,
       });
 
       const responseText = await response.text();

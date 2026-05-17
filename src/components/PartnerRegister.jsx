@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import API_BASE_URL from "../config/api";
+import { apiPost } from "../utils/apiClient";
 import { auth, db } from "../firebase";
 import {
   isPasswordValid,
@@ -108,29 +108,23 @@ const PartnerRegister = () => {
       });
 
       try {
-        const notificationResponse = await fetch(
-          `${API_BASE_URL}/api/notifications/vendor-registration`,
+        const notificationResponse = await apiPost(
+          "/api/notifications/vendor-registration",
           {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              business_name: businessName,
-              businessName,
-              vendor_email: email,
-              email,
-              phone_number: phoneNumber,
-              phoneNumber,
-              street_address: streetAddress,
-              streetAddress,
-              city,
-              state,
-              zip_code: zipCode,
-              zipCode,
-              store_hours: storeHours,
-              storeHours,
-            }),
+            business_name: businessName,
+            businessName,
+            vendor_email: email,
+            email,
+            phone_number: phoneNumber,
+            phoneNumber,
+            street_address: streetAddress,
+            streetAddress,
+            city,
+            state,
+            zip_code: zipCode,
+            zipCode,
+            store_hours: storeHours,
+            storeHours,
           },
         );
 
