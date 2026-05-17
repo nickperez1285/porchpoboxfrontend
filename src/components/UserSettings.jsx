@@ -173,7 +173,11 @@ const UserSettings = ({ user }) => {
 
           <div style={{ gridColumn: "1 / -1", border: "1px solid #ddd", borderRadius: 16, padding: 24, background: "#fff" }}>
             <h3 style={{ marginTop: 0, marginBottom: 6 }}>🔔 Notifications</h3>
-            <p style={{ margin: "0 0 16px", fontSize: 14, color: "#666" }}>Receive an email when a package is checked in at your location.</p>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "#666" }}>
+              When on, you get an email when a package is checked in
+              {profileData?.phoneNumber ? " and a text message to your phone on file" : ""}.
+              Add a phone number in Edit to enable SMS alerts.
+            </p>
             <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
               <button
                 type="button"
