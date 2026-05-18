@@ -13,8 +13,9 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
+    const form = e.currentTarget;
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(form);
     const payload = {
       name: formData.get("name"),
       email: formData.get("email"),
@@ -31,13 +32,14 @@ export default function ContactPage() {
 
       if (response.ok) {
         setStatus("Message sent successfully!");
-        e.currentTarget.reset();
+        form.reset();
       } else {
-        throw new Error("Failed to send message");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to send message");
       }
     } catch (err) {
       console.error("Submission error:", err);
-      setStatus("Failed to send message. Please try again.");
+      setStatus(`Error: ${err.message}`);
     }
   };
 
