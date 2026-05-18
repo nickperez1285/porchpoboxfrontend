@@ -3,6 +3,13 @@ import { useState } from "react";
 export default function ContactPage() {
   const [status, setStatus] = useState("");
 
+  // Ensure we don't have double slashes if the env var has a trailing one
+  const getApiUrl = (path) => {
+    const base = process.env.REACT_APP_API_URL || "";
+    const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+    return `${normalizedBase}${path}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
@@ -16,14 +23,11 @@ export default function ContactPage() {
     };
 
     try {
-      const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/notifications/contact`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        },
-      );
+      const response = await fetch(getApiUrl("/api/notifications/contact"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (response.ok) {
         setStatus("Message sent successfully!");
@@ -40,7 +44,7 @@ export default function ContactPage() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
-        <h1 style={styles.title}>Contact Us </h1>
+        <h1 style={styles.title}>Contact Us</h1>
 
         <input
           type="text"

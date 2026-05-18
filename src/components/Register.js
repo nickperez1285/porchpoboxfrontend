@@ -72,17 +72,20 @@ const Register = () => {
     authProvider,
   }) => {
     try {
-      const welcomeResponse = await fetch("/api/notifications/user-welcome", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const welcomeResponse = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/notifications/welcome`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: userName,
+            email: userEmail,
+            authProvider: authProvider || "email",
+          }),
         },
-        body: JSON.stringify({
-          name: userName,
-          email: userEmail,
-          authProvider: authProvider || "email",
-        }),
-      });
+      );
 
       if (!welcomeResponse.ok) {
         const errorBody = await welcomeResponse.json().catch(() => null);
