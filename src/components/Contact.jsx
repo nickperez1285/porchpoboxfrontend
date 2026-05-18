@@ -1,31 +1,40 @@
 import { useState } from "react";
-import emailjs from "@emailjs/browser";
 
 export default function ContactPage() {
   const [status, setStatus] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("Sending...");
 
-    emailjs
-      .send(
-        "service_eg7azka",
-        "template_jd2shuq",
+    const formData = new FormData(e.currentTarget);
+    const payload = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      message: formData.get("message"),
+      subject: "Contact Form Submission",
+    };
+
+    try {
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/notifications/contact`,
         {
-          name: e.target.name.value,
-          email: e.target.email.value,
-          message: e.target.message.value
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         },
-        "Id1MelaGp_AdTTwf7"
-      )
-      .then(() => {
+      );
+
+      if (response.ok) {
         setStatus("Message sent successfully!");
-        e.target.reset();
-      })
-      .catch(() => {
-        setStatus("Failed to send message. Please try again.");
-      });
+        e.currentTarget.reset();
+      } else {
+        throw new Error("Failed to send message");
+      }
+    } catch (err) {
+      console.error("Submission error:", err);
+      setStatus("Failed to send message. Please try again.");
+    }
   };
 
   return (
@@ -62,7 +71,6 @@ export default function ContactPage() {
         </button>
         {status && <p style={styles.status}>{status}</p>}
       </form>
-      h
     </div>
   );
 }
