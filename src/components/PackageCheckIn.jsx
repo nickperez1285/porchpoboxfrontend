@@ -220,7 +220,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             {users.length === 0 ? (
               <div className="pkg-checkin__empty">
                 {search.length < 2
-                  ? "No customer accounts found."
+                  ? "Type a name or email to search customers"
                   : "No customers match your search."}
               </div>
             ) : (
