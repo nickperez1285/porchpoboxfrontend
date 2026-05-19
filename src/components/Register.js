@@ -151,16 +151,16 @@ const Register = () => {
         createdAt: serverTimestamp(),
       });
 
-      await sendWelcomeEmail({
+      sendWelcomeEmail({
         name: displayName,
         email: user.email,
         authProvider: "google",
-      });
-      await logSignup({
+      }).catch(console.error);
+      logSignup({
         name: displayName,
         email: user.email,
         authProvider: "google",
-      });
+      }).catch(console.error);
 
       navigate("/profile");
     } catch (err) {
@@ -261,8 +261,10 @@ const Register = () => {
         createdAt: serverTimestamp(),
       });
 
-      await sendWelcomeEmail({ name, email, authProvider: "email" });
-      await logSignup({ name, email, authProvider: "email" });
+      sendWelcomeEmail({ name, email, authProvider: "email" }).catch(
+        console.error,
+      );
+      logSignup({ name, email, authProvider: "email" }).catch(console.error);
 
       navigate("/profile");
     } catch (err) {
