@@ -24,7 +24,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const [expandedUserIds, setExpandedUserIds] = useState([]);
 
   useEffect(() => {
-    if (search.trim().length < 2) {
+    if (search.trim().length < 1) {
       setUsers([]);
       return;
     }
@@ -48,7 +48,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [search]);

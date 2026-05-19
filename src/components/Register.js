@@ -130,6 +130,7 @@ const Register = () => {
 
       await setDoc(userDocRef, {
         name: displayName,
+        nameLower: displayName.toLowerCase(),
         email: user.email,
         phoneNumber: "",
         streetAddress: "",
@@ -240,6 +241,7 @@ const Register = () => {
 
       await setDoc(doc(db, "users", user.uid), {
         name: name,
+        nameLower: name.toLowerCase(),
         phoneNumber: phoneNumber,
         email: email,
         streetAddress: streetAddress,

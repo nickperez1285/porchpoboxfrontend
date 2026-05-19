@@ -69,6 +69,7 @@ const EditProfile = ({ user }) => {
 
       await updateDoc(doc(db, "users", user.uid), {
         name,
+        nameLower: name.toLowerCase(),
         email,
         phoneNumber,
         streetAddress,
