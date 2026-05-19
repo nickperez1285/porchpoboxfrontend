@@ -1,8 +1,7 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { collection, getDocs } from "firebase/firestore";
 import { apiPost } from "../utils/apiClient";
-import { db } from "../firebase";
+import { auth } from "../firebase";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import "./PackageCheckIn.css";
 
@@ -15,9 +14,9 @@ const rowStatusClass = (user) => {
 const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
-  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [selectedUsers, setSelectedUsers] = useState([]);
   const [packageQuantities, setPackageQuantities] = useState({});
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -25,61 +24,34 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const [expandedUserIds, setExpandedUserIds] = useState([]);
 
   useEffect(() => {
-    const loadUsers = async () => {
+    if (search.trim().length < 2) {
+      setUsers([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      setError("");
       try {
-        const [usersSnapshot, packageCountsSnapshot] = await Promise.all([
-          getDocs(collection(db, "users")),
-          getDocs(
-            collection(db, "partners", partnerProfile.id, "packageCounts"),
-          ),
-        ]);
-
-        const packageCounts = Object.fromEntries(
-          packageCountsSnapshot.docs.map((entry) => [
-            entry.id,
-            {
-              count: Number(entry.data().count) || 0,
-              totalReceived:
-                Number(entry.data().totalReceived) ||
-                Number(entry.data().count) ||
-                0,
-              totalPickedUp: Number(entry.data().totalPickedUp) || 0,
-            },
-          ]),
+        const idToken = await auth.currentUser.getIdToken();
+        const response = await fetch(
+          `${process.env.REACT_APP_API_URL}/api/notifications/search-customers?q=${encodeURIComponent(search)}`,
+          { headers: { Authorization: `Bearer ${idToken}` } },
         );
 
-        setUsers(
-          usersSnapshot.docs.map((entry) => ({
-            id: entry.id,
-            ...entry.data(),
-            packagesCheckedIn: Number(entry.data().packagesCheckedIn) || 0,
-            packagesDelivered: Number(entry.data().packagesDelivered) || 0,
-            packageCount: packageCounts[entry.id]?.count || 0,
-            totalReceived: packageCounts[entry.id]?.totalReceived || 0,
-            totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
-          })),
-        );
-      } catch (loadError) {
-        console.error("Error loading users for package check in:", loadError);
-        setError("Unable to load users for package check in.");
+        if (!response.ok) throw new Error("Search failed");
+        const data = await response.json();
+        setUsers(data);
+      } catch (err) {
+        console.error("Search error:", err);
+        setError("Failed to search customers.");
       } finally {
         setLoading(false);
       }
-    };
+    }, 400);
 
-    loadUsers();
-  }, [partnerProfile.id]);
-
-  const filteredUsers = useMemo(() => {
-    const term = search.trim().toLowerCase();
-    if (!term) {
-      return users;
-    }
-
-    return users.filter((user) =>
-      `${user.name || ""} ${user.email || ""}`.toLowerCase().includes(term),
-    );
-  }, [search, users]);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const toggleExpanded = (userId) => {
     setExpandedUserIds((current) =>
@@ -92,21 +64,19 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
   const getNormalizedPackageQuantity = (userId) =>
     Math.max(1, Number(packageQuantities[userId]) || 1);
 
-  const toggleSelection = (userId) => {
-    setSelectedUserIds((current) =>
-      current.includes(userId)
-        ? current.filter((id) => id !== userId)
-        : [...current, userId],
-    );
-    setPackageQuantities((current) => ({
-      ...current,
-      [userId]: current[userId] ?? "1",
-    }));
+  const toggleSelection = (user) => {
+    const isSelected = selectedUsers.some((u) => u.id === user.id);
+    if (isSelected) {
+      setSelectedUsers((prev) => prev.filter((u) => u.id !== user.id));
+    } else {
+      setSelectedUsers((prev) => [...prev, user]);
+      setPackageQuantities((current) => ({
+        ...current,
+        [user.id]: current[user.id] ?? "1",
+      }));
+    }
   };
 
-  const selectedUsers = users.filter((user) =>
-    selectedUserIds.includes(user.id),
-  );
   const totalSelectedPackages = selectedUsers.reduce(
     (sum, user) => sum + getNormalizedPackageQuantity(user.id),
     0,
@@ -190,8 +160,12 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                 Select customers, set how many packages arrived, then confirm.
                 Customers get an email when you check in.
               </p>
-              <p className="pkg-checkin__lead" style={{ marginTop: 8, fontSize: 13, color: "#b0b0b0" }}>
-                Checking in at: <strong style={{ color: "#e8d9a8" }}>{locationLabel}</strong>
+              <p
+                className="pkg-checkin__lead"
+                style={{ marginTop: 8, fontSize: 13, color: "#b0b0b0" }}
+              >
+                Checking in at:{" "}
+                <strong style={{ color: "#e8d9a8" }}>{locationLabel}</strong>
               </p>
             </div>
             <Link className="pkg-checkin__back" to="/partner">
@@ -214,11 +188,16 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
             aria-label="Search customers"
           />
           <div className="pkg-checkin__badge">
-            {totalSelectedPackages} package{totalSelectedPackages !== 1 ? "s" : ""} selected
+            {totalSelectedPackages} package
+            {totalSelectedPackages !== 1 ? "s" : ""} selected
           </div>
         </div>
 
-        {error ? <p className="pkg-checkin__alert" role="alert">{error}</p> : null}
+        {error ? (
+          <p className="pkg-checkin__alert" role="alert">
+            {error}
+          </p>
+        ) : null}
 
         {loading ? (
           <div className="pkg-checkin__list-card">
@@ -227,20 +206,26 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         ) : (
           <div className="pkg-checkin__list-card">
             <div className="pkg-checkin__list-head">
-              <span>Customers ({filteredUsers.length})</span>
-              <span style={{ fontWeight: 500, textTransform: "none", letterSpacing: 0 }}>
+              <span>Search Results ({users.length})</span>
+              <span
+                style={{
+                  fontWeight: 500,
+                  textTransform: "none",
+                  letterSpacing: 0,
+                }}
+              >
                 Qty · Include
               </span>
             </div>
-            {filteredUsers.length === 0 ? (
+            {users.length === 0 ? (
               <div className="pkg-checkin__empty">
-                {users.length === 0
+                {search.length < 2
                   ? "No customer accounts found."
                   : "No customers match your search."}
               </div>
             ) : (
               <ul className="pkg-checkin__list">
-                {filteredUsers.map((user) => (
+                {users.map((user) => (
                   <li
                     key={user.id}
                     className={`pkg-checkin__row ${rowStatusClass(user)}`}
@@ -269,8 +254,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                             Phone: {user.phoneNumber || "—"}
                           </div>
                           <div className="pkg-checkin__meta-row">
-                            Address:{" "}
-                            {user.streetAddress || "—"}
+                            Address: {user.streetAddress || "—"}
                             {user.city ? `, ${user.city}` : ""}
                             {user.state ? `, ${user.state}` : ""}
                             {user.zipCode ? ` ${user.zipCode}` : ""}
@@ -303,8 +287,8 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                         <input
                           type="checkbox"
                           className="pkg-checkin__checkbox"
-                          checked={selectedUserIds.includes(user.id)}
-                          onChange={() => toggleSelection(user.id)}
+                          checked={selectedUsers.some((u) => u.id === user.id)}
+                          onChange={() => toggleSelection(user)}
                           aria-label={`Include ${user.name || "customer"} in check-in`}
                         />
                       </div>
@@ -313,6 +297,61 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                 ))}
               </ul>
             )}
+          </div>
+        )}
+
+        {selectedUsers.length > 0 && (
+          <div className="pkg-checkin__list-card" style={{ marginTop: 24 }}>
+            <div
+              className="pkg-checkin__list-head"
+              style={{ background: "#f0f0f0", color: "#333" }}
+            >
+              <span>Selected for Check-In ({selectedUsers.length})</span>
+            </div>
+            <ul className="pkg-checkin__list">
+              {selectedUsers.map((user) => (
+                <li
+                  key={`sel-${user.id}`}
+                  className={`pkg-checkin__row ${rowStatusClass(user)}`}
+                >
+                  <div className="pkg-checkin__row-main">
+                    <span className="pkg-checkin__name">{user.name}</span>
+                    <div
+                      className="pkg-checkin__meta"
+                      style={{ display: "block" }}
+                    >
+                      {user.email} · Status: {user.status}
+                    </div>
+                  </div>
+                  <div className="pkg-checkin__controls">
+                    <input
+                      type="number"
+                      className="pkg-checkin__qty"
+                      min="1"
+                      value={packageQuantities[user.id] ?? "1"}
+                      onChange={(e) =>
+                        updatePackageQuantity(user.id, e.target.value)
+                      }
+                      onBlur={() => finalizePackageQuantity(user.id)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleSelection(user)}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        color: "#dc3545",
+                        cursor: "pointer",
+                        fontSize: 18,
+                        padding: "0 8px",
+                      }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
@@ -336,85 +375,101 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
         </div>
       </div>
 
-      {showConfirm && (() => {
-        const inactiveSelected = selectedUsers.filter(
-          (u) => u.status !== "active" && u.status !== "trial",
-        );
-        return (
-          <div
-            className="pkg-checkin-modal__backdrop"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="pkg-checkin-confirm-title"
-          >
-            <div className="pkg-checkin-modal__panel">
-              <h2 id="pkg-checkin-confirm-title" className="pkg-checkin-modal__title">
-                Confirm check-in
-              </h2>
-              <p className="pkg-checkin-modal__text">
-                You are about to check in{" "}
-                <strong>
-                  {totalSelectedPackages} package
-                  {totalSelectedPackages !== 1 ? "s" : ""}
-                </strong>{" "}
-                for{" "}
-                <strong>
-                  {selectedUsers.length} customer
-                  {selectedUsers.length !== 1 ? "s" : ""}
-                </strong>
-                . Notification emails will be sent when applicable.
-              </p>
+      {showConfirm &&
+        (() => {
+          const inactiveSelected = selectedUsers.filter(
+            (u) => u.status !== "active" && u.status !== "trial",
+          );
+          return (
+            <div
+              className="pkg-checkin-modal__backdrop"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="pkg-checkin-confirm-title"
+            >
+              <div className="pkg-checkin-modal__panel">
+                <h2
+                  id="pkg-checkin-confirm-title"
+                  className="pkg-checkin-modal__title"
+                >
+                  Confirm check-in
+                </h2>
+                <p className="pkg-checkin-modal__text">
+                  You are about to check in{" "}
+                  <strong>
+                    {totalSelectedPackages} package
+                    {totalSelectedPackages !== 1 ? "s" : ""}
+                  </strong>{" "}
+                  for{" "}
+                  <strong>
+                    {selectedUsers.length} customer
+                    {selectedUsers.length !== 1 ? "s" : ""}
+                  </strong>
+                  . Notification emails will be sent when applicable.
+                </p>
 
-              {inactiveSelected.length > 0 && (
-                <div className="pkg-checkin-modal__warn">
-                  <div className="pkg-checkin-modal__warn-title">
-                    Payment may be required
+                {inactiveSelected.length > 0 && (
+                  <div className="pkg-checkin-modal__warn">
+                    <div className="pkg-checkin-modal__warn-title">
+                      Payment may be required
+                    </div>
+                    <p
+                      style={{
+                        margin: "0 0 8px",
+                        fontSize: 13,
+                        color: "#7a0000",
+                      }}
+                    >
+                      The following customer
+                      {inactiveSelected.length !== 1 ? "s are" : " is"}{" "}
+                      <strong>inactive</strong> (trial used or subscription
+                      lapsed):
+                    </p>
+                    <ul style={{ margin: 0, paddingLeft: 18 }}>
+                      {inactiveSelected.map((u) => (
+                        <li
+                          key={u.id}
+                          style={{
+                            fontSize: 13,
+                            color: "#7a0000",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {u.name || u.email || "Unknown user"}
+                        </li>
+                      ))}
+                    </ul>
+                    <p
+                      style={{ margin: "8px 0 0", fontSize: 12, color: "#a00" }}
+                    >
+                      You may still accept their package; remind them they need
+                      an active plan to continue.
+                    </p>
                   </div>
-                  <p style={{ margin: "0 0 8px", fontSize: 13, color: "#7a0000" }}>
-                    The following customer
-                    {inactiveSelected.length !== 1 ? "s are" : " is"}{" "}
-                    <strong>inactive</strong> (trial used or subscription
-                    lapsed):
-                  </p>
-                  <ul style={{ margin: 0, paddingLeft: 18 }}>
-                    {inactiveSelected.map((u) => (
-                      <li
-                        key={u.id}
-                        style={{ fontSize: 13, color: "#7a0000", fontWeight: 600 }}
-                      >
-                        {u.name || u.email || "Unknown user"}
-                      </li>
-                    ))}
-                  </ul>
-                  <p style={{ margin: "8px 0 0", fontSize: 12, color: "#a00" }}>
-                    You may still accept their package; remind them they need an
-                    active plan to continue.
-                  </p>
-                </div>
-              )}
+                )}
 
-              <div className="pkg-checkin-modal__actions">
-                <button
-                  type="button"
-                  className="pkg-checkin-modal__btn-cancel"
-                  onClick={() => setShowConfirm(false)}
-                  disabled={submitting}
-                >
-                  Go back
-                </button>
-                <button
-                  type="button"
-                  className="pkg-checkin-modal__btn-confirm"
-                  onClick={handleCheckIn}
-                  disabled={submitting}
-                >
-                  {submitting ? "Checking in…" : "Confirm check-in"}
-                </button>
+                <div className="pkg-checkin-modal__actions">
+                  <button
+                    type="button"
+                    className="pkg-checkin-modal__btn-cancel"
+                    onClick={() => setShowConfirm(false)}
+                    disabled={submitting}
+                  >
+                    Go back
+                  </button>
+                  <button
+                    type="button"
+                    className="pkg-checkin-modal__btn-confirm"
+                    onClick={handleCheckIn}
+                    disabled={submitting}
+                  >
+                    {submitting ? "Checking in…" : "Confirm check-in"}
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
     </div>
   );
 };
