@@ -1,0 +1,19 @@
+.checkout-status-pill {
+  display: inline-block;
+  background: #e6f4ea;
+  color: #1a7f37;
+  borderRadius: 999px;
+  padding: 4px 14px;
+  fontWeight: 700;
+  fontSize: 13px;
+}
+
+.checkout-step-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+.checkout-step-row:last-child { margin-bottom: 0; }
+
+.checkout-step-text { fontSize: 14px; color: #444; lineHeight: 1.5; }

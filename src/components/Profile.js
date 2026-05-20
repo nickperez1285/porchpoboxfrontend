@@ -4,6 +4,7 @@ import { signOut } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
+import "./Profile.css";
 
 const formatDate = (value) => {
   if (!value) return "Not available";
@@ -39,33 +40,13 @@ const getStatusDisplay = (status) => {
 };
 
 const Card = ({ children, style = {} }) => (
-  <div
-    style={{
-      background: "#fff",
-      border: "1px solid #ebebeb",
-      borderRadius: 18,
-      padding: 24,
-      boxShadow: "0 2px 12px rgba(0,0,0,0.06)",
-      ...style,
-    }}
-  >
+  <div className="data-card" style={style}>
     {children}
   </div>
 );
 
 const SectionLabel = ({ children }) => (
-  <div
-    style={{
-      fontSize: 11,
-      fontWeight: 700,
-      letterSpacing: 1.2,
-      textTransform: "uppercase",
-      color: "#aaa",
-      marginBottom: 10,
-    }}
-  >
-    {children}
-  </div>
+  <div className="section-label">{children}</div>
 );
 
 const Profile = ({ user }) => {
@@ -186,53 +167,12 @@ const Profile = ({ user }) => {
     (user?.email ? user.email.substring(0, 2).toUpperCase() + "26" : "—");
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        background: "#f7f7f8",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 980,
-          margin: "48px auto 0",
-          padding: "0 20px",
-          flex: 1,
-          width: "100%",
-          boxSizing: "border-box",
-        }}
-      >
+    <div className="profile-wrap">
+      <div className="profile-container">
         {/* ── Hero ── */}
-        <div
-          style={{
-            background: "linear-gradient(135deg, #0f0f0f 0%, #1c1c1c 100%)",
-            color: "#f5f5f5",
-            borderRadius: 22,
-            padding: "32px 28px",
-            marginBottom: 28,
-            boxShadow: "0 8px 32px rgba(0,0,0,0.22)",
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: isMobile ? "center" : "space-between",
-            alignItems: "center",
-            gap: 20,
-            textAlign: isMobile ? "center" : "left",
-          }}
-        >
+        <div className="profile-hero">
           <div style={{ minWidth: isMobile ? "100%" : "auto" }}>
-            <div
-              style={{
-                fontSize: 11,
-                color: "#d4af37",
-                letterSpacing: 1.6,
-                textTransform: "uppercase",
-                marginBottom: 8,
-              }}
-            >
-              My Profile
-            </div>
+            <div className="profile-hero-eyebrow">My Profile</div>
             <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 4 }}>
               {user.displayName || profileData?.name || "Account Holder"}
             </div>
@@ -240,24 +180,10 @@ const Profile = ({ user }) => {
           </div>
 
           {statusInfo && (
-            <div
-              style={{
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.1)",
-                borderRadius: 14,
-                padding: "14px 20px",
-                minWidth: isMobile ? "100%" : 180,
-                textAlign: "center",
-              }}
-            >
+            <div className="profile-sub-pill">
               <div
-                style={{
-                  fontSize: 11,
-                  color: "#888",
-                  textTransform: "uppercase",
-                  letterSpacing: 1,
-                  marginBottom: 8,
-                }}
+                className="section-label"
+                style={{ color: "#888", marginBottom: 8 }}
               >
                 Subscription
               </div>
@@ -306,42 +232,7 @@ const Profile = ({ user }) => {
           (profileData.prefLocation.id ||
             profileData.prefLocation.businessName ||
             profileData.prefLocation.streetAddress) ? (
-            <div
-              style={{
-                background: "linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%)",
-                borderRadius: 20,
-                padding: "28px 32px",
-                color: "#f5f5f5",
-                boxShadow: "0 0 0 3px #d4af37, 0 16px 48px rgba(0,0,0,0.3)",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  top: -40,
-                  right: -40,
-                  width: 200,
-                  height: 200,
-                  background:
-                    "radial-gradient(circle, rgba(212,175,55,0.12), transparent 70%)",
-                  pointerEvents: "none",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: -30,
-                  left: -30,
-                  width: 160,
-                  height: 160,
-                  background:
-                    "radial-gradient(circle, rgba(212,175,55,0.07), transparent 70%)",
-                  pointerEvents: "none",
-                }}
-              />
-
+            <div className="profile-address-card">
               <div
                 style={{
                   display: "flex",
@@ -367,18 +258,7 @@ const Profile = ({ user }) => {
                   >
                     <span>📦</span> Your Package Delivery Address
                   </div>
-                  <div
-                    style={{
-                      fontFamily: "'Courier New', monospace",
-                      lineHeight: 2,
-                      fontSize: 17,
-                      background: "rgba(255,255,255,0.08)",
-                      border: "1px solid rgba(212,175,55,0.5)",
-                      borderRadius: 12,
-                      padding: "16px 20px",
-                      marginBottom: 14,
-                    }}
-                  >
+                  <div className="address-visual-box">
                     <div
                       style={{ fontWeight: 800, fontSize: 19, color: "#fff" }}
                     >
@@ -486,7 +366,7 @@ const Profile = ({ user }) => {
                   style={{
                     fontWeight: 700,
                     fontSize: 15,
-                    color: "rgb(236, 74, 10)",
+                    color: "red",
                   }}
                 >
                   📦 No delivery address yet
@@ -515,14 +395,7 @@ const Profile = ({ user }) => {
         </div>
 
         {/* ── Main Grid ── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 20,
-            marginBottom: 40,
-          }}
-        >
+        <div className="profile-data-grid">
           {/* Package History */}
           <Card>
             <div

@@ -4,6 +4,7 @@ import { updateEmail, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import PrefLocationModal from "./PrefLocationModal";
+import "./UserSettings.css";
 
 const UserSettings = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
@@ -128,30 +129,12 @@ const UserSettings = ({ user }) => {
     searchParams.get("highlight") === "location" && !profileData?.prefLocation;
 
   return (
-    <div style={{ maxWidth: 760, margin: "60px auto", padding: "0 20px" }}>
+    <div className="settings-container">
       {showPrefModal && (
         <PrefLocationModal user={user} onDone={handlePrefDone} />
       )}
-      <div
-        style={{
-          background: "linear-gradient(135deg, #121212 0%, #1e1e1e 100%)",
-          color: "#f5f5f5",
-          borderRadius: 18,
-          padding: "28px 24px",
-          marginBottom: 24,
-          boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
-        }}
-      >
-        <div
-          style={{
-            color: "#d4af37",
-            fontSize: 12,
-            letterSpacing: 1.2,
-            textTransform: "uppercase",
-          }}
-        >
-          User Profile
-        </div>
+      <div className="settings-hero">
+        <div className="settings-hero-eyebrow">User Profile</div>
         <h2 style={{ margin: "8px 0 6px" }}>Settings</h2>
         <p style={{ margin: 0, color: "#d6d6d6" }}>
           Manage your contact details and mailing address.
@@ -167,105 +150,40 @@ const UserSettings = ({ user }) => {
       )}
 
       {!editing ? (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 20,
-          }}
-        >
-          <div
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
-          >
+        <div className="settings-grid">
+          <div className="settings-card">
             <h3 style={{ marginTop: 0 }}>Contact Information</h3>
             <div style={{ marginBottom: 14 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Name
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+              <div className="settings-label">Name</div>
+              <div className="settings-value">
                 {profileData?.name || user.displayName || "Not provided"}
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Email
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+              <div className="settings-label">Email</div>
+              <div className="settings-value">
                 {user.email || "Not available"}
               </div>
             </div>
             <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Phone
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+              <div className="settings-label">Phone</div>
+              <div className="settings-value">
                 {profileData?.phoneNumber || "Not provided"}
               </div>
             </div>
           </div>
 
-          <div
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
-          >
+          <div className="settings-card">
             <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
             <div style={{ marginBottom: 14 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Street Address
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+              <div className="settings-label">Street Address</div>
+              <div className="settings-value">
                 {profileData?.streetAddress || "Not provided"}
               </div>
             </div>
             <div style={{ marginBottom: 14 }}>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                City
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+              <div className="settings-label">City</div>
+              <div className="settings-value">
                 {profileData?.city || "Not provided"}
               </div>
             </div>
@@ -277,32 +195,14 @@ const UserSettings = ({ user }) => {
               }}
             >
               <div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#666",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                  }}
-                >
-                  State
-                </div>
-                <div style={{ marginTop: 4, fontSize: 18 }}>
+                <div className="settings-label">State</div>
+                <div className="settings-value">
                   {profileData?.state || "Not provided"}
                 </div>
               </div>
               <div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#666",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                  }}
-                >
-                  ZIP Code
-                </div>
-                <div style={{ marginTop: 4, fontSize: 18 }}>
+                <div className="settings-label">ZIP Code</div>
+                <div className="settings-value">
                   {profileData?.zipCode || "Not provided"}
                 </div>
               </div>
@@ -310,8 +210,8 @@ const UserSettings = ({ user }) => {
           </div>
 
           <div
+            className="settings-card-full"
             style={{
-              gridColumn: "1 / -1",
               display: "flex",
               gap: 12,
               flexWrap: "wrap",
@@ -328,15 +228,7 @@ const UserSettings = ({ user }) => {
             </Link>
           </div>
 
-          <div
-            style={{
-              gridColumn: "1 / -1",
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
-          >
+          <div className="settings-card settings-card-full">
             <h3 style={{ marginTop: 0, marginBottom: 6 }}>🔔 Notifications</h3>
             <p style={{ margin: "0 0 16px", fontSize: 14, color: "#666" }}>
               When on, you get an email when a package is checked in
@@ -345,36 +237,20 @@ const UserSettings = ({ user }) => {
                 : ""}
               . Add a phone number in Edit to enable SMS alerts.
             </p>
-            <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div className="notif-toggle-wrap">
               <button
                 type="button"
                 onClick={handleNotifToggle}
                 disabled={savingNotif}
+                className="notif-toggle-btn"
                 style={{
-                  width: 52,
-                  height: 28,
-                  borderRadius: 999,
-                  border: "none",
-                  cursor: "pointer",
                   background: notificationsEnabled ? "#1a7f37" : "#ccc",
-                  position: "relative",
-                  transition: "background 0.2s",
-                  flexShrink: 0,
                 }}
                 aria-label="Toggle notifications"
               >
                 <span
-                  style={{
-                    position: "absolute",
-                    top: 3,
-                    left: notificationsEnabled ? 26 : 3,
-                    width: 22,
-                    height: 22,
-                    borderRadius: "50%",
-                    background: "#fff",
-                    transition: "left 0.2s",
-                    boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
-                  }}
+                  className="notif-toggle-circle"
+                  style={{ left: notificationsEnabled ? 26 : 3 }}
                 />
               </button>
               <span
@@ -393,13 +269,7 @@ const UserSettings = ({ user }) => {
           </div>
 
           <div
-            style={{
-              gridColumn: "1 / -1",
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
+            className={`settings-card settings-card-full ${shouldHighlightLocation ? "location-highlight" : ""}`}
           >
             <h3 style={{ marginTop: 0 }}>Preferred Location</h3>
             <p style={{ fontSize: 13, color: "#888", margin: "0 0 14px" }}>
@@ -440,22 +310,8 @@ const UserSettings = ({ user }) => {
           </div>
         </div>
       ) : (
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-            gap: 20,
-          }}
-        >
-          <div
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
-          >
+        <form onSubmit={handleSubmit} className="settings-grid">
+          <div className="settings-card">
             <h3 style={{ marginTop: 0 }}>Contact Information</h3>
             {[
               {
@@ -481,15 +337,7 @@ const UserSettings = ({ user }) => {
               },
             ].map(({ label, value, setter, type, autoComplete }) => (
               <div key={label} style={{ marginBottom: 14 }}>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#666",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 4,
-                  }}
-                >
+                <div className="settings-label" style={{ marginBottom: 4 }}>
                   {label}
                 </div>
                 <input
@@ -498,27 +346,13 @@ const UserSettings = ({ user }) => {
                   onChange={(e) => setter(e.target.value)}
                   autoComplete={autoComplete}
                   required
-                  style={{
-                    width: "100%",
-                    padding: "8px 10px",
-                    borderRadius: 8,
-                    border: "1px solid #ccc",
-                    fontSize: 15,
-                    boxSizing: "border-box",
-                  }}
+                  className="settings-input"
                 />
               </div>
             ))}
           </div>
 
-          <div
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: 16,
-              padding: 24,
-              background: "#fff",
-            }}
-          >
+          <div className="settings-card">
             <h3 style={{ marginTop: 0 }}>Mailing Address</h3>
             {[
               {
@@ -547,15 +381,7 @@ const UserSettings = ({ user }) => {
               },
             ].map(({ label, value, setter, autoComplete }) => (
               <div key={label} style={{ marginBottom: 14 }}>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#666",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 4,
-                  }}
-                >
+                <div className="settings-label" style={{ marginBottom: 4 }}>
                   {label}
                 </div>
                 <input
@@ -564,14 +390,7 @@ const UserSettings = ({ user }) => {
                   onChange={(e) => setter(e.target.value)}
                   autoComplete={autoComplete}
                   required
-                  style={{
-                    width: "100%",
-                    padding: "8px 10px",
-                    borderRadius: 8,
-                    border: "1px solid #ccc",
-                    fontSize: 15,
-                    boxSizing: "border-box",
-                  }}
+                  className="settings-input"
                 />
               </div>
             ))}
@@ -581,12 +400,16 @@ const UserSettings = ({ user }) => {
             <p style={{ color: "red", gridColumn: "1 / -1" }}>{error}</p>
           )}
 
-          <div style={{ display: "flex", gap: 12, gridColumn: "1 / -1" }}>
-            <button type="submit" disabled={saving}>
+          <div
+            className="settings-card-full"
+            style={{ display: "flex", gap: 12 }}
+          >
+            <button type="submit" className="btn-save" disabled={saving}>
               {saving ? "Saving..." : "Save Changes"}
             </button>
             <button
               type="button"
+              className="btn-cancel"
               onClick={() => {
                 setEditing(false);
                 setError("");

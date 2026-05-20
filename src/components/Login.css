@@ -1,0 +1,15 @@
+.login-footer {
+  marginTop: 24px;
+  textAlign: center;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  fontSize: 14px;
+}
+
+.login-footer-link {
+  color: #666;
+  textDecoration: none;
+}
+
+.login-footer-link-bold { color: #0b57d0; fontWeight: 700; }

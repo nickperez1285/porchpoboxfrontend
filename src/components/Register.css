@@ -1,0 +1,41 @@
+.reg-google-signin-section {
+  margin-bottom: 20px;
+}
+
+.reg-btn-google {
+  width: 100%;
+  padding: 10px 16px;
+  margin-top: 12px;
+  background-color: #ffffff;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s;
+}
+
+.reg-btn-google:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.reg-btn-google:hover:not(:disabled) {
+  background-color: #f8f8f8;
+}
+
+.reg-divider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.reg-divider-text {
+  color: #666;
+  font-size: 14px;
+}

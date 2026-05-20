@@ -14,6 +14,7 @@ import {
   passwordRequirementsText,
 } from "../utils/passwordValidation";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
+import "./Register.css";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -319,13 +320,7 @@ const Register = () => {
         </div>
       )}
       <form className="reg-form" onSubmit={handleRegister} noValidate>
-        <p className="reg-section-label">Account</p>
-
-        {/* Google Sign-In Option */}
-        <div
-          className="reg-google-signin-section"
-          style={{ marginBottom: "20px" }}
-        >
+        <div className="reg-google-signin-section">
           <label
             className="reg-terms-checkbox-row"
             htmlFor="register-terms-agree-google"
@@ -345,31 +340,6 @@ const Register = () => {
             className="reg-btn-google"
             onClick={handleGoogleSignIn}
             disabled={loading || !termsAccepted}
-            style={{
-              width: "100%",
-              padding: "10px 16px",
-              marginTop: "12px",
-              backgroundColor: "#ffffff",
-              border: "1px solid #dadce0",
-              borderRadius: "4px",
-              fontSize: "14px",
-              fontWeight: "500",
-              cursor: loading || !termsAccepted ? "not-allowed" : "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              opacity: loading || !termsAccepted ? 0.6 : 1,
-              transition: "background-color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading && termsAccepted) {
-                e.target.style.backgroundColor = "#f8f8f8";
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = "#ffffff";
-            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path
@@ -393,20 +363,12 @@ const Register = () => {
           </button>
         </div>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "12px",
-            margin: "20px 0",
-          }}
-        >
+        <div className="reg-divider-wrap">
           <hr style={{ flex: 1 }} />
-          <span style={{ color: "#666", fontSize: "14px" }}>
-            or continue with email
-          </span>
+          <span className="reg-divider-text">or continue with email</span>
           <hr style={{ flex: 1 }} />
         </div>
+        <p className="reg-section-label">Account Details</p>
 
         <RegField
           id="reg-email"

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
+import "./ReferralForm.css";
 
 export default function ReferralForm() {
   const [email, setEmail] = useState("");
@@ -48,20 +49,22 @@ export default function ReferralForm() {
   };
 
   return (
-    <div
-      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
-    >
-      <div style={{ ...styles.container, flex: 1 }}>
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <h1 style={styles.title}>Referral Form</h1>
-          <p style={styles.description}>
+    <div className="referral-page-wrap">
+      <div className="referral-form-container">
+        <form onSubmit={handleSubmit} className="referral-form">
+          <h1 className="referral-form-title">Referral Form</h1>
+          <p className="referral-form-description">
             Enter the email address of your referral and/or add any additional
             information about how to get in contact with the referral. We will
             reach out to them and let them know about our services. Thank you
             for your support!
           </p>
-          <p style={{ margin: 0, fontSize: 13, color: "#6a4a00", background: "#fff8e1", border: "1px solid #f0c040", borderRadius: 6, padding: "10px 14px", textAlign: "center" }}>
-            💡 Your personal referral code can be found on your <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>Profile page</Link>.
+          <p className="referral-code-callout">
+            💡 Your personal referral code can be found on your{" "}
+            <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>
+              Profile page
+            </Link>
+            .
           </p>
 
           <input
@@ -71,7 +74,7 @@ export default function ReferralForm() {
             required
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            style={styles.input}
+            className="referral-form-input"
           />
 
           <div>
@@ -80,12 +83,18 @@ export default function ReferralForm() {
               name="referralCode"
               placeholder="Your Referral Code (e.g. JA120525)"
               value={referralCode}
-              onChange={(event) => setReferralCode(event.target.value.toUpperCase())}
+              onChange={(event) =>
+                setReferralCode(event.target.value.toUpperCase())
+              }
               maxLength={10}
-              style={styles.input}
+              className="referral-form-input"
             />
-            <p style={{ margin: "6px 0 0", fontSize: 12, color: "#888" }}>
-              Optional — find your code on your <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>Profile page</Link>.
+            <p className="referral-input-hint">
+              Optional — find your code on your{" "}
+              <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>
+                Profile page
+              </Link>
+              .
             </p>
           </div>
 
@@ -95,16 +104,20 @@ export default function ReferralForm() {
             rows={6}
             value={additionalInfo}
             onChange={(event) => setAdditionalInfo(event.target.value)}
-            style={{ ...styles.input, resize: "vertical" }}
+            className="referral-form-input referral-form-textarea"
           />
 
-          <button type="submit" style={styles.button} disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="referral-form-button"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? "Submitting..." : "Submit"}
           </button>
-          {status && <p style={styles.status}>{status}</p>}
+          {status && <p className="referral-form-status">{status}</p>}
         </form>
       </div>
-      <footer style={{ padding: "1em", background: "#111" }}>
+      <footer className="referral-footer">
         <center>
           <Link
             to="/partner"

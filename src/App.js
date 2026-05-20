@@ -54,10 +54,6 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   }, []);
 
   const location = useLocation();
-  const linkStyle = {
-    textDecoration: "none",
-    color: "inherit",
-  };
   const hideAuthLinks = [
     "/login",
     "/partner/login",
@@ -87,39 +83,24 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   };
 
   return (
-    <header style={{ position: "relative" }}>
-      <center>
-        <Link to="/" style={{ ...linkStyle, color: "gold" }}>
-          <h1 className="header">
-            <span style={{ position: "absolute", left: "-9999px" }}>
-              Porch P.O. Box
-            </span>
-          </h1>
+    <header className="app-header">
+      <div className="header-logo-wrap">
+        <Link to="/" className="header-logo-link">
+          <h1 className="header">Porch P.O. Box</h1>
         </Link>
-      </center>
+      </div>
       {!authLoading && !hideAuthLinks && (
-        <div
-          style={{
-            position: isMobile ? "static" : "absolute",
-            bottom: 0,
-            right: 0,
-            display: "flex",
-            justifyContent: isMobile ? "center" : "flex-end",
-            gap: isMobile ? 16 : 12,
-            marginTop: isMobile ? 10 : 0,
-            fontSize: isMobile ? "14px" : "inherit",
-          }}
-        >
-          <Link to={primaryLink.to} style={linkStyle}>
+        <div className="header-nav">
+          <Link to={primaryLink.to} className="header-link">
             {primaryLink.label}
           </Link>
           {isAdmin && (
-            <Link to="/admin" style={linkStyle}>
+            <Link to="/admin" className="header-link">
               Admin
             </Link>
           )}
           {!user && (
-            <Link to="/register" style={linkStyle}>
+            <Link to="/register" className="header-link">
               Register
             </Link>
           )}
@@ -127,16 +108,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
             <button
               type="button"
               onClick={handleLogout}
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                margin: 0,
-                cursor: "pointer",
-                font: "inherit",
-                color: "inherit",
-                textDecoration: "none",
-              }}
+              className="header-logout-btn"
             >
               Logout
             </button>
@@ -360,13 +332,7 @@ function App() {
             path="/admin/login"
             element={
               authLoading ? (
-                <div
-                  style={{
-                    maxWidth: 960,
-                    margin: "80px auto",
-                    padding: "0 20px",
-                  }}
-                >
+                <div className="admin-loading-container">
                   <h2>Admin Login</h2>
                   <p>Checking session...</p>
                 </div>
@@ -381,13 +347,7 @@ function App() {
             path="/admin"
             element={
               authLoading ? (
-                <div
-                  style={{
-                    maxWidth: 960,
-                    margin: "80px auto",
-                    padding: "0 20px",
-                  }}
-                >
+                <div className="admin-loading-container">
                   <h2>Admin</h2>
                   <p>Checking admin access...</p>
                 </div>

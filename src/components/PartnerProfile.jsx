@@ -10,6 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import "./PartnerProfile.css";
 
 const PAYOUT_RATE = 5; // $5 per active subscriber
 
@@ -147,200 +148,76 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   };
 
   return (
-    <div style={{ maxWidth: 960, margin: "60px auto", padding: "0 20px" }}>
-      <div
-        style={{
-          background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",
-          color: "#f5f5f5",
-          borderRadius: isMobile ? 0 : 18,
-          padding: isMobile ? "28px 20px" : "28px 24px",
-          margin: isMobile ? "0 -20px 24px" : "0 0 24px",
-          marginBottom: 24,
-          boxShadow: "0 12px 32px rgba(0, 0, 0, 0.18)",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            justifyContent: "space-between",
-            gap: 20,
-            alignItems: "center",
-          }}
-        >
+    <div className="partner-profile-container">
+      <div className="partner-hero">
+        <div className="partner-hero__content">
           <div>
-            <p
-              style={{
-                margin: 0,
-                color: "#d4af37",
-                letterSpacing: 1.2,
-                textTransform: "uppercase",
-                fontSize: 12,
-              }}
-            >
-              Partner Profile
-            </p>
-            <h2 style={{ margin: "8px 0 6px" }}>
+            <p className="partner-hero-eyebrow">Partner Profile</p>
+            <h2 className="partner-hero-title">
               {partnerProfile.businessName || "Partner Account"}
             </h2>
-            <p style={{ margin: 0, color: "#d6d6d6" }}>
+            <p className="partner-hero-subtitle">
               Manage your location details and account contact information.
             </p>
           </div>
         </div>
       </div>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
-          gap: 20,
-        }}
-      >
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-          }}
-        >
+      <div className="partner-grid">
+        <div className="partner-card">
           <h3 style={{ marginTop: 0 }}>Business Information</h3>
-          <div style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Business Name
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">Business Name</div>
+            <div className="partner-info-value">
               {partnerProfile.businessName || "Not provided"}
             </div>
           </div>
-          <div style={{ marginBottom: 14 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Phone
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">Phone</div>
+            <div className="partner-info-value">
               {partnerProfile.phoneNumber || "Not provided"}
             </div>
           </div>
-          <div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Contact Email
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">Contact Email</div>
+            <div className="partner-info-value">
               {user.email || partnerProfile.email || "Not available"}
             </div>
           </div>
         </div>
 
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-          }}
-        >
+        <div className="partner-card">
           <h3 style={{ marginTop: 0 }}>Location</h3>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Street Address
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">Street Address</div>
+            <div className="partner-info-value">
               {partnerProfile.streetAddress || "Not provided"}
             </div>
           </div>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              City
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">City</div>
+            <div className="partner-info-value">
               {partnerProfile.city || "Not provided"}
             </div>
           </div>
-          <div style={{ marginBottom: 18 }}>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                textTransform: "uppercase",
-                letterSpacing: 0.8,
-              }}
-            >
-              Store Hours
-            </div>
-            <div style={{ marginTop: 4, fontSize: 18 }}>
+          <div className="partner-info-group">
+            <div className="partner-info-label">Store Hours</div>
+            <div className="partner-info-value">
               {partnerProfile.storeHours || "Not provided"}
             </div>
           </div>
           <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-              gap: 16,
-            }}
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}
           >
-            <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                State
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+            <div className="partner-info-group">
+              <div className="partner-info-label">State</div>
+              <div className="partner-info-value">
                 {partnerProfile.state || "Not provided"}
               </div>
             </div>
-            <div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#666",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                }}
-              >
-                Zip Code
-              </div>
-              <div style={{ marginTop: 4, fontSize: 18 }}>
+            <div className="partner-info-group">
+              <div className="partner-info-label">Zip Code</div>
+              <div className="partner-info-value">
                 {partnerProfile.zipCode || "Not provided"}
               </div>
             </div>
@@ -348,24 +225,11 @@ const PartnerProfile = ({ user, partnerProfile }) => {
         </div>
 
         <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-            cursor: prefCount > 0 ? "pointer" : "default",
-          }}
+          className="partner-card"
+          style={{ cursor: prefCount > 0 ? "pointer" : "default" }}
           onClick={() => prefCount > 0 && setShowPrefUsers(!showPrefUsers)}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              flexWrap: "wrap",
-              marginBottom: 16,
-            }}
-          >
+          <div className="partner-card__header">
             <h3 style={{ margin: 0 }}>Monthly Subscribers</h3>
             {prefCount > 0 && (
               <span style={{ fontSize: 13, color: "#0b57d0" }}>
@@ -373,128 +237,52 @@ const PartnerProfile = ({ user, partnerProfile }) => {
               </span>
             )}
           </div>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-              gap: 14,
-              marginBottom: 8,
-            }}
-          >
-            <div
-              style={{ background: "#f8f5ea", borderRadius: 12, padding: 14 }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "#8a6a00",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                  marginBottom: 6,
-                }}
-              >
-                Total Active
-              </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: "#121212" }}>
+          <div className="subscriber-stats-grid">
+            <div className="stat-box stat-box-gold">
+              <div className="stat-label">Total Active</div>
+              <div className="stat-value">
                 {prefCount === null ? "—" : prefCount}
               </div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+              <div className="stat-hint">
                 active subscriber{prefCount !== 1 ? "s" : ""} at your location
               </div>
             </div>
-            <div
-              style={{ background: "#e8f5e9", borderRadius: 12, padding: 14 }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "#1a7f37",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                  marginBottom: 6,
-                }}
-              >
-                This Month
-              </div>
-              <div style={{ fontSize: 32, fontWeight: 700, color: "#1a7f37" }}>
+            <div className="stat-box stat-box-green">
+              <div className="stat-label">This Month</div>
+              <div className="stat-value">
                 {monthlyCount === null ? "—" : monthlyCount}
               </div>
-              <div style={{ fontSize: 12, color: "#888", marginTop: 4 }}>
+              <div className="stat-hint">
                 new subscriber{monthlyCount !== 1 ? "s" : ""} in{" "}
                 {new Date().toLocaleString("default", { month: "long" })}
               </div>
             </div>
           </div>
           {showPrefUsers && prefUsers.length > 0 && (
-            <div
-              style={{
-                marginTop: 18,
-                borderTop: "1px solid #eee",
-                paddingTop: 16,
-              }}
-            >
-              <ul
-                style={{
-                  listStyle: "none",
-                  padding: 0,
-                  margin: 0,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 10,
-                }}
-              >
-                {prefUsers.map((u) => (
-                  <li
-                    key={u.id}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      padding: "10px 14px",
-                      background: "#fafafa",
-                      borderRadius: 10,
-                      border: "1px solid #eee",
-                    }}
-                  >
-                    <span style={{ fontWeight: 600 }}>
-                      {u.name || "Unnamed user"}
+            <ul className="subscriber-list">
+              {prefUsers.map((u) => (
+                <li key={u.id} className="subscriber-item">
+                  <span style={{ fontWeight: 600 }}>
+                    {u.name || "Unnamed user"}
+                  </span>
+                  {u.email && (
+                    <span style={{ fontSize: 13, color: "#666", marginTop: 2 }}>
+                      {u.email}
                     </span>
-                    {u.email && (
-                      <span
-                        style={{ fontSize: 13, color: "#666", marginTop: 2 }}
-                      >
-                        {u.email}
-                      </span>
-                    )}
-                    {u.phoneNumber && (
-                      <span
-                        style={{ fontSize: 13, color: "#888", marginTop: 1 }}
-                      >
-                        {u.phoneNumber}
-                      </span>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
+                  )}
+                  {u.phoneNumber && (
+                    <span style={{ fontSize: 13, color: "#888", marginTop: 1 }}>
+                      {u.phoneNumber}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
 
-        <div
-          style={{
-            border: "1px solid #ddd",
-            borderRadius: 16,
-            padding: 24,
-            background: "#fff",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 16,
-            }}
-          >
+        <div className="partner-card">
+          <div className="partner-card__header">
             <h3 style={{ margin: 0 }}>Preferred Payment</h3>
             <button
               type="button"
@@ -519,33 +307,17 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                   (o) => o.value === selectedMethod,
                 );
                 return (
-                  <div
-                    style={{ display: "flex", alignItems: "center", gap: 14 }}
-                  >
+                  <div className="payment-method-wrap">
                     <div
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 12,
-                        background: opt?.bg,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 22,
-                        fontWeight: 700,
-                        color: opt?.color,
-                      }}
+                      className="payment-pill"
+                      style={{ background: opt?.bg, color: opt?.color }}
                     >
                       {opt?.symbol}
                     </div>
                     <div>
-                      <div style={{ fontWeight: 600, fontSize: 17 }}>
-                        {opt?.label}
-                      </div>
+                      <div className="payment-method-name">{opt?.label}</div>
                       {opt?.hasHandle && paymentHandle && (
-                        <div
-                          style={{ fontSize: 13, color: "#666", marginTop: 2 }}
-                        >
+                        <div className="payment-method-handle">
                           {paymentHandle}
                         </div>
                       )}
@@ -670,111 +442,35 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             .filter((p) => p.status === "paid")
             .reduce((s, p) => s + (p.amount || 0), 0);
           return (
-            <div
-              style={{
-                border: "1px solid #ddd",
-                borderRadius: 16,
-                padding: 24,
-                background: "#fff",
-              }}
-            >
+            <div className="partner-card">
               <h3 style={{ marginTop: 0, marginBottom: 16 }}>
                 💰 Payout Tracking
               </h3>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                  gap: 12,
-                  marginBottom: 20,
-                }}
-              >
-                <div
-                  style={{
-                    background: "#e8f5e9",
-                    borderRadius: 12,
-                    padding: 14,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "#1a7f37",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.8,
-                      marginBottom: 6,
-                    }}
-                  >
-                    This Month
-                  </div>
-                  <div
-                    style={{ fontSize: 28, fontWeight: 700, color: "#1a7f37" }}
-                  >
-                    ${currentMonthEarnings}
-                  </div>
-                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>
+              <div className="stat-grid">
+                <div className="stat-box stat-box-green">
+                  <div className="stat-label">This Month</div>
+                  <div className="stat-value">${currentMonthEarnings}</div>
+                  <div className="stat-hint">
                     {prefCount || 0} subscribers × $5
                   </div>
                 </div>
-                <div
-                  style={{
-                    background: "#f8f5ea",
-                    borderRadius: 12,
-                    padding: 14,
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "#8a6a00",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.8,
-                      marginBottom: 6,
-                    }}
-                  >
-                    Total Paid
-                  </div>
-                  <div
-                    style={{ fontSize: 28, fontWeight: 700, color: "#121212" }}
-                  >
-                    ${totalPaid}
-                  </div>
-                  <div style={{ fontSize: 11, color: "#888", marginTop: 4 }}>
-                    all time
-                  </div>
+                <div className="stat-box stat-box-gold">
+                  <div className="stat-label">Total Paid</div>
+                  <div className="stat-value">${totalPaid}</div>
+                  <div className="stat-hint">all time</div>
                 </div>
               </div>
               {!payoutsLoading && payouts.length > 0 && (
                 <div>
                   <div
-                    style={{
-                      fontSize: 12,
-                      color: "#666",
-                      textTransform: "uppercase",
-                      letterSpacing: 0.8,
-                      marginBottom: 10,
-                    }}
+                    className="partner-info-label"
+                    style={{ marginBottom: 10 }}
                   >
                     Payout History
                   </div>
-                  <div
-                    style={{ display: "flex", flexDirection: "column", gap: 8 }}
-                  >
+                  <div className="payout-list">
                     {payouts.map((p) => (
-                      <div
-                        key={p.id}
-                        style={{
-                          display: "flex",
-                          justifyContent: "space-between",
-                          alignItems: "center",
-                          padding: "10px 14px",
-                          background: "#fafafa",
-                          borderRadius: 10,
-                          border: "1px solid #eee",
-                          flexWrap: "wrap",
-                          gap: 10,
-                        }}
-                      >
+                      <div key={p.id} className="payout-row">
                         <div>
                           <div style={{ fontWeight: 600, fontSize: 14 }}>
                             {p.month || "—"}
@@ -791,20 +487,9 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                           </div>
                         </div>
                         <div style={{ textAlign: "right" }}>
-                          <div style={{ fontWeight: 700, fontSize: 16 }}>
-                            ${p.amount}
-                          </div>
+                          <div className="payout-amount">${p.amount}</div>
                           <span
-                            style={{
-                              fontSize: 11,
-                              fontWeight: 600,
-                              borderRadius: 999,
-                              padding: "2px 8px",
-                              background:
-                                p.status === "paid" ? "#d4edda" : "#fff3cd",
-                              color:
-                                p.status === "paid" ? "#1a7f37" : "#856404",
-                            }}
+                            className={`payout-status ${p.status === "paid" ? "payout-status--paid" : "payout-status--pending"}`}
                           >
                             {p.status === "paid" ? "✓ Paid" : "Pending"}
                           </span>
