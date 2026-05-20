@@ -1,8 +1,8 @@
 import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
-import Profile from "../Profile";
-import { auth, db } from "../../firebase";
+import Profile from "./Profile";
+import { auth, db } from "../firebase";
 import { mockDeep } from "jest-mock-extended";
 import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
 
