@@ -28,6 +28,8 @@ const PartnerActivityLog = ({ partnerProfile }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [sortOrder, setSortOrder] = useState("desc");
 
   useEffect(() => {
     if (!partnerProfile?.id) return;
@@ -91,22 +93,40 @@ const PartnerActivityLog = ({ partnerProfile }) => {
   }, [partnerProfile?.id]);
 
   const filteredEntries = useMemo(() => {
+    let result = [...entries];
+
+    // 1. Filter by Search Term
     const term = search.toLowerCase().trim();
-    if (!term) return entries;
-    return entries.filter((entry) => {
-      const typeInfo = getTypeStyle(entry.type);
-      const label = (typeInfo.label || "").toLowerCase();
-      const name = (entry.customerName || "").toLowerCase();
-      const email = (entry.customerEmail || "").toLowerCase();
-      const month = (entry.month || "").toLowerCase();
-      return (
-        label.includes(term) ||
-        name.includes(term) ||
-        email.includes(term) ||
-        month.includes(term)
-      );
+    if (term) {
+      result = result.filter((entry) => {
+        const typeInfo = getTypeStyle(entry.type);
+        const label = (typeInfo.label || "").toLowerCase();
+        const name = (entry.customerName || "").toLowerCase();
+        const email = (entry.customerEmail || "").toLowerCase();
+        const month = (entry.month || "").toLowerCase();
+        return (
+          label.includes(term) ||
+          name.includes(term) ||
+          email.includes(term) ||
+          month.includes(term)
+        );
+      });
+    }
+
+    // 2. Filter by Type
+    if (filterType !== "all") {
+      result = result.filter((entry) => entry.type === filterType);
+    }
+
+    // 3. Sort by Timestamp
+    result.sort((a, b) => {
+      const ta = a.timestamp?.toDate?.() || new Date(0);
+      const tb = b.timestamp?.toDate?.() || new Date(0);
+      return sortOrder === "desc" ? tb - ta : ta - tb;
     });
-  }, [entries, search]);
+
+    return result;
+  }, [entries, search, filterType, sortOrder]);
 
   const isPayoutType = (type) =>
     ["payout-created", "payout-paid"].includes(type);
@@ -147,14 +167,16 @@ const PartnerActivityLog = ({ partnerProfile }) => {
         <Link to="/partner">← Back to Partner Portal</Link>
       </div>
 
-      <div style={{ marginBottom: 20 }}>
+      <div
+        style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 20 }}
+      >
         <input
           type="search"
           placeholder="Search activity by name, email, or type..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            width: "100%",
+            flex: "1 1 300px",
             padding: "12px 16px",
             borderRadius: 14,
             border: "1px solid #ddd",
@@ -164,6 +186,41 @@ const PartnerActivityLog = ({ partnerProfile }) => {
             boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
           }}
         />
+
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 10,
+            border: "1px solid #ddd",
+            fontSize: 14,
+            background: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          <option value="all">All Types</option>
+          <option value="check-in">Check Ins</option>
+          <option value="delivery">Deliveries</option>
+          <option value="subscription">Subscriptions</option>
+          <option value="payout-paid">Payouts Paid</option>
+        </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value)}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 10,
+            border: "1px solid #ddd",
+            fontSize: 14,
+            background: "#fff",
+            cursor: "pointer",
+          }}
+        >
+          <option value="desc">Newest First</option>
+          <option value="asc">Oldest First</option>
+        </select>
       </div>
 
       {loading ? (
