@@ -28,21 +28,19 @@ const getDaysLeft = (value) => {
 const getStatusDisplay = (status) => {
   switch (status) {
     case "active":
-      return { label: "Active", color: "#1a7f37", bg: "#d4edda", icon: "✓" };
+      return { label: "Active", className: "status--active", icon: "✓" };
     case "trial":
-      return { label: "Trial", color: "#856404", bg: "#fff3cd", icon: "◎" };
+      return { label: "Trial", className: "status--trial", icon: "◎" };
     case "inactive":
     case "canceled":
-      return { label: "Inactive", color: "#dc3545", bg: "#ffd9d9", icon: "✕" };
+      return { label: "Inactive", className: "status--inactive", icon: "✕" };
     default:
-      return { label: "Unknown", color: "#888", bg: "#f0f0f0", icon: "?" };
+      return { label: "Unknown", className: "status--unknown", icon: "?" };
   }
 };
 
-const Card = ({ children, style = {} }) => (
-  <div className="data-card" style={style}>
-    {children}
-  </div>
+const Card = ({ children, className = "" }) => (
+  <div className={`data-card ${className}`}>{children}</div>
 );
 
 const SectionLabel = ({ children }) => (
@@ -140,8 +138,12 @@ const Profile = ({ user }) => {
   };
 
   const daysLeft = getDaysLeft(profileData?.subscriptionEndsAt);
-  const urgentColor =
-    daysLeft <= 7 ? "#dc3545" : daysLeft <= 14 ? "#fd7e14" : "#1a7f37";
+  const urgentClass =
+    daysLeft <= 7
+      ? "urgent-high"
+      : daysLeft <= 14
+        ? "urgent-med"
+        : "urgent-low";
 
   const [addressCopied, setAddressCopied] = useState(false);
 
@@ -173,10 +175,10 @@ const Profile = ({ user }) => {
         <div className="profile-hero">
           <div style={{ minWidth: isMobile ? "100%" : "auto" }}>
             <div className="profile-hero-eyebrow">My Profile</div>
-            <div style={{ fontSize: 26, fontWeight: 700, marginBottom: 4 }}>
+            <div className="profile-hero-title">
               {user.displayName || profileData?.name || "Account Holder"}
             </div>
-            <div style={{ fontSize: 14, color: "#999" }}>{user.email}</div>
+            <div className="profile-hero-email">{user.email}</div>
           </div>
 
           {statusInfo && (
@@ -187,20 +189,10 @@ const Profile = ({ user }) => {
               >
                 Subscription
               </div>
-              <span
-                style={{
-                  display: "inline-block",
-                  background: statusInfo.bg,
-                  color: statusInfo.color,
-                  borderRadius: 999,
-                  padding: "4px 14px",
-                  fontWeight: 700,
-                  fontSize: 13,
-                }}
-              >
+              <span className={`status-pill ${statusInfo.className}`}>
                 {statusInfo.icon} {statusInfo.label}
               </span>
-              <div style={{ marginTop: 10, fontSize: 12 }}>
+              <div className="profile-sub-status">
                 {profileData?.status === "inactive" ||
                 profileData?.status === "canceled" ? (
                   <Link
@@ -217,7 +209,7 @@ const Profile = ({ user }) => {
                     Get unlimited access →
                   </Link>
                 ) : hasActiveSubscription ? (
-                  <span style={{ color: urgentColor, fontWeight: 600 }}>
+                  <span className={urgentClass} style={{ fontWeight: 600 }}>
                     {daysLeft} days left
                   </span>
                 ) : null}
@@ -233,42 +225,20 @@ const Profile = ({ user }) => {
             profileData.prefLocation.businessName ||
             profileData.prefLocation.streetAddress) ? (
             <div className="profile-address-card">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  flexWrap: "wrap",
-                  gap: 20,
-                }}
-              >
+              <div className="profile-address-header">
                 <div>
-                  <div
-                    style={{
-                      fontSize: 14,
-                      color: "#d4af37",
-                      letterSpacing: 2,
-                      textTransform: "uppercase",
-                      marginBottom: 18,
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 8,
-                      fontWeight: 800,
-                    }}
-                  >
+                  <div className="profile-address-label">
                     <span>📦</span> Your Package Delivery Address
                   </div>
                   <div className="address-visual-box">
-                    <div
-                      style={{ fontWeight: 800, fontSize: 19, color: "#fff" }}
-                    >
+                    <div className="profile-address-name">
                       {user.displayName || profileData?.name || "Your Name"}
                     </div>
-                    <div style={{ color: "#d4af37", fontWeight: 600 }}>
+                    <div className="profile-address-vendor">
                       c/o {profileData.prefLocation.businessName}
                     </div>
                     {profileData.prefLocation.streetAddress ? (
-                      <div style={{ color: "#bbb" }}>
+                      <div className="profile-address-text">
                         {profileData.prefLocation.streetAddress}
                       </div>
                     ) : null}
@@ -279,7 +249,7 @@ const Profile = ({ user }) => {
                     ]
                       .filter(Boolean)
                       .join(", ") ? (
-                      <div style={{ color: "#bbb" }}>
+                      <div className="profile-address-text">
                         {[
                           profileData.prefLocation.city,
                           profileData.prefLocation.state,
@@ -295,22 +265,21 @@ const Profile = ({ user }) => {
                         profileData.prefLocation.state,
                         profileData.prefLocation.zipCode,
                       ].filter(Boolean).length && (
-                        <div
-                          style={{ color: "#888", fontSize: 13, marginTop: 6 }}
-                        >
+                        <div className="profile-address-note">
                           Full street address will appear here once your partner
                           completes their profile, or set a location in
                           settings.
                         </div>
                       )}
                   </div>
-                  <p style={{ margin: 0, fontSize: 12, color: "#666" }}>
+                  <p className="profile-address-hint">
                     Use this address when placing orders online. Packages are
                     held securely until you pick them up.
                   </p>
                 </div>
                 <button
                   type="button"
+                  className="btn-copy-address"
                   onClick={() => {
                     setAddressCopied(true);
                     setTimeout(() => setAddressCopied(false), 2000); // Reset after 2 seconds
@@ -329,64 +298,25 @@ const Profile = ({ user }) => {
                     ].join("\n");
                     navigator.clipboard.writeText(addr);
                   }}
-                  style={{
-                    padding: "11px 20px",
-                    background: "#d4af37",
-                    color: "#121212",
-                    border: "none",
-                    borderRadius: 10,
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    fontSize: 13,
-                    whiteSpace: "nowrap",
-                    alignSelf: "flex-start",
-                    boxShadow: "0 4px 16px rgba(212,175,55,0.45)",
-                  }}
                 >
                   {addressCopied ? "✅ Copied!" : "📋 Copy Address"}
                 </button>
               </div>
             </div>
           ) : (
-            <div
-              style={{
-                background: "#fffbea",
-                border: "1px solid #f04049",
-                borderRadius: 16,
-                padding: "20px 24px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                flexWrap: "wrap",
-                gap: 12,
-              }}
-            >
+            <div className="profile-no-address">
               <div>
-                <div
-                  style={{
-                    fontWeight: 700,
-                    fontSize: 15,
-                    color: "red",
-                  }}
-                >
+                <div className="no-address-title">
                   📦 No delivery address yet
                 </div>
-                <div style={{ fontSize: 13, color: "#999", marginTop: 4 }}>
+                <div className="no-address-text">
                   Set a preferred partner location to get your package delivery
                   address.
                 </div>
               </div>
               <Link
                 to="/profile/settings?highlight=location"
-                style={{
-                  padding: "9px 18px",
-                  background: "#d4af37",
-                  color: "#121212",
-                  borderRadius: 10,
-                  fontWeight: 700,
-                  textDecoration: "none",
-                  fontSize: 13,
-                }}
+                className="btn-set-location"
               >
                 Set Preferred Location
               </Link>
@@ -398,163 +328,55 @@ const Profile = ({ user }) => {
         <div className="profile-data-grid">
           {/* Package History */}
           <Card>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
-            >
+            <div className="card-header">
               <SectionLabel>Package History</SectionLabel>
-              <Link
-                to="/profile/packages"
-                style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}
-              >
+              <Link to="/profile/packages" className="view-history-link">
                 View Full History →
               </Link>
             </div>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "1fr 1fr",
-                gap: 12,
-                marginBottom: 20,
-              }}
-            >
+            <div className="stats-grid">
               <div
-                style={{
-                  borderRadius: 12,
-                  padding: "14px 16px",
-                  background:
-                    currentPackagesWaiting > 0 ? "#fff8e1" : "#f8f8f8",
-                  border: `1px solid ${currentPackagesWaiting > 0 ? "#f0c040" : "#eee"}`,
-                }}
+                className={`stat-box ${currentPackagesWaiting > 0 ? "stat-box--active" : ""}`}
               >
+                <div className="stat-label">Waiting</div>
                 <div
-                  style={{
-                    fontSize: 11,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 6,
-                  }}
-                >
-                  Waiting
-                </div>
-                <div
-                  style={{
-                    fontSize: 30,
-                    fontWeight: 800,
-                    color: currentPackagesWaiting > 0 ? "#b8860b" : "#222",
-                  }}
+                  className={`stat-value ${currentPackagesWaiting > 0 ? "stat-value--active" : ""}`}
                 >
                   {currentPackagesWaiting}
                 </div>
               </div>
-              <div
-                style={{
-                  borderRadius: 12,
-                  padding: "14px 16px",
-                  background: "#f8f8f8",
-                  border: "1px solid #eee",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 6,
-                  }}
-                >
-                  Picked Up
-                </div>
-                <div style={{ fontSize: 30, fontWeight: 800, color: "#222" }}>
+              <div className="stat-box">
+                <div className="stat-label">Picked Up</div>
+                <div className="stat-value">
                   {Number(profileData?.packagesDelivered) || 0}
                 </div>
               </div>
             </div>
 
             {packagesLoading ? (
-              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>
-                Loading...
-              </p>
+              <p className="profile-address-note">Loading...</p>
             ) : packageHistory.length === 0 ? (
-              <p style={{ color: "#bbb", fontSize: 13, margin: 0 }}>
-                No package history yet.
-              </p>
+              <p className="profile-address-note">No package history yet.</p>
             ) : (
-              <div
-                style={{ display: "flex", flexDirection: "column", gap: 10 }}
-              >
+              <div className="package-list">
                 {packageHistory.map((pkg) => (
                   <Link
                     key={pkg.partnerId}
                     to="/profile/packages"
-                    style={{
-                      padding: "12px 14px",
-                      borderRadius: 10,
-                      background: "#fafafa",
-                      border: "1px solid #f0f0f0",
-                      textDecoration: "none",
-                      display: "block",
-                    }}
+                    className="package-item"
                   >
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "#333",
-                        marginBottom: 8,
-                      }}
-                    >
-                      📍 {pkg.partnerName}
-                    </div>
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr 1fr",
-                        gap: 8,
-                      }}
-                    >
+                    <div className="package-vendor">📍 {pkg.partnerName}</div>
+                    <div className="package-details">
                       <div>
-                        <div
-                          style={{
-                            fontSize: 11,
-                            color: "#bbb",
-                            marginBottom: 2,
-                          }}
-                        >
-                          Received
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 700,
-                            color: "#333",
-                          }}
-                        >
+                        <div className="package-detail-label">Received</div>
+                        <div className="package-detail-value">
                           {pkg.totalPickedUp}
                         </div>
                       </div>
                       <div>
+                        <div className="package-detail-label">Waiting</div>
                         <div
-                          style={{
-                            fontSize: 11,
-                            color: "#bbb",
-                            marginBottom: 2,
-                          }}
-                        >
-                          Waiting
-                        </div>
-                        <div
-                          style={{
-                            fontSize: 15,
-                            fontWeight: 700,
-                            color: pkg.currentWaiting > 0 ? "#b8860b" : "#333",
-                          }}
+                          className={`package-detail-value ${pkg.currentWaiting > 0 ? "package-detail-value--active" : ""}`}
                         >
                           {pkg.currentWaiting}
                         </div>
@@ -567,60 +389,23 @@ const Profile = ({ user }) => {
           </Card>
 
           {/* Account */}
-          <Card style={{ background: "#fafafa" }}>
+          <Card className="card--alt">
             <SectionLabel>Account</SectionLabel>
 
             {/* Referral Code */}
-            <div
-              style={{
-                marginBottom: 14,
-                padding: "14px 16px",
-                borderRadius: 12,
-                background: "#fff",
-                border: "1px solid #ebebeb",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "#aaa",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                  marginBottom: 8,
-                }}
-              >
-                Your Referral Code
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span
-                  style={{
-                    fontWeight: 800,
-                    fontSize: 22,
-                    letterSpacing: 3,
-                    color: "#121212",
-                    fontFamily: "monospace",
-                  }}
-                >
-                  {displayReferral}
-                </span>
+            <div className="card-section">
+              <div className="section-label-inner">Your Referral Code</div>
+              <div className="referral-code-wrap">
+                <span className="referral-code-text">{displayReferral}</span>
                 {displayReferral !== "—" && (
                   <button
                     type="button"
+                    className="btn-copy-mini"
                     onClick={() =>
                       navigator.clipboard
                         .writeText(displayReferral)
                         .then(() => alert("Referral code copied!"))
                     }
-                    style={{
-                      padding: "4px 10px",
-                      background: "#d4af37",
-                      border: "none",
-                      borderRadius: 6,
-                      fontWeight: 700,
-                      fontSize: 11,
-                      cursor: "pointer",
-                      color: "#121212",
-                    }}
                   >
                     Copy
                   </button>
@@ -628,55 +413,30 @@ const Profile = ({ user }) => {
                 {displayReferral !== "—" && (
                   <button
                     type="button"
+                    className="btn-share-mini"
                     onClick={handleShareReferral}
-                    style={{
-                      padding: "4px 10px",
-                      background: "#121212",
-                      border: "none",
-                      borderRadius: 6,
-                      fontWeight: 700,
-                      fontSize: 11,
-                      cursor: "pointer",
-                      color: "#fff",
-                    }}
                   >
                     Share
                   </button>
                 )}
               </div>
-              <div style={{ fontSize: 12, color: "#bbb", marginTop: 6 }}>
+              <div className="referral-hint">
                 Share with a business to refer them as a partner.
               </div>
             </div>
 
             {/* Preferred Location */}
             <div
-              style={{
-                marginBottom: 14,
-                padding: "14px 16px",
-                borderRadius: 12,
-                background: "#fff",
-                border: `1px solid ${profileData?.prefLocation ? "#c8e6c9" : "#f0c040"}`,
-              }}
+              className={`card-section ${profileData?.prefLocation ? "card-section--location-ok" : "card-section--location-warn"}`}
             >
-              <div
-                style={{
-                  fontSize: 11,
-                  color: "#aaa",
-                  textTransform: "uppercase",
-                  letterSpacing: 0.8,
-                  marginBottom: 6,
-                }}
-              >
-                Preferred Location
-              </div>
+              <div className="section-label-inner">Preferred Location</div>
               {profileData?.prefLocation ? (
                 <>
-                  <div style={{ fontWeight: 700, fontSize: 14, color: "#222" }}>
+                  <div className="location-name">
                     {profileData.prefLocation.businessName}
                   </div>
                   {profileData.prefLocation.streetAddress && (
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 3 }}>
+                    <div className="location-address">
                       {[
                         profileData.prefLocation.streetAddress,
                         profileData.prefLocation.city,
@@ -686,24 +446,17 @@ const Profile = ({ user }) => {
                         .join(", ")}
                     </div>
                   )}
-                  <div style={{ marginTop: 8 }}>
+                  <div className="location-actions">
                     <Link
                       to="/profile/settings?highlight=location"
-                      style={{
-                        fontSize: 12,
-                        color: "#0b57d0",
-                        fontWeight: 600,
-                      }}
+                      className="change-location-link"
                     >
                       Change location
                     </Link>
                   </div>
                 </>
               ) : (
-                <Link
-                  to="/profile/settings"
-                  style={{ fontSize: 13, color: "#b8860b", fontWeight: 600 }}
-                >
+                <Link to="/profile/settings" className="location-empty-link">
                   ⚠️ No location set — tap to choose one
                 </Link>
               )}
@@ -711,70 +464,29 @@ const Profile = ({ user }) => {
 
             {/* Subscription dates */}
             {hasActiveSubscription && (
-              <div
-                style={{
-                  marginBottom: 14,
-                  padding: "14px 16px",
-                  borderRadius: 12,
-                  background: "#fff",
-                  border: "1px solid #ebebeb",
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#aaa",
-                    textTransform: "uppercase",
-                    letterSpacing: 0.8,
-                    marginBottom: 10,
-                  }}
-                >
-                  Subscription
-                </div>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "1fr 1fr",
-                    gap: 10,
-                    marginBottom: 10,
-                  }}
-                >
+              <div className="card-section">
+                <div className="section-label-inner">Subscription</div>
+                <div className="sub-dates-grid">
                   <div>
-                    <div style={{ fontSize: 11, color: "#bbb" }}>Started</div>
-                    <div
-                      style={{ fontSize: 13, fontWeight: 600, color: "#333" }}
-                    >
+                    <div className="sub-date-label">Started</div>
+                    <div className="sub-date-value">
                       {formatDate(profileData?.subscribedAt)}
                     </div>
                   </div>
                   <div>
-                    <div style={{ fontSize: 11, color: "#bbb" }}>Ends</div>
-                    <div
-                      style={{ fontSize: 13, fontWeight: 600, color: "#333" }}
-                    >
+                    <div className="sub-date-label">Ends</div>
+                    <div className="sub-date-value">
                       {formatDate(profileData?.subscriptionEndsAt)}
                     </div>
                   </div>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ fontSize: 11, color: "#bbb" }}>Days left</div>
-                  <div
-                    style={{
-                      fontSize: 20,
-                      fontWeight: 800,
-                      color: urgentColor,
-                    }}
-                  >
+                <div className="days-left-wrap">
+                  <div className="days-left-label">Days left</div>
+                  <div className={`days-left-value ${urgentClass}`}>
                     {daysLeft}
                   </div>
                   {daysLeft <= 7 && (
-                    <span
-                      style={{
-                        fontSize: 12,
-                        color: urgentColor,
-                        fontWeight: 600,
-                      }}
-                    >
+                    <span className={`renew-alert ${urgentClass}`}>
                       Renew soon!
                     </span>
                   )}
@@ -783,61 +495,19 @@ const Profile = ({ user }) => {
             )}
 
             {/* Actions */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                marginTop: 4,
-              }}
-            >
-              <Link
-                to="/profile/settings"
-                style={{
-                  display: "block",
-                  padding: "11px 16px",
-                  background: "#121212",
-                  color: "#fff",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  textAlign: "center",
-                  fontSize: 14,
-                }}
-              >
+            <div className="profile-actions">
+              <Link to="/profile/settings" className="btn-profile-action">
                 ⚙️ Settings
               </Link>
               {!hasActiveSubscription && (
-                <Link
-                  to="/plans"
-                  style={{
-                    display: "block",
-                    padding: "11px 16px",
-                    background: "#d4af37",
-                    color: "#121212",
-                    borderRadius: 10,
-                    fontWeight: 700,
-                    textDecoration: "none",
-                    textAlign: "center",
-                    fontSize: 14,
-                  }}
-                >
+                <Link to="/plans" className="btn-subscribe">
                   Subscribe Now
                 </Link>
               )}
               <button
                 type="button"
+                className="btn-logout"
                 onClick={handleLogout}
-                style={{
-                  padding: "11px 16px",
-                  background: "#fff",
-                  color: "#888",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                  border: "1px solid #e8e8e8",
-                  cursor: "pointer",
-                  fontSize: 14,
-                }}
               >
                 Logout
               </button>

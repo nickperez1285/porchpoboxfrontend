@@ -31,11 +31,19 @@ jest.mock("../utils/passwordValidation", () => ({
   passwordRequirementsText: "Mock requirements",
 }));
 
+// Mock useNavigate specifically to check for 'replace' flag
+const mockNavigate = jest.fn();
+jest.mock("react-router-dom", () => ({
+  ...jest.requireActual("react-router-dom"),
+  useNavigate: () => mockNavigate,
+}));
+
 jest.mock("../config/api", () => "http://localhost:5000");
 
 describe("Register Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockNavigate.mockClear();
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
@@ -122,9 +130,11 @@ describe("Register Component", () => {
         undefined,
         expect.objectContaining({
           name: "Jane Doe",
+          nameLower: "jane doe", // Verifying data consistency for search
           referralCode: expect.stringMatching(/^JD\d{6}$/), // Matches Name-based prefix
         }),
       );
+      expect(mockNavigate).toHaveBeenCalledWith("/profile", { replace: true });
     });
   });
 });
