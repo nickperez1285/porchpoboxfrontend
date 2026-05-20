@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import { getApiUrl } from "../config/api";
 import {
   isPasswordValid,
   passwordRequirementsText,
@@ -109,7 +110,7 @@ const PartnerRegister = () => {
       try {
         const idToken = await user.getIdToken();
         const notificationResponse = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/notifications/vendor-registration`,
+          getApiUrl("/api/notifications/vendor-registration"),
           {
             method: "POST",
             headers: {

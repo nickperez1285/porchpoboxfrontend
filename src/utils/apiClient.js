@@ -1,5 +1,5 @@
 import { auth } from "../firebase";
-import API_BASE_URL from "../config/api";
+import API_BASE_URL, { getApiUrl } from "../config/api";
 
 export const getAuthHeaders = async (extraHeaders = {}) => {
   const headers = { ...extraHeaders };
@@ -22,7 +22,7 @@ export const apiPost = async (path, body, { requireAuth = true } = {}) => {
     throw new Error("You must be signed in to perform this action.");
   }
 
-  return fetch(`${API_BASE_URL}${path}`, {
+  return fetch(getApiUrl(path), {
     method: "POST",
     headers,
     body: JSON.stringify(body),
@@ -36,7 +36,7 @@ export const apiGet = async (path, { requireAuth = true } = {}) => {
     throw new Error("You must be signed in to perform this action.");
   }
 
-  return fetch(`${API_BASE_URL}${path}`, {
+  return fetch(getApiUrl(path), {
     method: "GET",
     headers,
   });

@@ -2,12 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { apiGet } from "../utils/apiClient";
 import { auth } from "../firebase";
-
-const getApiUrl = (path) => {
-  const base = process.env.REACT_APP_API_URL || "";
-  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
-  return `${normalizedBase}${path}`;
-};
+import { getApiUrl } from "../config/api";
 
 const SESSION_CHECK_RETRY_MS = 1500;
 const SESSION_CHECK_MAX_ATTEMPTS = 3;
@@ -89,10 +84,10 @@ const CheckoutSuccess = ({ user, authLoading }) => {
         if (!finalizeResponse.ok || !finalizePayload?.success)
           throw new Error(
             finalizePayload?.message || "Unable to activate subscription.",
-          );
+        );
 
         // Trigger the welcome email via backend
-        fetch(`${process.env.REACT_APP_API_URL}/api/notifications/welcome`, {
+        fetch(getApiUrl("/api/notifications/welcome"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

@@ -2,13 +2,8 @@ import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import { getApiUrl } from "../config/api";
 import PrefLocationModal from "./PrefLocationModal";
-
-const getApiUrl = (path) => {
-  const base = process.env.REACT_APP_API_URL || "";
-  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
-  return `${normalizedBase}${path}`;
-};
 
 const PLAN_CONFIG = [
   {

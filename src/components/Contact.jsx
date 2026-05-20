@@ -1,15 +1,9 @@
 import { useState } from "react";
+import { getApiUrl } from "../config/api";
 import "./Contact.css";
 
 export default function ContactPage() {
   const [status, setStatus] = useState("");
-
-  // Ensure we don't have double slashes if the env var has a trailing one
-  const getApiUrl = (path) => {
-    const base = process.env.REACT_APP_API_URL || "";
-    const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
-    return `${normalizedBase}${path}`;
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
+import { getApiUrl } from "../config/api";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import "./PackageCheckIn.css";
 
@@ -36,7 +37,9 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       try {
         const idToken = await auth.currentUser.getIdToken();
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/notifications/search-customers?q=${encodeURIComponent(search)}`,
+          getApiUrl(
+            `/api/notifications/search-customers?q=${encodeURIComponent(search)}`,
+          ),
           { headers: { Authorization: `Bearer ${idToken}` } },
         );
 
@@ -104,7 +107,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     try {
       const idToken = await auth.currentUser.getIdToken();
       const response = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/notifications/package-check-in`,
+        getApiUrl("/api/notifications/package-check-in"),
         {
           method: "POST",
           headers: {
