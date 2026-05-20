@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { apiPost } from "../utils/apiClient";
 import { auth } from "../firebase";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 import "./PackageCheckIn.css";
@@ -101,19 +100,30 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setError("");
 
     try {
-      const response = await apiPost("/api/notifications/package-check-in", {
-        vendorName:
-          partnerProfile.businessName ||
-          partnerProfile.streetAddress ||
-          "Your Porch P.O. Box Location",
-        partnerId: partnerProfile.id,
-        recipients: selectedUsers.map((user) => ({
-          id: user.id,
-          name: user.name || "Customer",
-          email: user.email,
-          packageCount: getNormalizedPackageQuantity(user.id),
-        })),
-      });
+      const idToken = await auth.currentUser.getIdToken();
+      const response = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/notifications/package-check-in`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            vendorName:
+              partnerProfile.businessName ||
+              partnerProfile.streetAddress ||
+              "Your Location",
+            partnerId: partnerProfile.id,
+            recipients: selectedUsers.map((u) => ({
+              id: u.id,
+              name: u.name || "Customer",
+              email: u.email,
+              packageCount: getNormalizedPackageQuantity(u.id),
+            })),
+          }),
+        },
+      );
 
       if (!response.ok) {
         const responseText = await response.text();
