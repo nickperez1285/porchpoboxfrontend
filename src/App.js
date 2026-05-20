@@ -86,7 +86,9 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
     <header className="app-header">
       <div className="header-logo-wrap">
         <Link to="/" className="header-logo-link">
-          <h1 className="header">Porch P.O. Box</h1>
+          <h1 className="header">
+            <span className="visually-hidden">Porch P.O. Box</span>
+          </h1>
         </Link>
       </div>
       {!authLoading && !hideAuthLinks && (
@@ -183,7 +185,6 @@ function App() {
           userStatus={userStatus}
           partnerProfile={partnerProfile}
         />
-        <hr />
 
         <Routes>
           <Route path="/vendor" element={<Navigate to="/partner" replace />} />
