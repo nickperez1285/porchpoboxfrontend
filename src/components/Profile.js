@@ -471,7 +471,7 @@ const Profile = ({ user }) => {
             <div
               style={{
                 background: "#fffbea",
-                border: "1px solid #f0c040",
+                border: "1px solid #f04049",
                 borderRadius: 16,
                 padding: "20px 24px",
                 display: "flex",
@@ -483,7 +483,11 @@ const Profile = ({ user }) => {
             >
               <div>
                 <div
-                  style={{ fontWeight: 700, fontSize: 15, color: "#7a5c00" }}
+                  style={{
+                    fontWeight: 700,
+                    fontSize: 15,
+                    color: "rgb(236, 74, 10)",
+                  }}
                 >
                   📦 No delivery address yet
                 </div>
@@ -493,7 +497,7 @@ const Profile = ({ user }) => {
                 </div>
               </div>
               <Link
-                to="/profile/settings"
+                to="/profile/settings?highlight=location"
                 style={{
                   padding: "9px 18px",
                   background: "#d4af37",
@@ -811,7 +815,7 @@ const Profile = ({ user }) => {
                   )}
                   <div style={{ marginTop: 8 }}>
                     <Link
-                      to="/profile/settings"
+                      to="/profile/settings?highlight=location"
                       style={{
                         fontSize: 12,
                         color: "#0b57d0",

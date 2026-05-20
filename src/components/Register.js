@@ -117,8 +117,16 @@ const Register = () => {
 
       // Check if user profile already exists
       const userDocRef = doc(db, "users", user.uid);
-      let userDocSnap;
+      let userDocSnap = null;
       try {
+        // Attempt to get the document. If this fails due to permissions,
+        // it likely means the user is new and the rules are preventing a read
+        // on a non-existent document. We'll proceed to try and create it.
+        // If it fails for other reasons (e.g., network), the outer catch will handle it.
+        // The Firestore rules should allow a user to 'get' their own document,
+        // even if it doesn't exist, to perform this check.
+        // The 'get' rule in firestore.rules has been updated to be null-safe
+        // and allow this check for the user's own UID.
         userDocSnap = await getDoc(userDocRef);
       } catch (getErr) {
         // If getDoc fails due to permissions, it often means the user is truly new
@@ -126,7 +134,7 @@ const Register = () => {
         console.warn("Could not check existence, attempting creation:", getErr);
       }
 
-      if (userDocSnap?.exists()) {
+      if (userDocSnap && userDocSnap.exists()) {
         // User already exists, navigate to profile and clear history
         navigate("/profile", { replace: true });
         return;
@@ -178,7 +186,7 @@ const Register = () => {
       } else if (err.code === "auth/account-exists-with-different-credential") {
         setError(
           "An account with this email already exists. Please use email/password login or a different email.",
-        );
+        ); //
       } else if (
         err.message.includes("blocked-by-client") ||
         err.message.includes("permissions")
