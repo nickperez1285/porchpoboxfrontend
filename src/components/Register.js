@@ -117,9 +117,16 @@ const Register = () => {
 
       // Check if user profile already exists
       const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
+      let userDocSnap;
+      try {
+        userDocSnap = await getDoc(userDocRef);
+      } catch (getErr) {
+        // If getDoc fails due to permissions, it often means the user is truly new
+        // and the rules are being strict. We can proceed to try and create the doc.
+        console.warn("Could not check existence, attempting creation:", getErr);
+      }
 
-      if (userDocSnap.exists()) {
+      if (userDocSnap?.exists()) {
         // User already exists, navigate to profile and clear history
         navigate("/profile", { replace: true });
         return;
@@ -171,6 +178,13 @@ const Register = () => {
       } else if (err.code === "auth/account-exists-with-different-credential") {
         setError(
           "An account with this email already exists. Please use email/password login or a different email.",
+        );
+      } else if (
+        err.message.includes("blocked-by-client") ||
+        err.message.includes("permissions")
+      ) {
+        setError(
+          "The request was blocked. Please disable any ad-blockers or tracking protection and try again.",
         );
       } else {
         setError(
