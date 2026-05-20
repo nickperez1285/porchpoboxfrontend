@@ -5,8 +5,10 @@ import PartnerStatusLegend from "./PartnerStatusLegend";
 import "./PackageCheckIn.css";
 
 const rowStatusClass = (user) => {
-  if (user.status === "active") return "pkg-checkin__row--active";
-  if (user.status === "trial") return "pkg-checkin__row--trial";
+  const status = (user.status || "").trim().toLowerCase();
+  if (status === "active" || status === "member")
+    return "pkg-checkin__row--active";
+  if (status === "trial") return "pkg-checkin__row--trial";
   return "pkg-checkin__row--inactive";
 };
 
@@ -224,7 +226,7 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
                   letterSpacing: 0,
                 }}
               >
-                Qty · Include
+                Include
               </span>
             </div>
             {users.length === 0 ? (

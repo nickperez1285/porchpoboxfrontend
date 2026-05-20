@@ -162,8 +162,10 @@ const CustomerList = ({
 
   const getCustomerBackgroundColor = (user) => {
     // Priority: dynamic user details, then data cached in packageCounts
-    const status = userDetails[user.id]?.status || user.status;
-    if (status === "active") return "#d4edda";
+    const status = (userDetails[user.id]?.status || user.status || "")
+      .trim()
+      .toLowerCase();
+    if (status === "active" || status === "member") return "#d4edda";
     if (status === "trial") return "#fff6bf";
     return "#ffd9d9";
   };
