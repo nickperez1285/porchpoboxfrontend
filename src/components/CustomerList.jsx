@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { db } from "../firebase";
 import { apiPost } from "../utils/apiClient";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
 
 const CustomerList = ({
   vendorId,
@@ -12,6 +12,7 @@ const CustomerList = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedUserIds, setExpandedUserIds] = useState([]);
+  const [userDetails, setUserDetails] = useState({});
   const [deliveringUserId, setDeliveringUserId] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [packageQuantities, setPackageQuantities] = useState({});
@@ -39,91 +40,53 @@ const CustomerList = ({
       return () => {};
     }
 
-    let usersSnapshotData = null;
-    let packageCountsSnapshotData = null;
-
-    const syncUsers = () => {
-      if (!usersSnapshotData || !packageCountsSnapshotData) {
-        return;
-      }
-
-      const packageCounts = Object.fromEntries(
-        packageCountsSnapshotData.docs.map((entry) => [
-          entry.id,
-          {
-            count: Number(entry.data().count) || 0,
-            totalReceived:
-              Number(entry.data().totalReceived) ||
-              Number(entry.data().count) ||
-              0,
-            totalPickedUp: Number(entry.data().totalPickedUp) || 0,
-            holdForResubscribe: Boolean(entry.data().holdForResubscribe),
-          },
-        ]),
-      );
-
-      const usersList = usersSnapshotData.docs
-        .map((entry) => ({
-          id: entry.id,
-          ...entry.data(),
-          packagesCheckedIn: Number(entry.data().packagesCheckedIn) || 0,
-          packagesDelivered: Number(entry.data().packagesDelivered) || 0,
-          packageCount: packageCounts[entry.id]?.count || 0,
-          totalReceived: packageCounts[entry.id]?.totalReceived || 0,
-          totalPickedUp: packageCounts[entry.id]?.totalPickedUp || 0,
-          holdForResubscribe:
-            packageCounts[entry.id]?.holdForResubscribe || false,
-        }))
-        .filter((user) => user.packageCount > 0);
-
-      setUsers(usersList);
-      setLoading(false);
-    };
-
-    const unsubscribeUsers = onSnapshot(
-      collection(db, "users"),
-      (snapshot) => {
-        usersSnapshotData = snapshot;
-        setError("");
-        syncUsers();
-      },
-      (snapshotError) => {
-        console.error("Error fetching users:", snapshotError);
-        setError(
-          "Unable to load customers. Check Firestore partner read permissions.",
-        );
-        setLoading(false);
-      },
-    );
-
+    // Drive the list from the packageCounts subcollection
     const unsubscribePackageCounts = onSnapshot(
       collection(db, "partners", vendorId, "packageCounts"),
       (snapshot) => {
-        packageCountsSnapshotData = snapshot;
         setError("");
-        syncUsers();
+        const usersList = snapshot.docs
+          .map((d) => ({
+            id: d.id,
+            ...d.data(),
+            packageCount: Number(d.data().count) || 0,
+            totalReceived:
+              Number(d.data().totalReceived) || Number(d.data().count) || 0,
+            totalPickedUp: Number(d.data().totalPickedUp) || 0,
+            holdForResubscribe: Boolean(d.data().holdForResubscribe),
+          }))
+          .filter((u) => u.packageCount > 0);
+
+        setUsers(usersList);
+        setLoading(false);
       },
       (snapshotError) => {
         console.error("Error fetching partner package counts:", snapshotError);
-        setError(
-          "Unable to load customers. Check Firestore partner read permissions.",
-        );
+        setError("Unable to load active deliveries.");
         setLoading(false);
       },
     );
 
-    return () => {
-      unsubscribeUsers();
-      unsubscribePackageCounts();
-    };
+    return () => unsubscribePackageCounts();
   }, [vendorId]);
 
-  const toggleExpanded = (userId) => {
-    setExpandedUserIds((current) =>
-      current.includes(userId)
-        ? current.filter((id) => id !== userId)
-        : [...current, userId],
-    );
+  const toggleExpanded = async (userId) => {
+    const isExpanding = !expandedUserIds.includes(userId);
+    if (isExpanding) {
+      setExpandedUserIds((prev) => [...prev, userId]);
+      if (!userDetails[userId]) {
+        try {
+          const snap = await getDoc(doc(db, "users", userId));
+          if (snap.exists()) {
+            setUserDetails((prev) => ({ ...prev, [userId]: snap.data() }));
+          }
+        } catch (err) {
+          console.error("Error fetching user details:", err);
+        }
+      }
+    } else {
+      setExpandedUserIds((prev) => prev.filter((id) => id !== userId));
+    }
   };
 
   const handleDeliverSelected = async () => {
@@ -198,8 +161,10 @@ const CustomerList = ({
   };
 
   const getCustomerBackgroundColor = (user) => {
-    if (user.status === "active") return "#d4edda";
-    if (user.status === "trial") return "#fff6bf";
+    // Priority: dynamic user details, then data cached in packageCounts
+    const status = userDetails[user.id]?.status || user.status;
+    if (status === "active") return "#d4edda";
+    if (status === "trial") return "#fff6bf";
     return "#ffd9d9";
   };
 
@@ -370,14 +335,28 @@ const CustomerList = ({
 
                 {expandedUserIds.includes(user.id) && (
                   <div style={{ marginTop: 12 }}>
-                    <div>Subscription Status: {user.status || "inactive"}</div>
-                    <div>Email: {user.email || "No email"}</div>
-                    <div>Phone: {user.phoneNumber || "No phone number"}</div>
                     <div>
-                      Address: {user.streetAddress || "No street address"}
-                      {user.city ? `, ${user.city}` : ""}
-                      {user.state ? `, ${user.state}` : ""}
-                      {user.zipCode ? ` ${user.zipCode}` : ""}
+                      Subscription Status:{" "}
+                      {userDetails[user.id]?.status ||
+                        user.status ||
+                        "loading..."}
+                    </div>
+                    <div>
+                      Email:{" "}
+                      {userDetails[user.id]?.email || user.email || "No email"}
+                    </div>
+                    <div>Phone: {userDetails[user.id]?.phoneNumber || "—"}</div>
+                    <div>
+                      Address: {userDetails[user.id]?.streetAddress || "—"}
+                      {userDetails[user.id]?.city
+                        ? `, ${userDetails[user.id].city}`
+                        : ""}
+                      {userDetails[user.id]?.state
+                        ? `, ${userDetails[user.id].state}`
+                        : ""}
+                      {userDetails[user.id]?.zipCode
+                        ? ` ${userDetails[user.id].zipCode}`
+                        : ""}
                     </div>
                     <div>User ID: {user.id}</div>
                   </div>
