@@ -120,8 +120,8 @@ const Register = () => {
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
-        // User already exists, just navigate
-        navigate("/");
+        // User already exists, navigate to profile
+        navigate("/profile", { replace: true });
         return;
       }
 
@@ -162,7 +162,7 @@ const Register = () => {
         authProvider: "google",
       }).catch(console.error);
 
-      navigate("/profile");
+      navigate("/profile", { replace: true });
     } catch (err) {
       console.error("Google sign-in error:", err);
 
@@ -266,7 +266,7 @@ const Register = () => {
       );
       logSignup({ name, email, authProvider: "email" }).catch(console.error);
 
-      navigate("/profile");
+      navigate("/profile", { replace: true });
     } catch (err) {
       console.error(err);
       setError(err.message);

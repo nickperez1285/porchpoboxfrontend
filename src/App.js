@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Link, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import MainPage from "./components/MainPage";
@@ -38,24 +45,38 @@ import { auth, db } from "./firebase";
 import "./App.css";
 
 const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 600);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth <= 600);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const location = useLocation();
   const linkStyle = {
     textDecoration: "none",
-    color: "inherit"
+    color: "inherit",
   };
   const hideAuthLinks = [
     "/login",
     "/partner/login",
     "/vendor/login",
-    "/admin/login"
+    "/admin/login",
   ].includes(location.pathname);
   const onCustomerProfilePage = location.pathname === "/profile";
   const primaryLink = onCustomerProfilePage
     ? { to: "/", label: "Home" }
     : {
-      to: user ? (partnerProfile ? "/partner" : "/profile") : "/login",
-      label: user ? (partnerProfile ? "Partner Portal" : "Profile") : "Login"
-    };
+        to: user ? (partnerProfile ? "/partner" : "/profile") : "/login",
+        label: user
+          ? partnerProfile
+            ? isMobile
+              ? "Partner"
+              : "Partner Portal"
+            : "Profile"
+          : "Login",
+      };
 
   const handleLogout = async () => {
     try {
@@ -79,16 +100,29 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
       {!authLoading && !hideAuthLinks && (
         <div
           style={{
-            position: "absolute",
+            position: isMobile ? "static" : "absolute",
             bottom: 0,
             right: 0,
             display: "flex",
-            gap: 12
+            justifyContent: isMobile ? "center" : "flex-end",
+            gap: isMobile ? 16 : 12,
+            marginTop: isMobile ? 10 : 0,
+            fontSize: isMobile ? "14px" : "inherit",
           }}
         >
-          <Link to={primaryLink.to} style={linkStyle}>{primaryLink.label}</Link>
-          {isAdmin && <Link to="/admin" style={linkStyle}>Admin</Link>}
-          {!user && <Link to="/register" style={linkStyle}>Register</Link>}
+          <Link to={primaryLink.to} style={linkStyle}>
+            {primaryLink.label}
+          </Link>
+          {isAdmin && (
+            <Link to="/admin" style={linkStyle}>
+              Admin
+            </Link>
+          )}
+          {!user && (
+            <Link to="/register" style={linkStyle}>
+              Register
+            </Link>
+          )}
           {user && (
             <button
               type="button"
@@ -101,7 +135,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
                 cursor: "pointer",
                 font: "inherit",
                 color: "inherit",
-                textDecoration: "none"
+                textDecoration: "none",
               }}
             >
               Logout
@@ -132,7 +166,7 @@ function App() {
       setPartnerProfile(
         partnerDoc.exists()
           ? { id: partnerDoc.id, uid: currentUser.uid, ...partnerDoc.data() }
-          : null
+          : null,
       );
     } catch (error) {
       console.error("Error loading partner profile:", error);
@@ -179,15 +213,32 @@ function App() {
         />
         <hr />
 
-
         <Routes>
           <Route path="/vendor" element={<Navigate to="/partner" replace />} />
-          <Route path="/vendor/login" element={<Navigate to="/partner/login" replace />} />
-          <Route path="/vendor/register" element={<Navigate to="/partner/register" replace />} />
-          <Route path="/vendor/pending" element={<Navigate to="/partner/pending" replace />} />
-          <Route path="/vendor/profile" element={<Navigate to="/partner/profile" replace />} />
-          <Route path="/vendor/profile/edit" element={<Navigate to="/partner/profile/edit" replace />} />
-          <Route path="/vendor/package-check-in" element={<Navigate to="/partner/package-check-in" replace />} />
+          <Route
+            path="/vendor/login"
+            element={<Navigate to="/partner/login" replace />}
+          />
+          <Route
+            path="/vendor/register"
+            element={<Navigate to="/partner/register" replace />}
+          />
+          <Route
+            path="/vendor/pending"
+            element={<Navigate to="/partner/pending" replace />}
+          />
+          <Route
+            path="/vendor/profile"
+            element={<Navigate to="/partner/profile" replace />}
+          />
+          <Route
+            path="/vendor/profile/edit"
+            element={<Navigate to="/partner/profile/edit" replace />}
+          />
+          <Route
+            path="/vendor/package-check-in"
+            element={<Navigate to="/partner/package-check-in" replace />}
+          />
           <Route
             path="/partner"
             element={
@@ -203,7 +254,10 @@ function App() {
             element={<Login title="Partner Login" redirectTo="/partner" />}
           />
           <Route path="/partner/register" element={<PartnerRegister />} />
-          <Route path="/partner/pending" element={<PartnerRegistrationPending />} />
+          <Route
+            path="/partner/pending"
+            element={<PartnerRegistrationPending />}
+          />
           <Route
             path="/partner/profile"
             element={
@@ -218,7 +272,10 @@ function App() {
             path="/partner/profile/edit"
             element={
               user && partnerProfile ? (
-                <PartnerEditProfile user={user} partnerProfile={partnerProfile} />
+                <PartnerEditProfile
+                  user={user}
+                  partnerProfile={partnerProfile}
+                />
               ) : (
                 <Navigate to="/partner/login" replace />
               )
@@ -253,25 +310,46 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route
             path="/profile"
-            element={user ? <Profile user={user} /> : <Navigate to="/login" replace />}
+            element={
+              user ? <Profile user={user} /> : <Navigate to="/login" replace />
+            }
           />
           <Route
             path="/profile/settings"
-            element={user ? <UserSettings user={user} /> : <Navigate to="/login" replace />}
+            element={
+              user ? (
+                <UserSettings user={user} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route
             path="/profile/edit"
-            element={user ? <EditProfile user={user} /> : <Navigate to="/login" replace />}
+            element={
+              user ? (
+                <EditProfile user={user} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           <Route
             path="/profile/packages"
-            element={user ? <PackageHistoryPage user={user} /> : <Navigate to="/login" replace />}
+            element={
+              user ? (
+                <PackageHistoryPage user={user} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
           />
           {/* <Route path="/admin/create-user" element={<AdminCreateUser />} /> */}
           <Route
             path="/customers"
             element={
-              user && ((partnerProfile && partnerProfile.approved) || isAdmin) ? (
+              user &&
+              ((partnerProfile && partnerProfile.approved) || isAdmin) ? (
                 <Customers />
               ) : (
                 <Navigate to="/partner" replace />
@@ -282,7 +360,13 @@ function App() {
             path="/admin/login"
             element={
               authLoading ? (
-                <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
+                <div
+                  style={{
+                    maxWidth: 960,
+                    margin: "80px auto",
+                    padding: "0 20px",
+                  }}
+                >
                   <h2>Admin Login</h2>
                   <p>Checking session...</p>
                 </div>
@@ -297,7 +381,13 @@ function App() {
             path="/admin"
             element={
               authLoading ? (
-                <div style={{ maxWidth: 960, margin: "80px auto", padding: "0 20px" }}>
+                <div
+                  style={{
+                    maxWidth: 960,
+                    margin: "80px auto",
+                    padding: "0 20px",
+                  }}
+                >
                   <h2>Admin</h2>
                   <p>Checking admin access...</p>
                 </div>
@@ -310,17 +400,38 @@ function App() {
           />
           <Route
             path="/admin/activity-log"
-            element={isAdmin ? <AdminActivityLog /> : <Navigate to="/admin/login" replace />}
+            element={
+              isAdmin ? (
+                <AdminActivityLog />
+              ) : (
+                <Navigate to="/admin/login" replace />
+              )
+            }
           />
           <Route
             path="/admin/partner/:partnerId"
-            element={isAdmin ? <AdminPartnerView /> : <Navigate to="/admin/login" replace />}
+            element={
+              isAdmin ? (
+                <AdminPartnerView />
+              ) : (
+                <Navigate to="/admin/login" replace />
+              )
+            }
           />
           <Route
             path="/admin/payouts"
-            element={isAdmin ? <AdminPayoutsPage /> : <Navigate to="/admin/login" replace />}
+            element={
+              isAdmin ? (
+                <AdminPayoutsPage />
+              ) : (
+                <Navigate to="/admin/login" replace />
+              )
+            }
           />
-          <Route path="/quickcheckout" element={<OneTimeProduct user={user} />} />
+          <Route
+            path="/quickcheckout"
+            element={<OneTimeProduct user={user} />}
+          />
           <Route
             path="/checkout/success"
             element={<CheckoutSuccess user={user} authLoading={authLoading} />}
@@ -332,7 +443,10 @@ function App() {
           <Route path="/terms/user" element={<UserTermsPage />} />
           <Route path="/terms/partner" element={<PartnerTermsPage />} />
 
-          <Route path="/" element={<MainPage user={user} userStatus={userStatus} />} />
+          <Route
+            path="/"
+            element={<MainPage user={user} userStatus={userStatus} />}
+          />
           <Route path="/contact" element={<Contact />} />
           <Route path="/referrals" element={<ReferralForm />} />
           <Route path="/plans" element={<PlansPage user={user} />} />
