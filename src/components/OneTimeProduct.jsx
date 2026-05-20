@@ -79,14 +79,22 @@ const ProductList = ({ user }) => {
     setLoadingPlanId(selectedPlan.id);
     setError("");
 
-    if (!selectedPlan.priceId) {
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      setError("You must be signed in to checkout.");
+      setLoadingPlanId("");
+      return;
+    }
+
+    if (!selectedPlan?.priceId) {
       setError(`Missing ${selectedPlan.envVar} in frontend environment.`);
       setLoadingPlanId("");
       return;
     }
 
     try {
-      const idToken = await auth.currentUser.getIdToken();
+      // Use auth.currentUser directly to ensure body and token consistency
+      const idToken = await currentUser.getIdToken();
       const response = await fetch(getApiUrl("/api/create-checkout-session"), {
         method: "POST",
         headers: {
@@ -96,8 +104,8 @@ const ProductList = ({ user }) => {
         body: JSON.stringify({
           priceId: selectedPlan.priceId,
           isSubscription: true,
-          userId: user.uid,
-          email: user.email,
+          userId: currentUser.uid,
+          email: currentUser.email,
         }),
       });
 

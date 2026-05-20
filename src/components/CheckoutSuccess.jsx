@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { apiGet, apiPost } from "../utils/apiClient";
+import { apiGet } from "../utils/apiClient";
+import { auth } from "../firebase";
+
+const getApiUrl = (path) => {
+  const base = process.env.REACT_APP_API_URL || "";
+  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  return `${normalizedBase}${path}`;
+};
 
 const SESSION_CHECK_RETRY_MS = 1500;
 const SESSION_CHECK_MAX_ATTEMPTS = 3;
@@ -61,13 +68,23 @@ const CheckoutSuccess = ({ user, authLoading }) => {
         if (!isPaid && !isComplete)
           throw new Error("Payment has not completed yet.");
 
-        const finalizeResponse = await apiPost(
-          "/api/finalize-checkout-session",
+        // Using manual fetch to ensure absolute URL and proper Auth headers
+        const idToken = await auth.currentUser.getIdToken();
+        const finalizeResponse = await fetch(
+          getApiUrl("/api/finalize-checkout-session"),
           {
-            sessionId,
-            userId: user.uid,
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${idToken}`,
+            },
+            body: JSON.stringify({
+              sessionId,
+              userId: user.uid,
+            }),
           },
         );
+
         const finalizePayload = await finalizeResponse.json().catch(() => null);
         if (!finalizeResponse.ok || !finalizePayload?.success)
           throw new Error(
