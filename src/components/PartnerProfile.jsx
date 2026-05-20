@@ -30,13 +30,6 @@ const PartnerProfile = ({ user, partnerProfile }) => {
   const [savingPayment, setSavingPayment] = useState(false);
   const [payouts, setPayouts] = useState([]);
   const [payoutsLoading, setPayoutsLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   const PAYMENT_OPTIONS = [
     {
