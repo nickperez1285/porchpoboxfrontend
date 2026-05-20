@@ -120,7 +120,7 @@ const Register = () => {
       const userDocSnap = await getDoc(userDocRef);
 
       if (userDocSnap.exists()) {
-        // User already exists, navigate to profile
+        // User already exists, navigate to profile and clear history
         navigate("/profile", { replace: true });
         return;
       }
