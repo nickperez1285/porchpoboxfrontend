@@ -1,9 +1,14 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "../firebase";
-import { apiPost } from "../utils/apiClient";
+import { auth, db } from "../firebase";
 import PrefLocationModal from "./PrefLocationModal";
+
+const getApiUrl = (path) => {
+  const base = process.env.REACT_APP_API_URL || "";
+  const normalizedBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  return `${normalizedBase}${path}`;
+};
 
 const PLAN_CONFIG = [
   {
@@ -11,22 +16,23 @@ const PLAN_CONFIG = [
     envVar: "REACT_APP_STRIPE_PRICE_ID_MONTHLY",
     label: "1 Month",
     price: "$20",
-    description: "Unlimited packages for 30 days"
+    description: "Unlimited packages for 30 days",
   },
   {
     id: "semiannual",
     envVar: "REACT_APP_STRIPE_PRICE_ID_SEMIANNUAL",
     label: "6 Months",
     price: "$100",
-    description: "Pay for 5 months and get a 6 month free"
+    description: "Pay for 5 months and get a 6 month free",
   },
   {
     id: "yearly",
     envVar: "REACT_APP_STRIPE_PRICE_ID_YEARLY",
     label: "1 Year",
     price: "$200",
-    description: "Pay for 10 months and get 2 months FREE for a full year of  access! "
-  }
+    description:
+      "Pay for 10 months and get 2 months FREE for a full year of  access! ",
+  },
 ];
 
 const ProductList = ({ user }) => {
@@ -34,16 +40,19 @@ const ProductList = ({ user }) => {
     () =>
       PLAN_CONFIG.map((plan) => ({
         ...plan,
-        priceId: process.env[plan.envVar]
+        priceId: process.env[plan.envVar],
       })),
-    []
+    [],
   );
-  const [selectedPlanId, setSelectedPlanId] = useState(plans[0]?.id || "monthly");
+  const [selectedPlanId, setSelectedPlanId] = useState(
+    plans[0]?.id || "monthly",
+  );
   const [loadingPlanId, setLoadingPlanId] = useState("");
   const [error, setError] = useState("");
   const [showPrefModal, setShowPrefModal] = useState(false);
 
-  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId) || plans[0];
+  const selectedPlan =
+    plans.find((plan) => plan.id === selectedPlanId) || plans[0];
 
   const startCheckout = async () => {
     if (!user || !selectedPlan) return;
@@ -77,11 +86,19 @@ const ProductList = ({ user }) => {
     }
 
     try {
-      const response = await apiPost("/api/create-checkout-session", {
-        priceId: selectedPlan.priceId,
-        isSubscription: true,
-        userId: user.uid,
-        email: user.email,
+      const idToken = await auth.currentUser.getIdToken();
+      const response = await fetch(getApiUrl("/api/create-checkout-session"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${idToken}`,
+        },
+        body: JSON.stringify({
+          priceId: selectedPlan.priceId,
+          isSubscription: true,
+          userId: user.uid,
+          email: user.email,
+        }),
       });
 
       const responseText = await response.text();
@@ -95,7 +112,7 @@ const ProductList = ({ user }) => {
 
       if (!response.ok || !payload?.url) {
         throw new Error(
-          payload?.message || responseText || "Unable to start checkout."
+          payload?.message || responseText || "Unable to start checkout.",
         );
       }
 
@@ -123,7 +140,7 @@ const ProductList = ({ user }) => {
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 12
+          gap: 12,
         }}
       >
         {plans.map((plan) => {
@@ -140,7 +157,7 @@ const ProductList = ({ user }) => {
                 border: isSelected ? "2px solid #b88a00" : "1px solid #d8d8d8",
                 background: isSelected ? "#f8f1d6" : "#ffffff",
                 padding: 18,
-                cursor: "pointer"
+                cursor: "pointer",
               }}
             >
               <div
@@ -148,7 +165,7 @@ const ProductList = ({ user }) => {
                   fontSize: 12,
                   letterSpacing: 1,
                   textTransform: "uppercase",
-                  color: "#8a6a00"
+                  color: "#8a6a00",
                 }}
               >
                 {plan.label}
@@ -170,7 +187,7 @@ const ProductList = ({ user }) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          textAlign: "center"
+          textAlign: "center",
         }}
       >
         {user ? (
@@ -180,7 +197,9 @@ const ProductList = ({ user }) => {
             onClick={startCheckout}
             disabled={Boolean(loadingPlanId)}
           >
-            {loadingPlanId ? "Starting sign up..." : `Sign Up For ${selectedPlan?.label || "Plan"}`}
+            {loadingPlanId
+              ? "Starting sign up..."
+              : `Sign Up For ${selectedPlan?.label || "Plan"}`}
           </button>
         ) : (
           <Link to="/login" style={{ display: "inline-flex" }}>
@@ -190,7 +209,15 @@ const ProductList = ({ user }) => {
           </Link>
         )}
         {error && (
-          <p style={{ color: "red", marginTop: 12, maxWidth: 420, marginLeft: "auto", marginRight: "auto" }}>
+          <p
+            style={{
+              color: "red",
+              marginTop: 12,
+              maxWidth: 420,
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
+          >
             {error}
           </p>
         )}
