@@ -36,7 +36,8 @@
   display: flex;
   gap: 16px;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  align-self: stretch;
   flex-wrap: wrap;
 }
 
