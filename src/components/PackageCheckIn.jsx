@@ -13,7 +13,18 @@ const rowStatusClass = (user) => {
   return "pkg-checkin__row--inactive";
 };
 
-const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
+const readErrorMessage = async (response, fallback) => {
+  const responseText = await response.text();
+
+  try {
+    const body = responseText ? JSON.parse(responseText) : null;
+    return body?.message || responseText || fallback;
+  } catch (parseError) {
+    return responseText || fallback;
+  }
+};
+
+const PackageCheckIn = ({ user, partnerProfile, onPackagesCheckedIn }) => {
   const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -31,31 +42,57 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       return;
     }
 
+    let cancelled = false;
+
     const timer = setTimeout(async () => {
       setLoading(true);
       setError("");
       try {
-        const idToken = await auth.currentUser.getIdToken();
-        const response = await fetch(
-          getApiUrl(
-            `/api/notifications/search-customers?q=${encodeURIComponent(search)}`,
-          ),
-          { headers: { Authorization: `Bearer ${idToken}` } },
-        );
+        const currentUser = user || auth.currentUser;
+        if (!currentUser) {
+          throw new Error("You must be signed in to search customers.");
+        }
 
-        if (!response.ok) throw new Error("Search failed");
+        const searchUrl = getApiUrl(
+          `/api/notifications/search-customers?q=${encodeURIComponent(search)}`,
+        );
+        const buildHeaders = async (forceRefresh = false) => ({
+          Authorization: `Bearer ${await currentUser.getIdToken(forceRefresh)}`,
+        });
+
+        let response = await fetch(searchUrl, {
+          headers: await buildHeaders(),
+        });
+
+        if (response.status === 401) {
+          response = await fetch(searchUrl, {
+            headers: await buildHeaders(true),
+          });
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            await readErrorMessage(response, "Customer search failed."),
+          );
+        }
         const data = await response.json();
-        setUsers(data);
+        if (!cancelled) setUsers(data);
       } catch (err) {
         console.error("Search error:", err);
-        setError("Failed to search customers.");
+        if (!cancelled) {
+          setUsers([]);
+          setError(err.message || "Failed to search customers.");
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }, 300);
 
-    return () => clearTimeout(timer);
-  }, [search]);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [search, user]);
 
   const toggleExpanded = (userId) => {
     setExpandedUserIds((current) =>
@@ -105,7 +142,12 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
     setError("");
 
     try {
-      const idToken = await auth.currentUser.getIdToken();
+      const currentUser = user || auth.currentUser;
+      if (!currentUser) {
+        throw new Error("You must be signed in to check in packages.");
+      }
+
+      const idToken = await currentUser.getIdToken(true);
       const response = await fetch(
         getApiUrl("/api/notifications/package-check-in"),
         {
@@ -131,17 +173,11 @@ const PackageCheckIn = ({ partnerProfile, onPackagesCheckedIn }) => {
       );
 
       if (!response.ok) {
-        const responseText = await response.text();
-        let body = null;
-
-        try {
-          body = responseText ? JSON.parse(responseText) : null;
-        } catch (parseError) {
-          body = null;
-        }
-
         throw new Error(
-          body?.message || responseText || "Package notification email failed.",
+          await readErrorMessage(
+            response,
+            "Package notification email failed.",
+          ),
         );
       }
 
