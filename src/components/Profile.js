@@ -193,7 +193,7 @@ const Profile = ({ user }) => {
                 {statusInfo.icon} {statusInfo.label}
               </span>
               <div className="profile-sub-status">
-                {pzrofileData?.status === "inactive" ||
+                {profileData?.status === "inactive" ||
                 profileData?.status === "canceled" ? (
                   <Link
                     to="/plans"
