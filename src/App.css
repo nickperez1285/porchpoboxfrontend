@@ -17,19 +17,18 @@
 
 .header-logo-link {
   text-decoration: none;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   max-width: 280px;
   width: 100%;
 }
 
-.header {
-  background-image: url("https://raw.githubusercontent.com/nickperez1285/porchpoboxfrontend/refs/heads/main/public/logo.png");
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center center;
+.header-logo {
+  display: block;
+  object-fit: contain;
   height: 100px;
   width: 100%;
-  margin: 0;
 }
 
 .header-nav {
@@ -90,9 +89,8 @@
   .header-logo-link {
     max-width: 200px;
   }
-  .header {
+  .header-logo {
     height: 80px;
-    background-position: left center;
   }
   .header-nav {
     justify-content: flex-end;

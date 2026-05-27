@@ -85,11 +85,13 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   return (
     <header className="app-header">
       <div className="header-logo-wrap">
-        <Link to="/" className="header-logo-link">
-          <h1 className="header">
-            <span className="visually-hidden">Porch P.O. Box</span>
-          </h1>
-        </Link>
+        <a href="https://porchpobox.com/" className="header-logo-link">
+          <img
+            src="/logo.png"
+            alt="Porch P.O. Box"
+            className="header-logo"
+          />
+        </a>
       </div>
       {!authLoading && !hideAuthLinks && (
         <div className="header-nav">
