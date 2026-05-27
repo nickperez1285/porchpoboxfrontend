@@ -193,7 +193,7 @@ const Profile = ({ user }) => {
                 {statusInfo.icon} {statusInfo.label}
               </span>
               <div className="profile-sub-status">
-                {profileData?.status === "inactive" ||
+                {pzrofileData?.status === "inactive" ||
                 profileData?.status === "canceled" ? (
                   <Link
                     to="/plans"
@@ -392,39 +392,6 @@ const Profile = ({ user }) => {
           <Card className="card--alt">
             <SectionLabel>Account</SectionLabel>
 
-            {/* Referral Code */}
-            <div className="card-section">
-              <div className="section-label-inner">Your Referral Code</div>
-              <div className="referral-code-wrap">
-                <span className="referral-code-text">{displayReferral}</span>
-                {displayReferral !== "—" && (
-                  <button
-                    type="button"
-                    className="btn-copy-mini"
-                    onClick={() =>
-                      navigator.clipboard
-                        .writeText(displayReferral)
-                        .then(() => alert("Referral code copied!"))
-                    }
-                  >
-                    Copy
-                  </button>
-                )}
-                {displayReferral !== "—" && (
-                  <button
-                    type="button"
-                    className="btn-share-mini"
-                    onClick={handleShareReferral}
-                  >
-                    Share
-                  </button>
-                )}
-              </div>
-              <div className="referral-hint">
-                Share with a business to refer them as a partner.
-              </div>
-            </div>
-
             {/* Preferred Location */}
             <div
               className={`card-section ${profileData?.prefLocation ? "card-section--location-ok" : "card-section--location-warn"}`}
@@ -493,6 +460,38 @@ const Profile = ({ user }) => {
                 </div>
               </div>
             )}
+            {/* Referral Code */}
+            <div className="card-section">
+              <div className="section-label-inner">Your Referral Code</div>
+              <div className="referral-code-wrap">
+                <span className="referral-code-text">{displayReferral}</span>
+                {displayReferral !== "—" && (
+                  <button
+                    type="button"
+                    className="btn-copy-mini"
+                    onClick={() =>
+                      navigator.clipboard
+                        .writeText(displayReferral)
+                        .then(() => alert("Referral code copied!"))
+                    }
+                  >
+                    Copy
+                  </button>
+                )}
+                {displayReferral !== "—" && (
+                  <button
+                    type="button"
+                    className="btn-share-mini"
+                    onClick={handleShareReferral}
+                  >
+                    Share
+                  </button>
+                )}
+              </div>
+              <div className="referral-hint">
+                Share with a business to refer them as a partner.
+              </div>
+            </div>
 
             {/* Actions */}
             <div className="profile-actions">
