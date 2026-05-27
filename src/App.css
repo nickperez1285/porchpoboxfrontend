@@ -1,9 +1,10 @@
 .app-header {
   background-color: #000;
   padding: 15px 20px;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   align-items: center;
+  justify-items: center;
   border-bottom: 1px solid #222;
   position: relative;
 }
@@ -35,7 +36,7 @@
   display: flex;
   gap: 16px;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   align-self: stretch;
   flex-wrap: wrap;
 }
@@ -77,14 +78,14 @@
 
 @media (min-width: 800px) {
   .app-header {
-    flex-direction: row;
-    justify-content: space-between;
+    grid-template-columns: 1fr auto 1fr;
     padding: 10px 40px;
   }
   .header-logo-wrap {
+    grid-column: 2;
     width: auto;
     margin-bottom: 0;
-    justify-content: flex-start;
+    justify-content: center;
   }
   .header-logo-link {
     max-width: 200px;
@@ -93,6 +94,8 @@
     height: 80px;
   }
   .header-nav {
+    grid-column: 3;
+    justify-self: end;
     justify-content: flex-end;
     gap: 24px;
   }
