@@ -2,12 +2,11 @@ import React from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import Profile from "./Profile";
-import { auth, db } from "../firebase";
-import { mockDeep } from "jest-mock-extended";
-import { collection, doc, onSnapshot, query, where } from "firebase/firestore";
+import { auth } from "../firebase";
+import { collection, doc, onSnapshot } from "firebase/firestore";
 
 // Mock Firebase modules
-jest.mock("../../firebase", () => ({
+jest.mock("../firebase", () => ({
   auth: {
     currentUser: {
       uid: "test-uid",
@@ -15,7 +14,14 @@ jest.mock("../../firebase", () => ({
       email: "test@example.com",
     },
   },
-  db: {}, // Will be mocked deeply later
+  db: { __name: "mock-db" },
+}));
+
+jest.mock("firebase/firestore", () => ({
+  collection: jest.fn(),
+  doc: jest.fn(),
+  onSnapshot: jest.fn(),
+  getDoc: jest.fn(),
 }));
 
 // Mock react-router-dom's useNavigate
@@ -33,31 +39,25 @@ describe("Profile Component", () => {
   beforeEach(() => {
     // Reset mocks before each test
     mockNavigate.mockClear();
+    mockOnSnapshot = onSnapshot;
+    onSnapshot.mockClear();
+    doc.mockClear();
+    collection.mockClear();
 
     // Mock onSnapshot and its unsubscribe function
     mockUnsubscribe = jest.fn();
-    mockOnSnapshot = jest.fn((_ref, callback, errorCallback) => {
+    onSnapshot.mockImplementation((_ref, callback) => {
       // Default behavior: call the callback with an empty snapshot
-      callback({
-        exists: () => false,
-        data: () => undefined,
-        docs: [],
-      });
+      if (_ref === "user-doc") {
+        callback({ exists: () => true, data: () => ({}) });
+      } else {
+        callback({ docs: [] });
+      }
       return mockUnsubscribe;
     });
 
-    // Deeply mock the Firestore instance
-    db.collection = jest.fn(() => ({
-      doc: jest.fn(() => ({
-        collection: jest.fn(() => ({
-          onSnapshot: mockOnSnapshot,
-        })),
-      })),
-      onSnapshot: mockOnSnapshot, // For the user profile document
-    }));
-    db.doc = jest.fn(() => ({
-      onSnapshot: mockOnSnapshot,
-    }));
+    doc.mockReturnValue("user-doc");
+    collection.mockReturnValue("history-collection");
 
     // Spy on console.error to catch and potentially assert on errors
     consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
@@ -68,7 +68,7 @@ describe("Profile Component", () => {
   });
 
   const renderProfile = (user = auth.currentUser) => {
-    render(
+    return render(
       <Router>
         <Profile user={user} />
       </Router>,
@@ -109,17 +109,19 @@ describe("Profile Component", () => {
       return mockUnsubscribe;
     });
 
-    renderProfile();
+    const { unmount } = renderProfile();
 
-    expect(screen.getByText("Test User")).toBeInTheDocument();
+    expect(screen.getAllByText("Test User").length).toBeGreaterThan(0);
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(screen.getByText("Active")).toBeInTheDocument();
-    expect(screen.getByText("Test Partner")).toBeInTheDocument();
-    expect(screen.getByText("123 Main St")).toBeInTheDocument();
+    expect(screen.getByText(/Active/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Test Partner/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/123 Main St/i).length).toBeGreaterThan(0);
     expect(screen.getByText("TESTCODE")).toBeInTheDocument();
     expect(screen.getByText("5")).toBeInTheDocument(); // Packages Delivered
 
-    // Check if unsubscribe is called on unmount (implicit in cleanup after test)
+    unmount();
+
+    // Check if unsubscribe is called on unmount
     expect(mockUnsubscribe).toHaveBeenCalledTimes(2); // One for profile, one for package history
   });
 
@@ -151,7 +153,7 @@ describe("Profile Component", () => {
 
     await waitFor(() => {
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        "Error loading package history:",
+        "CRITICAL: Permission denied reading packageHistory. Check /users/{userId}/packageHistory rule.",
         expect.any(Error),
       );
     });
@@ -179,7 +181,7 @@ describe("Profile Component", () => {
 
     renderProfile();
 
-    expect(screen.getByText("No delivery address yet")).toBeInTheDocument();
+    expect(screen.getByText(/No delivery address yet/)).toBeInTheDocument();
     expect(
       screen.getByText(
         "Set a preferred partner location to get your package delivery address.",

@@ -3,12 +3,15 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import ProductList from "./OneTimeProduct";
 import { getDoc } from "firebase/firestore";
+import { auth } from "../firebase";
 
 // Mock Firebase and Firestore
 jest.mock("../firebase", () => ({
   db: { __name: "mock-db" },
   auth: {
     currentUser: {
+      uid: "test-user-123",
+      email: "test@example.com",
       getIdToken: jest.fn().mockResolvedValue("test-token"),
     },
   },
@@ -32,7 +35,10 @@ const originalEnv = process.env;
 
 describe("OneTimeProduct (ProductList)", () => {
   beforeEach(() => {
-    jest.resetModules();
+    auth.currentUser.uid = "test-user-123";
+    auth.currentUser.email = "test@example.com";
+    auth.currentUser.getIdToken.mockResolvedValue("test-token");
+
     process.env = {
       ...originalEnv,
       REACT_APP_STRIPE_PRICE_ID_MONTHLY: "price_monthly_123",

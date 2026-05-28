@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiPost } from "../utils/apiClient";
-import { getApiUrl } from "../config/api";
 import { auth, db } from "../firebase";
 import {
   createUserWithEmailAndPassword,
@@ -9,13 +8,18 @@ import {
   GoogleAuthProvider,
   updateProfile,
 } from "firebase/auth";
-import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 import {
   isPasswordValid,
   passwordRequirementsText,
 } from "../utils/passwordValidation";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
-import "./Register.css";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -75,7 +79,7 @@ const Register = () => {
   }) => {
     try {
       const welcomeResponse = await fetch(
-        getApiUrl("/api/notifications/welcome"),
+        `${process.env.REACT_APP_API_URL}/api/notifications/welcome`,
         {
           method: "POST",
           headers: {
@@ -119,26 +123,20 @@ const Register = () => {
 
       // Check if user profile already exists
       const userDocRef = doc(db, "users", user.uid);
-      let userDocSnap = null;
-      try {
-        // Attempt to get the document. If this fails due to permissions,
-        // it likely means the user is new and the rules are preventing a read
-        // on a non-existent document. We'll proceed to try and create it.
-        // If it fails for other reasons (e.g., network), the outer catch will handle it.
-        // The Firestore rules should allow a user to 'get' their own document,
-        // even if it doesn't exist, to perform this check.
-        // The 'get' rule in firestore.rules has been updated to be null-safe
-        // and allow this check for the user's own UID.
-        userDocSnap = await getDoc(userDocRef);
-      } catch (getErr) {
-        // If getDoc fails due to permissions, it often means the user is truly new
-        // and the rules are being strict. We can proceed to try and create the doc.
-        console.warn("Could not check existence, attempting creation:", getErr);
-      }
+      const userDocSnap = await getDoc(userDocRef);
 
-      if (userDocSnap && userDocSnap.exists()) {
-        // User already exists, navigate to profile and clear history
+      if (userDocSnap.exists()) {
+        // User already exists, navigate to profile and clear history.
+        // We also ensure their profile is up-to-date with Google's display name.
+        if (user.displayName && user.displayName !== userDocSnap.data().name) {
+          await updateDoc(userDocRef, {
+            name: user.displayName,
+            nameLower: user.displayName.toLowerCase(),
+          });
+        }
         navigate("/profile", { replace: true });
+        setLoading(false); // Ensure loading state is cleared
+
         return;
       }
 
@@ -188,13 +186,6 @@ const Register = () => {
       } else if (err.code === "auth/account-exists-with-different-credential") {
         setError(
           "An account with this email already exists. Please use email/password login or a different email.",
-        ); //
-      } else if (
-        err.message.includes("blocked-by-client") ||
-        err.message.includes("permissions")
-      ) {
-        setError(
-          "The request was blocked. Please disable any ad-blockers or tracking protection and try again.",
         );
       } else {
         setError(
@@ -321,7 +312,13 @@ const Register = () => {
         </div>
       )}
       <form className="reg-form" onSubmit={handleRegister} noValidate>
-        <div className="reg-google-signin-section">
+        <p className="reg-section-label">Account</p>
+
+        {/* Google Sign-In Option */}
+        <div
+          className="reg-google-signin-section"
+          style={{ marginBottom: "20px" }}
+        >
           <label
             className="reg-terms-checkbox-row"
             htmlFor="register-terms-agree-google"
@@ -341,6 +338,31 @@ const Register = () => {
             className="reg-btn-google"
             onClick={handleGoogleSignIn}
             disabled={loading || !termsAccepted}
+            style={{
+              width: "100%",
+              padding: "10px 16px",
+              marginTop: "12px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #dadce0",
+              borderRadius: "4px",
+              fontSize: "14px",
+              fontWeight: "500",
+              cursor: loading || !termsAccepted ? "not-allowed" : "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              opacity: loading || !termsAccepted ? 0.6 : 1,
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              if (!loading && termsAccepted) {
+                e.target.style.backgroundColor = "#f8f8f8";
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = "#ffffff";
+            }}
           >
             <svg width="18" height="18" viewBox="0 0 24 24">
               <path
@@ -364,12 +386,20 @@ const Register = () => {
           </button>
         </div>
 
-        <div className="reg-divider-wrap">
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            margin: "20px 0",
+          }}
+        >
           <hr style={{ flex: 1 }} />
-          <span className="reg-divider-text">or continue with email</span>
+          <span style={{ color: "#666", fontSize: "14px" }}>
+            or continue with email
+          </span>
           <hr style={{ flex: 1 }} />
         </div>
-        <p className="reg-section-label">Account Details</p>
 
         <RegField
           id="reg-email"

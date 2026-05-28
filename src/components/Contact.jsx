@@ -7,8 +7,10 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatus("Sending...");
     const form = e.currentTarget;
+    if (!form.checkValidity()) return;
+
+    setStatus("Sending...");
 
     const formData = new FormData(form);
     const payload = {

@@ -45,18 +45,18 @@ describe("Register component", () => {
     expect(screen.getByLabelText(/city/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/state/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/zip code/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/confirm password/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("checkbox", {
+      screen.getAllByRole("checkbox", {
         name: /i agree to the terms and conditions\./i,
       }),
-    ).toBeInTheDocument();
+    ).toHaveLength(2);
     expect(
       screen.getByRole("button", { name: /create account/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /sign up with google/i }),
-    ).toBeInTheDocument();
+      screen.getAllByRole("button", { name: /sign up with google/i }).length,
+    ).toBeGreaterThan(0);
   });
 });

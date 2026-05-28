@@ -3,7 +3,9 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import Register from "./Register";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { isPasswordValid } from "../utils/passwordValidation";
+import { apiPost } from "../utils/apiClient";
 
 // Mock Firebase
 jest.mock("../firebase", () => ({
@@ -19,16 +21,23 @@ jest.mock("firebase/auth", () => ({
 }));
 
 jest.mock("firebase/firestore", () => ({
-  doc: jest.fn(),
+  doc: jest.fn((_db, _coll, id) => ({ id, _path: {} })),
   setDoc: jest.fn(),
-  serverTimestamp: jest.fn(() => "mock-timestamp"),
-  getDoc: jest.fn(),
+  serverTimestamp: jest.fn(() => ({
+    toDate: () => new Date("2026-05-28T10:00:00Z"),
+  })), // Mock serverTimestamp to return a consistent object
+  getDoc: jest.fn(() => Promise.resolve({ exists: () => false })), // Default: doc does not exist
+  updateDoc: jest.fn(), // Mock updateDoc for existing user flow
 }));
 
 // Mock utils and config
 jest.mock("../utils/passwordValidation", () => ({
   isPasswordValid: jest.fn(() => true),
   passwordRequirementsText: "Mock requirements",
+}));
+
+jest.mock("../utils/apiClient", () => ({
+  apiPost: jest.fn(),
 }));
 
 // Mock useNavigate specifically to check for 'replace' flag
@@ -38,12 +47,38 @@ jest.mock("react-router-dom", () => ({
   useNavigate: () => mockNavigate,
 }));
 
-jest.mock("../config/api", () => "http://localhost:5000");
+jest.mock("../config/api", () => ({
+  __esModule: true,
+  default: "http://localhost:5000",
+  getApiUrl: (path) =>
+    `http://localhost:5000${path.startsWith("/") ? path : `/${path}`}`,
+}));
+
+// Mock Date for consistent referral code generation
+const MOCK_DATE = new Date("2026-05-28T10:00:00Z");
+const RealDate = Date;
+global.Date = jest.fn(() => MOCK_DATE);
+global.Date.now = jest.fn(() => MOCK_DATE.getTime());
+global.Date.prototype.getDate = jest.fn(() => MOCK_DATE.getDate());
+global.Date.prototype.getMonth = jest.fn(() => MOCK_DATE.getMonth());
+global.Date.prototype.getFullYear = jest.fn(() => MOCK_DATE.getFullYear());
 
 describe("Register Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockNavigate.mockClear();
+    doc.mockImplementation((_db, _coll, id) => ({ id, _path: {} }));
+    serverTimestamp.mockReturnValue({
+      toDate: () => new RealDate("2026-05-28T10:00:00Z"),
+    });
+    isPasswordValid.mockReturnValue(true);
+    apiPost.mockResolvedValue({ ok: true });
+    // Reset Date mock for each test
+    global.Date = jest.fn(() => MOCK_DATE);
+    global.Date.now = jest.fn(() => MOCK_DATE.getTime());
+    global.Date.prototype.getDate = jest.fn(() => MOCK_DATE.getDate());
+    global.Date.prototype.getMonth = jest.fn(() => MOCK_DATE.getMonth());
+    global.Date.prototype.getFullYear = jest.fn(() => MOCK_DATE.getFullYear());
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
@@ -52,13 +87,19 @@ describe("Register Component", () => {
     );
   });
 
+  afterEach(() => {
+    global.Date = RealDate; // Restore original Date object
+  });
+
   it("renders registration form correctly", () => {
     render(
       <Router>
         <Register />
       </Router>,
     );
-    expect(screen.getByText(/Create account/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /Create account/i }),
+    ).toBeInTheDocument();
   });
 
   it("shows validation error for invalid email", async () => {
@@ -119,7 +160,7 @@ describe("Register Component", () => {
       target: { value: "SecurePass123!" },
     });
     fireEvent.click(
-      screen.getByLabelText(/I agree to the terms and conditions/i),
+      screen.getAllByLabelText(/I agree to the terms and conditions/i)[1],
     );
 
     fireEvent.click(screen.getByRole("button", { name: /Create account/i }));
@@ -127,11 +168,14 @@ describe("Register Component", () => {
     await waitFor(() => {
       expect(createUserWithEmailAndPassword).toHaveBeenCalled();
       expect(setDoc).toHaveBeenCalledWith(
-        undefined,
+        expect.objectContaining({
+          _path: expect.any(Object), // Ensure doc() returns a valid ref
+          id: "test-uid",
+        }),
         expect.objectContaining({
           name: "Jane Doe",
           nameLower: "jane doe", // Verifying data consistency for search
-          referralCode: expect.stringMatching(/^JD\d{6}$/), // Matches Name-based prefix
+          referralCode: expect.stringMatching(/^JA\d{6}$/), // Matches name-prefix format
         }),
       );
       expect(mockNavigate).toHaveBeenCalledWith("/profile", { replace: true });

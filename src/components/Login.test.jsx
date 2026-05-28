@@ -2,7 +2,7 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BrowserRouter as Router } from "react-router-dom";
 import Login from "./Login";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { getDoc } from "firebase/firestore";
 
 // Mock Firebase
@@ -34,6 +34,7 @@ jest.mock("react-router-dom", () => ({
 describe("Login Component", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    onAuthStateChanged.mockReturnValue(jest.fn());
   });
 
   it("redirects partners to /partner after successful login", async () => {
@@ -57,7 +58,7 @@ describe("Login Component", () => {
     fireEvent.change(screen.getByLabelText(/Password/i), {
       target: { value: "password123" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/partner");
@@ -85,7 +86,7 @@ describe("Login Component", () => {
     fireEvent.change(screen.getByLabelText(/Password/i), {
       target: { value: "password123" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /Sign in/i }));
+    fireEvent.click(screen.getByRole("button", { name: /^Sign in$/i }));
 
     await waitFor(() => {
       expect(mockNavigate).toHaveBeenCalledWith("/profile");
