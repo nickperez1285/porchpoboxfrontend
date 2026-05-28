@@ -308,6 +308,43 @@ const Profile = ({ user }) => {
           <Card className="card--alt">
             <SectionLabel>Account</SectionLabel>
 
+            {/* Subscription Status */}
+            {(() => {
+              const isSubActive =
+                profileData?.status === "active" ||
+                profileData?.status === "member";
+              const subLabel = isSubActive
+                ? "Active"
+                : profileData?.status === "trial"
+                  ? "Trial"
+                  : "Inactive";
+              const subClass = isSubActive
+                ? "profile-status--active"
+                : profileData?.status === "trial"
+                  ? "profile-status--trial"
+                  : "profile-status--inactive";
+              const section = (
+                <div
+                  className={`card-section card-section--sub ${isSubActive ? "" : "card-section--sub-warn"}`}
+                >
+                  <div className="section-label-inner">Subscription</div>
+                  <div className="profile-subscription-status">
+                    <span className={`profile-status-pill ${subClass}`}>
+                      {subLabel}
+                    </span>
+                    {!isSubActive && (
+                      <span className="profile-sub-cta">
+                        {profileData?.status === "trial"
+                          ? "Upgrade to keep receiving packages"
+                          : "Choose a plan to get started"}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+              return isSubActive ? section : <Link to="/plans" className="profile-sub-link-wrap">{section}</Link>;
+            })()}
+
             {/* Preferred Location */}
             <div
               className={`card-section ${profileData?.prefLocation ? "card-section--location-ok" : "card-section--location-warn"}`}
@@ -376,37 +413,6 @@ const Profile = ({ user }) => {
               <div className="referral-hint">
                 Share with a business to refer them as a partner.
               </div>
-            </div>
-
-            {/* Subscription Status */}
-            <div className="card-section">
-              <div className="section-label-inner">Subscription</div>
-              <div className="profile-subscription-status">
-                <span
-                  className={`profile-status-pill ${
-                    profileData?.status === "active" ||
-                    profileData?.status === "member"
-                      ? "profile-status--active"
-                      : profileData?.status === "trial"
-                        ? "profile-status--trial"
-                        : "profile-status--inactive"
-                  }`}
-                >
-                  {profileData?.status === "active" ||
-                  profileData?.status === "member"
-                    ? "Active"
-                    : profileData?.status === "trial"
-                      ? "Trial"
-                      : "Inactive"}
-                </span>
-              </div>
-              {profileData?.status !== "active" &&
-                profileData?.status !== "member" &&
-                profileData?.status !== "trial" && (
-                  <Link to="/plans" className="profile-plans-link">
-                    View plans →
-                  </Link>
-                )}
             </div>
 
             {/* Actions */}
