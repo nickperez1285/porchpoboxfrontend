@@ -378,6 +378,37 @@ const Profile = ({ user }) => {
               </div>
             </div>
 
+            {/* Subscription Status */}
+            <div className="card-section">
+              <div className="section-label-inner">Subscription</div>
+              <div className="profile-subscription-status">
+                <span
+                  className={`profile-status-pill ${
+                    profileData?.status === "active" ||
+                    profileData?.status === "member"
+                      ? "profile-status--active"
+                      : profileData?.status === "trial"
+                        ? "profile-status--trial"
+                        : "profile-status--inactive"
+                  }`}
+                >
+                  {profileData?.status === "active" ||
+                  profileData?.status === "member"
+                    ? "Active"
+                    : profileData?.status === "trial"
+                      ? "Trial"
+                      : "Inactive"}
+                </span>
+              </div>
+              {profileData?.status !== "active" &&
+                profileData?.status !== "member" &&
+                profileData?.status !== "trial" && (
+                  <Link to="/plans" className="profile-plans-link">
+                    View plans →
+                  </Link>
+                )}
+            </div>
+
             {/* Actions */}
             <div className="profile-actions">
               <Link to="/profile/settings" className="btn-profile-action">
