@@ -4,7 +4,46 @@ import { updateEmail, updateProfile } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import PrefLocationModal from "./PrefLocationModal";
+import SubscriptionSettings from "./SubscriptionSettings";
 import "./UserSettings.css";
+
+const toDate = (value) => {
+  if (!value) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  if (typeof value.seconds === "number") return new Date(value.seconds * 1000);
+
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const formatDate = (value) => {
+  const date = toDate(value);
+  return date ? date.toLocaleDateString() : "Not set";
+};
+
+const getDaysLeft = (value) => {
+  const date = toDate(value);
+  if (!date) return null;
+
+  return Math.max(
+    0,
+    Math.ceil((date.getTime() - Date.now()) / (1000 * 60 * 60 * 24)),
+  );
+};
+
+const getStatusDisplay = (status) => {
+  switch (status) {
+    case "active":
+      return { label: "Active", className: "settings-status--active" };
+    case "trial":
+      return { label: "Trial", className: "settings-status--trial" };
+    case "inactive":
+    case "canceled":
+      return { label: "Inactive", className: "settings-status--inactive" };
+    default:
+      return { label: "Unknown", className: "settings-status--unknown" };
+  }
+};
 
 const UserSettings = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
@@ -127,6 +166,19 @@ const UserSettings = ({ user }) => {
 
   const shouldHighlightLocation =
     searchParams.get("highlight") === "location" && !profileData?.prefLocation;
+  const subscriptionStatus = getStatusDisplay(profileData?.status);
+  const hasSubscriptionDates = Boolean(
+    profileData?.subscribedAt || profileData?.subscriptionEndsAt,
+  );
+  const daysLeft = getDaysLeft(profileData?.subscriptionEndsAt);
+  const renewalClass =
+    typeof daysLeft !== "number"
+      ? "settings-renewal--unknown"
+      : daysLeft <= 7
+        ? "settings-renewal--urgent"
+        : daysLeft <= 14
+          ? "settings-renewal--soon"
+          : "settings-renewal--ok";
 
   return (
     <div className="settings-container">
@@ -137,7 +189,7 @@ const UserSettings = ({ user }) => {
         <div className="settings-hero-eyebrow">User Profile</div>
         <h2 style={{ margin: "8px 0 6px" }}>Settings</h2>
         <p style={{ margin: 0, color: "#d6d6d6" }}>
-          Manage your contact details and mailing address.
+          Manage your contact details, delivery preferences, and subscription.
         </p>
       </div>
 
@@ -226,6 +278,67 @@ const UserSettings = ({ user }) => {
             >
               Change Password
             </Link>
+          </div>
+
+          <div className="settings-card settings-card-full">
+            <div className="settings-subscription-header">
+              <div>
+                <h3 style={{ marginTop: 0, marginBottom: 6 }}>
+                  Subscription
+                </h3>
+                <p className="settings-subscription-copy">
+                  Review your current subscription and manage plan, renewal,
+                  and discounts.
+                </p>
+              </div>
+              <span
+                className={`settings-status-pill ${subscriptionStatus.className}`}
+              >
+                {subscriptionStatus.label}
+              </span>
+            </div>
+
+            {hasSubscriptionDates ? (
+              <>
+                <div className="settings-subscription-dates">
+                  <div>
+                    <div className="settings-subscription-label">Started</div>
+                    <div className="settings-subscription-value">
+                      {formatDate(profileData?.subscribedAt)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="settings-subscription-label">
+                      Renews/Ends
+                    </div>
+                    <div className="settings-subscription-value">
+                      {formatDate(profileData?.subscriptionEndsAt)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="settings-subscription-label">Days Left</div>
+                    <div
+                      className={`settings-subscription-value ${renewalClass}`}
+                    >
+                      {typeof daysLeft === "number" ? daysLeft : "Not set"}
+                    </div>
+                  </div>
+                </div>
+
+                {typeof daysLeft === "number" && daysLeft <= 7 ? (
+                  <div className={`settings-renewal-alert ${renewalClass}`}>
+                    Renew soon to avoid interruptions to package receiving.
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <p className="settings-subscription-empty">
+                No active subscription dates are on file yet. Choose a plan
+                below to start or update your subscription.
+              </p>
+            )}
+
+            <SubscriptionSettings user={user} profileData={profileData} />
           </div>
 
           <div className="settings-card settings-card-full">

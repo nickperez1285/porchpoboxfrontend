@@ -49,6 +49,120 @@
   font-size: 18px;
 }
 
+.settings-subscription-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.settings-subscription-copy {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.settings-status-pill {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.settings-status--active {
+  color: #1a7f37;
+  background: #d4edda;
+}
+
+.settings-status--trial {
+  color: #856404;
+  background: #fff3cd;
+}
+
+.settings-status--inactive {
+  color: #dc3545;
+  background: #ffd9d9;
+}
+
+.settings-status--unknown {
+  color: #888;
+  background: #f0f0f0;
+}
+
+.settings-subscription-dates {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.settings-subscription-dates > div {
+  background: #fafafa;
+  border: 1px solid #ededed;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.settings-subscription-label {
+  color: #777;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.settings-subscription-value {
+  color: #222;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.settings-renewal-alert,
+.settings-subscription-empty {
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0 0 16px;
+  padding: 11px 12px;
+}
+
+.settings-subscription-empty {
+  background: #fafafa;
+  border: 1px solid #ededed;
+  color: #666;
+}
+
+.settings-renewal--urgent {
+  color: #dc3545;
+}
+
+.settings-renewal--soon {
+  color: #fd7e14;
+}
+
+.settings-renewal--ok {
+  color: #1a7f37;
+}
+
+.settings-renewal--unknown {
+  color: #888;
+}
+
+.settings-renewal-alert.settings-renewal--urgent {
+  background: #fff1f1;
+  border: 1px solid #ffd0d0;
+}
+
+.settings-card .subscription-settings {
+  margin: 18px 0 0;
+}
+
 .settings-input-group {
   margin-bottom: 14px;
 }
@@ -111,4 +225,10 @@
   color: #666;
   padding: 10px 20px;
   border-radius: 10px;
+}
+
+@media (max-width: 520px) {
+  .settings-subscription-header {
+    flex-direction: column;
+  }
 }

@@ -113,7 +113,6 @@ describe("Profile Component", () => {
 
     expect(screen.getAllByText("Test User").length).toBeGreaterThan(0);
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(screen.getByText(/Active/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Test Partner/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/123 Main St/i).length).toBeGreaterThan(0);
     expect(screen.getByText("TESTCODE")).toBeInTheDocument();

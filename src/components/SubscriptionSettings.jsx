@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { getApiUrl } from "../config/api";
 import { auth } from "../firebase";
+import "./SubscriptionSettings.css";
 
 const PLAN_CONFIG = [
   {

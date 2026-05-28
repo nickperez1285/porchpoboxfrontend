@@ -33,6 +33,22 @@ const renderSettings = (profileData = {}) => {
 describe("UserSettings — Notifications", () => {
   beforeEach(() => jest.clearAllMocks());
 
+  it("shows subscription settings on the settings page", async () => {
+    renderSettings({
+      status: "active",
+      subscribedAt: new Date("2026-01-01T00:00:00Z"),
+      subscriptionEndsAt: new Date("2026-12-31T00:00:00Z"),
+    });
+
+    expect(
+      await screen.findByRole("heading", { name: "Subscription" }),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/Manage plan, renewal, and discounts/i).length,
+    ).toBeGreaterThan(0);
+  });
+
   it("shows notifications toggle in settings", async () => {
     renderSettings({ notificationsEnabled: true });
     expect(await screen.findByText(/Notifications/)).toBeInTheDocument();

@@ -4,41 +4,7 @@ import { signOut } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
-import SubscriptionSettings from "./SubscriptionSettings";
 import "./Profile.css";
-
-const formatDate = (value) => {
-  if (!value) return "Not available";
-  const date = value?.toDate ? value.toDate() : new Date(value);
-  if (Number.isNaN(date.getTime())) return "Not available";
-  return date.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-};
-
-const getDaysLeft = (value) => {
-  if (!value) return 0;
-  const date = value?.toDate ? value.toDate() : new Date(value);
-  if (Number.isNaN(date.getTime())) return 0;
-  const diff = date.getTime() - Date.now();
-  return diff <= 0 ? 0 : Math.ceil(diff / (1000 * 60 * 60 * 24));
-};
-
-const getStatusDisplay = (status) => {
-  switch (status) {
-    case "active":
-      return { label: "Active", className: "status--active", icon: "✓" };
-    case "trial":
-      return { label: "Trial", className: "status--trial", icon: "◎" };
-    case "inactive":
-    case "canceled":
-      return { label: "Inactive", className: "status--inactive", icon: "✕" };
-    default:
-      return { label: "Unknown", className: "status--unknown", icon: "?" };
-  }
-};
 
 const Card = ({ children, className = "" }) => (
   <div className={`data-card ${className}`}>{children}</div>
@@ -65,13 +31,6 @@ const Profile = ({ user }) => {
     (sum, entry) => sum + (Number(entry.currentWaiting) || 0),
     0,
   );
-  const hasActiveSubscription = Boolean(
-    profileData?.status === "active" &&
-    (profileData?.subscribedAt || profileData?.subscriptionEndsAt),
-  );
-  const statusInfo = profileData?.status
-    ? getStatusDisplay(profileData.status)
-    : null;
 
   useEffect(() => {
     let isCancelled = false;
@@ -138,14 +97,6 @@ const Profile = ({ user }) => {
     }
   };
 
-  const daysLeft = getDaysLeft(profileData?.subscriptionEndsAt);
-  const urgentClass =
-    daysLeft <= 7
-      ? "urgent-high"
-      : daysLeft <= 14
-        ? "urgent-med"
-        : "urgent-low";
-
   const [addressCopied, setAddressCopied] = useState(false);
 
   const handleShareReferral = () => {
@@ -181,42 +132,6 @@ const Profile = ({ user }) => {
             </div>
             <div className="profile-hero-email">{user.email}</div>
           </div>
-
-          {statusInfo && (
-            <div className="profile-sub-pill">
-              <div
-                className="section-label"
-                style={{ color: "#888", marginBottom: 8 }}
-              >
-                Subscription
-              </div>
-              <span className={`status-pill ${statusInfo.className}`}>
-                {statusInfo.icon} {statusInfo.label}
-              </span>
-              <div className="profile-sub-status">
-                {profileData?.status === "inactive" ||
-                profileData?.status === "canceled" ? (
-                  <Link
-                    to="/plans"
-                    style={{ color: "#d4af37", fontWeight: 600 }}
-                  >
-                    Subscribe to continue →
-                  </Link>
-                ) : profileData?.status === "trial" ? (
-                  <Link
-                    to="/plans"
-                    style={{ color: "#d4af37", fontWeight: 600 }}
-                  >
-                    Get unlimited access →
-                  </Link>
-                ) : hasActiveSubscription ? (
-                  <span className={urgentClass} style={{ fontWeight: 600 }}>
-                    {daysLeft} days left
-                  </span>
-                ) : null}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* ── Delivery Address ── (show whenever a preferred partner is set; street may be filled later) */}
@@ -430,40 +345,6 @@ const Profile = ({ user }) => {
               )}
             </div>
 
-            {/* Subscription dates */}
-            {hasActiveSubscription && (
-              <div className="card-section">
-                <div className="section-label-inner">Subscription</div>
-                <div className="sub-dates-grid">
-                  <div>
-                    <div className="sub-date-label">Started</div>
-                    <div className="sub-date-value">
-                      {formatDate(profileData?.subscribedAt)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="sub-date-label">Ends</div>
-                    <div className="sub-date-value">
-                      {formatDate(profileData?.subscriptionEndsAt)}
-                    </div>
-                  </div>
-                </div>
-                <div className="days-left-wrap">
-                  <div className="days-left-label">Days left</div>
-                  <div className={`days-left-value ${urgentClass}`}>
-                    {daysLeft}
-                  </div>
-                  {daysLeft <= 7 && (
-                    <span className={`renew-alert ${urgentClass}`}>
-                      Renew soon!
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            <SubscriptionSettings user={user} profileData={profileData} />
-
             {/* Referral Code */}
             <div className="card-section">
               <div className="section-label-inner">Your Referral Code</div>
@@ -502,11 +383,6 @@ const Profile = ({ user }) => {
               <Link to="/profile/settings" className="btn-profile-action">
                 ⚙️ Settings
               </Link>
-              {!hasActiveSubscription && (
-                <Link to="/plans" className="btn-subscribe">
-                  Subscribe Now
-                </Link>
-              )}
               <button
                 type="button"
                 className="btn-logout"
