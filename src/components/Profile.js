@@ -4,6 +4,7 @@ import { signOut } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import Footer from "./Footer";
+import SubscriptionSettings from "./SubscriptionSettings";
 import "./Profile.css";
 
 const formatDate = (value) => {
@@ -460,6 +461,9 @@ const Profile = ({ user }) => {
                 </div>
               </div>
             )}
+
+            <SubscriptionSettings user={user} profileData={profileData} />
+
             {/* Referral Code */}
             <div className="card-section">
               <div className="section-label-inner">Your Referral Code</div>
