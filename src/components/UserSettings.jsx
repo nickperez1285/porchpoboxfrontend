@@ -283,12 +283,10 @@ const UserSettings = ({ user }) => {
           <div className="settings-card settings-card-full">
             <div className="settings-subscription-header">
               <div>
-                <h3 style={{ marginTop: 0, marginBottom: 6 }}>
-                  Subscription
-                </h3>
+                <h3 style={{ marginTop: 0, marginBottom: 6 }}>Subscription</h3>
                 <p className="settings-subscription-copy">
-                  Review your current subscription and manage plan, renewal,
-                  and discounts.
+                  Review your current subscription and manage plan, renewal, and
+                  discounts.
                 </p>
               </div>
               <span
@@ -348,7 +346,7 @@ const UserSettings = ({ user }) => {
               {profileData?.phoneNumber
                 ? " and a text message to your phone on file"
                 : ""}
-              . Add a phone number in Edit to enable SMS alerts.
+              {/* . Add a phone number in Edit to enable SMS alerts. */}
             </p>
             <div className="notif-toggle-wrap">
               <button
