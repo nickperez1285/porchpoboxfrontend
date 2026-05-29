@@ -419,21 +419,25 @@
 }
 
 .card-section--sub-warn {
-  background: #fff8e6;
-  border-color: #d4af37;
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+  background: linear-gradient(135deg, #fef7e6 0%, #fdf0d0 100%);
+  border: 2px solid #d4af37;
+  border-radius: 14px;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2), 0 4px 20px rgba(212, 175, 55, 0.15);
+  padding: 16px 18px;
 }
 
 .profile-sub-link-wrap {
   display: block;
   text-decoration: none;
   color: inherit;
+  margin-bottom: 14px;
+  border-radius: 14px;
 }
 
 .profile-sub-link-wrap:hover .card-section--sub-warn {
   border-color: #b8960f;
-  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.5);
-  transform: scale(1.01);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.4), 0 6px 28px rgba(212, 175, 55, 0.25);
+  transform: scale(1.015);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
@@ -442,6 +446,21 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.card-section--sub-warn .profile-status-pill {
+  font-size: 13px;
+  padding: 6px 16px;
+}
+
+.card-section--sub-warn .profile-status--trial {
+  color: #7a5d00;
+  background: #fdebb3;
+}
+
+.card-section--sub-warn .profile-status--inactive {
+  color: #b71c1c;
+  background: #ffcdd2;
 }
 
 .profile-status-pill {
@@ -458,20 +477,19 @@
   background: #d4edda;
 }
 
-.profile-status--trial {
-  color: #856404;
-  background: #fff3cd;
-}
-
-.profile-status--inactive {
-  color: #dc3545;
-  background: #ffd9d9;
-}
-
 .profile-sub-cta {
-  font-size: 12px;
-  font-weight: 700;
-  color: #b8860b;
+  font-size: 13px;
+  font-weight: 800;
+  color: #7a5d00;
   text-align: right;
-  line-height: 1.3;
+  line-height: 1.35;
+  background: rgba(212, 175, 55, 0.15);
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+}
+
+.profile-sub-link-wrap:hover .profile-sub-cta {
+  background: rgba(212, 175, 55, 0.25);
+  transition: background 0.15s ease;
 }
