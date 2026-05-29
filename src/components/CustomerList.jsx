@@ -70,6 +70,28 @@ const CustomerList = ({
     return () => unsubscribePackageCounts();
   }, [vendorId]);
 
+  // Fetch live user status from the users collection
+  useEffect(() => {
+    if (users.length === 0) return;
+    let cancelled = false;
+    const ids = users
+      .filter((u) => !userDetails[u.id])
+      .map((u) => u.id);
+    if (ids.length === 0) return;
+    Promise.all(ids.map((id) => getDoc(doc(db, "users", id)))).then(
+      (snaps) => {
+        if (cancelled) return;
+        const updates = {};
+        snaps.forEach((snap) => {
+          if (snap.exists()) updates[snap.id] = snap.data();
+        });
+        setUserDetails((prev) => ({ ...prev, ...updates }));
+      },
+      () => {},
+    );
+    return () => { cancelled = true; };
+  }, [users]);
+
   const toggleExpanded = async (userId) => {
     const isExpanding = !expandedUserIds.includes(userId);
     if (isExpanding) {
