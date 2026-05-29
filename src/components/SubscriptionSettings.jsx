@@ -37,7 +37,6 @@ const readResponse = async (response) => {
 
 const SubscriptionSettings = ({ user, profileData }) => {
   const [priceIds, setPriceIds] = useState(null);
-  const [configLoading, setConfigLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,10 +45,7 @@ const SubscriptionSettings = ({ user, profileData }) => {
       .then((data) => {
         if (!cancelled) setPriceIds(data.priceIds);
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setConfigLoading(false);
-      });
+      .catch(() => {});
     return () => { cancelled = true; };
   }, []);
 

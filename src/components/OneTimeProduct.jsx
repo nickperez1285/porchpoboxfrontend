@@ -29,7 +29,6 @@ const PLAN_CONFIG = [
 
 const ProductList = ({ user }) => {
   const [priceIds, setPriceIds] = useState(null);
-  const [configLoading, setConfigLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -38,10 +37,7 @@ const ProductList = ({ user }) => {
       .then((data) => {
         if (!cancelled) setPriceIds(data.priceIds);
       })
-      .catch(() => {})
-      .finally(() => {
-        if (!cancelled) setConfigLoading(false);
-      });
+      .catch(() => {});
     return () => { cancelled = true; };
   }, []);
 

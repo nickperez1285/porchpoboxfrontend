@@ -90,7 +90,7 @@ const CustomerList = ({
       () => {},
     );
     return () => { cancelled = true; };
-  }, [users]);
+  }, [users, userDetails]);
 
   const toggleExpanded = async (userId) => {
     const isExpanding = !expandedUserIds.includes(userId);
