@@ -1,26 +1,25 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { doc, getDoc } from "firebase/firestore";
 import { getApiUrl } from "../config/api";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import PrefLocationModal from "./PrefLocationModal";
 import "./SubscriptionSettings.css";
 
 const PLAN_CONFIG = [
   {
     id: "monthly",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_MONTHLY",
     label: "1 Month",
     price: "$20",
     description: "Monthly unlimited package receiving",
   },
   {
     id: "semiannual",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_SEMIANNUAL",
     label: "6 Months",
     price: "$100",
     description: "Longer coverage with one month included",
   },
   {
     id: "yearly",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_YEARLY",
     label: "1 Year",
     price: "$200",
     description: "Best value for year-round deliveries",
@@ -37,14 +36,32 @@ const readResponse = async (response) => {
 };
 
 const SubscriptionSettings = ({ user, profileData }) => {
+  const [priceIds, setPriceIds] = useState(null);
+  const [configLoading, setConfigLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(getApiUrl("/api/stripe-config"))
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) setPriceIds(data.priceIds);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setConfigLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   const plans = useMemo(
     () =>
       PLAN_CONFIG.map((plan) => ({
         ...plan,
-        priceId: process.env[plan.envVar],
+        priceId: priceIds?.[plan.id] || "",
       })),
-    [],
+    [priceIds],
   );
+  const [showPrefModal, setShowPrefModal] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState("yearly");
   const [promoCode, setPromoCode] = useState("");
   const [appliedPromo, setAppliedPromo] = useState(null);
@@ -107,15 +124,7 @@ const SubscriptionSettings = ({ user, profileData }) => {
     }
   };
 
-  const startCheckout = async () => {
-    setError("");
-    setMessage("");
-
-    if (!selectedPlan?.priceId) {
-      setError(`Missing ${selectedPlan.envVar} in frontend environment.`);
-      return;
-    }
-
+  const proceedToCheckout = async () => {
     setBusyAction("checkout");
     try {
       const currentUser = getCurrentUser();
@@ -146,6 +155,29 @@ const SubscriptionSettings = ({ user, profileData }) => {
       setError(err.message);
       setBusyAction("");
     }
+  };
+
+  const startCheckout = async () => {
+    setError("");
+    setMessage("");
+
+    if (!selectedPlan?.priceId) {
+      setError("Pricing configuration not loaded. Try again.");
+      return;
+    }
+
+    // Require preferred location before subscribing
+    try {
+      const userSnap = await getDoc(doc(db, "users", getCurrentUser().uid));
+      if (!userSnap.exists() || !userSnap.data().prefLocation) {
+        setShowPrefModal(true);
+        return;
+      }
+    } catch (err) {
+      console.error("Error checking prefLocation:", err);
+    }
+
+    await proceedToCheckout();
   };
 
   const updateCancellation = async (cancel) => {
@@ -185,6 +217,16 @@ const SubscriptionSettings = ({ user, profileData }) => {
 
   return (
     <div className="subscription-settings">
+      {showPrefModal && (
+        <PrefLocationModal
+          user={auth.currentUser || user}
+          onDone={() => {
+            setShowPrefModal(false);
+            proceedToCheckout();
+          }}
+          required
+        />
+      )}
       <div className="subscription-settings__header">
         <div>
           <div className="section-label-inner">Subscription Settings</div>

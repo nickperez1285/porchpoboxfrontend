@@ -20,3 +20,6 @@ yarn-error.log*
 
 .env
 .vercel
+
+.env.test
+.env.live

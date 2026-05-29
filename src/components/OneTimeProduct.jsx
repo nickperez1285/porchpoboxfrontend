@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -8,21 +8,18 @@ import PrefLocationModal from "./PrefLocationModal";
 const PLAN_CONFIG = [
   {
     id: "monthly",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_MONTHLY",
     label: "1 Month",
     price: "$20",
     description: "Unlimited packages for 30 days",
   },
   {
     id: "semiannual",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_SEMIANNUAL",
     label: "6 Months",
     price: "$100",
     description: "Pay for 5 months and get a 6 month free",
   },
   {
     id: "yearly",
-    envVar: "REACT_APP_STRIPE_PRICE_ID_YEARLY",
     label: "1 Year",
     price: "$200",
     description:
@@ -31,17 +28,32 @@ const PLAN_CONFIG = [
 ];
 
 const ProductList = ({ user }) => {
+  const [priceIds, setPriceIds] = useState(null);
+  const [configLoading, setConfigLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch(getApiUrl("/api/stripe-config"))
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled) setPriceIds(data.priceIds);
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setConfigLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
   const plans = useMemo(
     () =>
       PLAN_CONFIG.map((plan) => ({
         ...plan,
-        priceId: process.env[plan.envVar],
+        priceId: priceIds?.[plan.id] || "",
       })),
-    [],
+    [priceIds],
   );
-  const [selectedPlanId, setSelectedPlanId] = useState(
-    plans[0]?.id || "monthly",
-  );
+  const [selectedPlanId, setSelectedPlanId] = useState("monthly");
   const [loadingPlanId, setLoadingPlanId] = useState("");
   const [error, setError] = useState("");
   const [showPrefModal, setShowPrefModal] = useState(false);
@@ -82,7 +94,7 @@ const ProductList = ({ user }) => {
     }
 
     if (!selectedPlan?.priceId) {
-      setError(`Missing ${selectedPlan.envVar} in frontend environment.`);
+      setError("Pricing configuration not loaded. Try again.");
       setLoadingPlanId("");
       return;
     }
