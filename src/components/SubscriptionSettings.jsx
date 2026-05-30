@@ -41,14 +41,9 @@ const SubscriptionSettings = ({ user, profileData }) => {
   useEffect(() => {
     let cancelled = false;
     const url = getApiUrl("/api/stripe-config");
-    console.log("[stripe-config] Fetching from:", url);
     fetch(url)
-      .then((r) => {
-        console.log("[stripe-config] Response status:", r.status);
-        return r.json();
-      })
+      .then((r) => r.json())
       .then((data) => {
-        console.log("[stripe-config] Data received:", data);
         if (!cancelled) setPriceIds(data.priceIds);
       })
       .catch((err) => console.error("[stripe-config] Error:", err));

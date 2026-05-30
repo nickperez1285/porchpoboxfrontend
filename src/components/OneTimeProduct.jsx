@@ -33,14 +33,9 @@ const ProductList = ({ user }) => {
   useEffect(() => {
     let cancelled = false;
     const url = getApiUrl("/api/stripe-config");
-    console.log("[stripe-config] Fetching from:", url);
     fetch(url)
-      .then((r) => {
-        console.log("[stripe-config] Response status:", r.status);
-        return r.json();
-      })
+      .then((r) => r.json())
       .then((data) => {
-        console.log("[stripe-config] Data received:", data);
         if (!cancelled) setPriceIds(data.priceIds);
       })
       .catch((err) => console.error("[stripe-config] Error:", err));
@@ -210,7 +205,7 @@ const ProductList = ({ user }) => {
         {user ? (
           <button
             type="button"
-            className="btn btn-dark hover:btn-ouline"
+            className="btn btn-dark hover:btn-outline"
             onClick={startCheckout}
             disabled={Boolean(loadingPlanId)}
           >
@@ -219,10 +214,8 @@ const ProductList = ({ user }) => {
               : `Sign Up For ${selectedPlan?.label || "Plan"}`}
           </button>
         ) : (
-          <Link to="/login" style={{ display: "inline-flex" }}>
-            <button type="button" className="btn btn-dark hover:btn-ouline">
-              SIGN UP
-            </button>
+          <Link to="/login" className="btn btn-dark hover:btn-outline" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+            SIGN UP
           </Link>
         )}
         {error && (

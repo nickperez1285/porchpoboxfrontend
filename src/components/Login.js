@@ -21,14 +21,7 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("Logged in:", user.email);
-      } else {
-        console.log("Logged out");
-      }
-    });
-
+    const unsubscribe = onAuthStateChanged(auth, () => {});
     return () => unsubscribe();
   }, []);
 

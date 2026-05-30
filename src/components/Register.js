@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { apiPost } from "../utils/apiClient";
 import { auth, db } from "../firebase";
+import { getApiUrl } from "../config/api";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
@@ -79,7 +80,7 @@ const Register = () => {
   }) => {
     try {
       const welcomeResponse = await fetch(
-        `${process.env.REACT_APP_API_URL}/api/notifications/welcome`,
+        getApiUrl("/api/notifications/welcome"),
         {
           method: "POST",
           headers: {

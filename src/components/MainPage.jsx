@@ -78,7 +78,7 @@ const MainPage = ({ user, userStatus }) => {
           try {
             const res = await fetch(
               `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1`,
-              { headers: { "Accept-Language": "en" } },
+              { headers: { "Accept-Language": "en", "User-Agent": "PorchPOBox/1.0 (https://porchpobox.com)" } },
             );
             const data = await res.json();
             if (data[0])

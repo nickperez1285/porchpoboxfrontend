@@ -54,14 +54,8 @@ jest.mock("../config/api", () => ({
     `http://localhost:5000${path.startsWith("/") ? path : `/${path}`}`,
 }));
 
-// Mock Date for consistent referral code generation
 const MOCK_DATE = new Date("2026-05-28T10:00:00Z");
 const RealDate = Date;
-global.Date = jest.fn(() => MOCK_DATE);
-global.Date.now = jest.fn(() => MOCK_DATE.getTime());
-global.Date.prototype.getDate = jest.fn(() => MOCK_DATE.getDate());
-global.Date.prototype.getMonth = jest.fn(() => MOCK_DATE.getMonth());
-global.Date.prototype.getFullYear = jest.fn(() => MOCK_DATE.getFullYear());
 
 describe("Register Component", () => {
   beforeEach(() => {

@@ -19,19 +19,16 @@ const UserTermsPage = () => {
         </li>
         <li>You agree that you  will not ship illegal items.</li>
         <li>
-          You agree that only you will pick up your owb packages and will present ID
+          You agree that only you will pick up your own packages and will present ID
           to verify your identity.
         </li>
         <li>
           You agree that you will not share your login credentials with anyone.
         </li>
         <li>
-vrv rvw          credentials.
-        </li>
-        <li>
           You agree that Partners will not release your packages to anyone
-          except those with an ID that matched the named recepient on the
-          package .
+          except those with an ID that matches the named recipient on the
+          package.
         </li>
         <li>
           You agree that Partners  provide a paid service  and are  only obligated to accept and  release packages to customers with active subscriptions in good standing. Partners are not obligated to accept or release packages for customers without active subscriptions or with suspended or canceled

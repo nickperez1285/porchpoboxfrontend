@@ -4,7 +4,6 @@ import { signOut } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import PrefLocationModal from "./PrefLocationModal";
-import Footer from "./Footer";
 import "./Profile.css";
 
 const Card = ({ children, className = "" }) => (
@@ -459,7 +458,6 @@ const Profile = ({ user }) => {
           </Card>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

@@ -160,6 +160,7 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
 
   useEffect(() => {
     const p = parseStoreHours(value);
+    if (oh === p.oh && om === p.om && op === p.op && ch === p.ch && cm === p.cm && cp === p.cp) return;
     setOh(p.oh);
     setOm(p.om);
     setOp(p.op);

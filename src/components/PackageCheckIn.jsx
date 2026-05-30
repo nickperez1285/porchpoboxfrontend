@@ -195,8 +195,8 @@ const PackageCheckIn = ({ user, partnerProfile, onPackagesCheckedIn }) => {
   };
 
   const locationLabel =
-    partnerProfile.businessName ||
-    partnerProfile.streetAddress ||
+    partnerProfile?.businessName ||
+    partnerProfile?.streetAddress ||
     "Your location";
 
   return (

@@ -6,6 +6,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
   const [partners, setPartners] = useState([]);
   const [selected, setSelected] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -16,6 +17,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
         setPartners(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
       } catch (err) {
         console.error("Error loading partners:", err);
+        setLoadError("Failed to load partner locations. Please try again.");
       }
     };
     load();
@@ -77,7 +79,9 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
             : "Select the partner location where you'd like your packages delivered. You can change this anytime in your profile settings."}
         </p>
 
-        {partners.length === 0 ? (
+        {loadError ? (
+          <p style={{ color: "#c00", background: "#fff0f0", padding: 12, borderRadius: 8, marginBottom: 24 }}>{loadError}</p>
+        ) : partners.length === 0 ? (
           <p style={{ color: "#888" }}>Loading locations...</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, maxHeight: 280, overflowY: "auto" }}>
@@ -120,7 +124,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
         )}
 
         <div style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}>
-          {!required && (
+          {(!required || loadError) && (
             <button
               type="button"
               onClick={onDone}

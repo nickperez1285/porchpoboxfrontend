@@ -19,9 +19,8 @@ const UserTermsAndConditions = ({ checked, onChange }) => {
         <li>You will not ship illegal items.</li>
         <li>Your membership can be cancelled at any time for any reason.</li>
         <li>
-          Your agree that the stores are not liable for any damages or losses.
+          You agree that the stores are not liable for any damages or losses.
         </li>
-        <li>Your membership can be cancelled at any time for any reason.</li>
       </ul>
       <label className="reg-terms-checkbox-row" htmlFor="reg-terms-agree">
         <input
