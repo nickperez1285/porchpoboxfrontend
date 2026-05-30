@@ -1,7 +1,16 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { db } from "../firebase";
 import { apiPost } from "../utils/apiClient";
-import { collection, onSnapshot, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore";
 
 const CustomerList = ({
   vendorId,
@@ -13,6 +22,7 @@ const CustomerList = ({
   const [error, setError] = useState("");
   const [expandedUserIds, setExpandedUserIds] = useState([]);
   const [userDetails, setUserDetails] = useState({});
+  const [userActivityLog, setUserActivityLog] = useState({});
   const [deliveringUserId, setDeliveringUserId] = useState("");
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [packageQuantities, setPackageQuantities] = useState({});
@@ -104,6 +114,22 @@ const CustomerList = ({
           }
         } catch (err) {
           console.error("Error fetching user details:", err);
+        }
+      }
+      if (!userActivityLog[userId] && vendorId) {
+        try {
+          const q = query(
+            collection(db, "partners", vendorId, "activityLog"),
+            where("customerId", "==", userId),
+            orderBy("timestamp", "desc"),
+          );
+          const snap = await getDocs(q);
+          setUserActivityLog((prev) => ({
+            ...prev,
+            [userId]: snap.docs.map((d) => ({ id: d.id, ...d.data() })),
+          }));
+        } catch (err) {
+          console.error("Error fetching user activity log:", err);
         }
       }
     } else {
@@ -403,6 +429,82 @@ const CustomerList = ({
                         : ""}
                     </div>
                     <div>User ID: {user.id}</div>
+
+                    <div style={{ marginTop: 12 }}>
+                      <div
+                        style={{
+                          fontSize: 12,
+                          fontWeight: 700,
+                          color: "#555",
+                          textTransform: "uppercase",
+                          letterSpacing: 0.8,
+                          marginBottom: 6,
+                        }}
+                      >
+                        Activity
+                      </div>
+                      {userActivityLog[user.id] === undefined ? (
+                        <span style={{ fontSize: 12, color: "#999" }}>
+                          Loading...
+                        </span>
+                      ) : userActivityLog[user.id].length === 0 ? (
+                        <span style={{ fontSize: 12, color: "#999" }}>
+                          No activity yet.
+                        </span>
+                      ) : (
+                        <div
+                          style={{
+                            maxHeight: 180,
+                            overflowY: "auto",
+                            fontSize: 12,
+                          }}
+                        >
+                          {userActivityLog[user.id].map((entry) => {
+                            const ts = entry.timestamp?.toDate
+                              ? entry.timestamp.toDate()
+                              : new Date(entry.timestamp);
+                            const label =
+                              entry.type === "check-in"
+                                ? "Check In"
+                                : entry.type === "delivery"
+                                  ? "Delivered"
+                                  : entry.type === "subscription"
+                                    ? "Subscribed"
+                                    : entry.type;
+                            return (
+                              <div
+                                key={entry.id}
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  padding: "4px 0",
+                                  borderBottom: "1px solid #f0f0f0",
+                                }}
+                              >
+                                <span style={{ fontWeight: 600 }}>
+                                  {label}
+                                </span>
+                                <span style={{ color: "#666" }}>
+                                  {entry.packageCount != null
+                                    ? `${entry.packageCount} pkg`
+                                    : ""}
+                                </span>
+                                <span style={{ color: "#999" }}>
+                                  {ts.toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                  })}{" "}
+                                  {ts.toLocaleTimeString("en-US", {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
