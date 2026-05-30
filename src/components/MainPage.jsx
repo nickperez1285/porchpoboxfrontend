@@ -345,7 +345,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                 "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."
               )}
             </p>
-            {!isActiveMember && !partnerProfile?.approved && (
+            {!isActiveMember && !partnerProfile && (
               <div style={{ marginTop: 20 }}>
                 <OneTimeProduct user={user} />
               </div>
