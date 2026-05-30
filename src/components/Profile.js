@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { collection, doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../firebase";
+import PrefLocationModal from "./PrefLocationModal";
 import Footer from "./Footer";
 import "./Profile.css";
 
@@ -19,6 +20,7 @@ const Profile = ({ user }) => {
   const [profileData, setProfileData] = useState(null);
   const [packageHistory, setPackageHistory] = useState([]);
   const [packagesLoading, setPackagesLoading] = useState(false);
+  const [showPrefModal, setShowPrefModal] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
   useEffect(() => {
@@ -266,21 +268,30 @@ const Profile = ({ user }) => {
             </div>
           ) : (
             <div className="profile-no-address">
-              <div>
+              {showPrefModal && (
+                <PrefLocationModal
+                  user={user}
+                  onDone={() => setShowPrefModal(false)}
+                />
+              )}
+              <div className="profile-address-header">
+                <div className="profile-address-label">
+                  <span>📦</span> Your Package Delivery Address
+                </div>
                 <div className="no-address-title">
-                  📦 No delivery address yet
+                  Please select your preferred Porch P.O. Box location
                 </div>
                 <div className="no-address-text">
-                  Set a preferred partner location to get your package delivery
-                  address.
+                  You need to choose a partner location before subscribing.
                 </div>
               </div>
-              <Link
-                to="/profile/settings?highlight=location"
+              <button
+                type="button"
                 className="btn-set-location"
+                onClick={() => setShowPrefModal(true)}
               >
-                Set Preferred Location
-              </Link>
+                Select Location
+              </button>
             </div>
           )}
         </div>
