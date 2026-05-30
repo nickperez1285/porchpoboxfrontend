@@ -186,7 +186,17 @@ const Profile = ({ user }) => {
                       {user.displayName || profileData?.name || "Your Name"}
                     </div>
                     <div className="profile-address-vendor">
-                      c/o {profileData.prefLocation.businessName}
+                      c/o{" "}
+                      {profileData.prefLocation.id ? (
+                        <Link
+                          to={`/partner/${profileData.prefLocation.id}`}
+                          className="profile-partner-link"
+                        >
+                          {profileData.prefLocation.businessName}
+                        </Link>
+                      ) : (
+                        profileData.prefLocation.businessName
+                      )}
                     </div>
                     {profileData.prefLocation.streetAddress ? (
                       <div className="profile-address-text">
@@ -313,7 +323,7 @@ const Profile = ({ user }) => {
                 {packageHistory.map((pkg) => (
                   <Link
                     key={pkg.partnerId}
-                    to="/profile/packages"
+                    to={`/partner/${pkg.partnerId}`}
                     className="package-item"
                   >
                     <div className="package-vendor">📍 {pkg.partnerName}</div>
@@ -351,7 +361,16 @@ const Profile = ({ user }) => {
               {profileData?.prefLocation ? (
                 <>
                   <div className="location-name">
-                    {profileData.prefLocation.businessName}
+                    {profileData.prefLocation.id ? (
+                      <Link
+                        to={`/partner/${profileData.prefLocation.id}`}
+                        className="profile-partner-link"
+                      >
+                        {profileData.prefLocation.businessName}
+                      </Link>
+                    ) : (
+                      profileData.prefLocation.businessName
+                    )}
                   </div>
                   {profileData.prefLocation.streetAddress && (
                     <div className="location-address">

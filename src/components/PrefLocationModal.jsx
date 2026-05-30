@@ -34,7 +34,8 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
           city: partner?.city || "",
           state: partner?.state || "",
           zipCode: partner?.zipCode || "",
-        }
+        },
+        prefLocationLastChangedAt: new Date(),
       });
       onDone();
     } catch (err) {

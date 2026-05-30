@@ -145,7 +145,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
       <div className="partner-hero">
         <div className="partner-hero__content">
           <div>
-            <p className="partner-hero-eyebrow">Partner Profile</p>
+            <p className="partner-hero-eyebrow"> Profile</p>
             <h2 className="partner-hero-title">
               {partnerProfile.businessName || "Partner Account"}
             </h2>

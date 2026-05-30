@@ -53,6 +53,7 @@ const UserSettings = ({ user }) => {
   const [success, setSuccess] = useState("");
   const [editing, setEditing] = useState(false);
   const [showPrefModal, setShowPrefModal] = useState(false);
+  const [locationChangeConfirm, setLocationChangeConfirm] = useState(null); // null | "confirm" | "blocked"
   const [searchParams] = useSearchParams();
 
   const [name, setName] = useState("");
@@ -153,15 +154,35 @@ const UserSettings = ({ user }) => {
       </div>
     );
 
+  const handleLocationClick = () => {
+    const lastChanged = toDate(profileData?.prefLocationLastChangedAt);
+    if (
+      lastChanged &&
+      Date.now() - lastChanged.getTime() < 30 * 24 * 60 * 60 * 1000
+    ) {
+      setLocationChangeConfirm("blocked");
+    } else {
+      setLocationChangeConfirm("confirm");
+    }
+  };
+
   const handlePrefDone = async () => {
     setShowPrefModal(false);
-    // Refresh profile data to show updated prefLocation
     try {
       const snap = await getDoc(doc(db, "users", user.uid));
       if (snap.exists()) setProfileData(snap.data());
     } catch (err) {
       console.error("Error refreshing profile:", err);
     }
+  };
+
+  const handlePrefConfirmed = () => {
+    setLocationChangeConfirm(null);
+    setShowPrefModal(true);
+  };
+
+  const dismissLocationConfirm = () => {
+    setLocationChangeConfirm(null);
   };
 
   const shouldHighlightLocation =
@@ -184,6 +205,110 @@ const UserSettings = ({ user }) => {
     <div className="settings-container">
       {showPrefModal && (
         <PrefLocationModal user={user} onDone={handlePrefDone} />
+      )}
+
+      {locationChangeConfirm && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(0,0,0,0.6)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 9999,
+            padding: 20,
+          }}
+        >
+          <div
+            style={{
+              background: "#fff",
+              borderRadius: 20,
+              padding: "32px 28px",
+              maxWidth: 460,
+              width: "100%",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+            }}
+          >
+            <div
+              style={{
+                fontSize: 12,
+                color: "#8a6a00",
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                marginBottom: 8,
+              }}
+            >
+              Preferred Location
+            </div>
+            <h2 style={{ margin: "0 0 10px" }}>
+              {locationChangeConfirm === "blocked"
+                ? "Change limit reached"
+                : "Confirm change"}
+            </h2>
+            {locationChangeConfirm === "blocked" ? (
+              <>
+                <p style={{ color: "#555", lineHeight: 1.6, marginBottom: 16 }}>
+                  You can only change your preferred location once per month.
+                </p>
+                <p style={{ color: "#555", lineHeight: 1.6, marginBottom: 24 }}>
+                  You last changed it on{" "}
+                  <strong>
+                    {formatDate(profileData?.prefLocationLastChangedAt)}
+                  </strong>
+                  . Please try again after{" "}
+                  <strong>
+                    {new Date(
+                      toDate(profileData?.prefLocationLastChangedAt).getTime() +
+                        30 * 24 * 60 * 60 * 1000,
+                    ).toLocaleDateString()}
+                  </strong>
+                  .
+                </p>
+              </>
+            ) : (
+              <p style={{ color: "#555", lineHeight: 1.6, marginBottom: 24 }}>
+                You can only change your preferred location{" "}
+                <strong>once per month</strong>. Are you sure you want to
+                proceed?
+              </p>
+            )}
+            <div
+              style={{ display: "flex", gap: 12, justifyContent: "flex-end" }}
+            >
+              <button
+                type="button"
+                onClick={dismissLocationConfirm}
+                style={{
+                  padding: "10px 18px",
+                  borderRadius: 10,
+                  border: "1px solid #ccc",
+                  background: "#fff",
+                  cursor: "pointer",
+                }}
+              >
+                {locationChangeConfirm === "blocked" ? "Got it" : "Cancel"}
+              </button>
+              {locationChangeConfirm === "confirm" && (
+                <button
+                  type="button"
+                  onClick={handlePrefConfirmed}
+                  style={{
+                    padding: "10px 20px",
+                    borderRadius: 10,
+                    border: "none",
+                    background: "#121212",
+                    color: "#fff",
+                    cursor: "pointer",
+                    fontWeight: 600,
+                  }}
+                >
+                  Yes, continue
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
       )}
       <div className="settings-hero">
         <div className="settings-hero-eyebrow">User Profile</div>
@@ -413,7 +538,7 @@ const UserSettings = ({ user }) => {
             )}
             <button
               type="button"
-              onClick={() => setShowPrefModal(true)}
+              onClick={handleLocationClick}
               style={{ marginTop: 14 }}
             >
               {profileData?.prefLocation ? "Change Location" : "Set Location"}

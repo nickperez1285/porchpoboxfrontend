@@ -32,12 +32,18 @@ const ProductList = ({ user }) => {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(getApiUrl("/api/stripe-config"))
-      .then((r) => r.json())
+    const url = getApiUrl("/api/stripe-config");
+    console.log("[stripe-config] Fetching from:", url);
+    fetch(url)
+      .then((r) => {
+        console.log("[stripe-config] Response status:", r.status);
+        return r.json();
+      })
       .then((data) => {
+        console.log("[stripe-config] Data received:", data);
         if (!cancelled) setPriceIds(data.priceIds);
       })
-      .catch(() => {});
+      .catch((err) => console.error("[stripe-config] Error:", err));
     return () => { cancelled = true; };
   }, []);
 

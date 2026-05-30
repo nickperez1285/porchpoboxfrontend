@@ -41,6 +41,8 @@ import About from "./components/About";
 import TermsIndex from "./components/TermsIndex";
 import PackageHistoryPage from "./components/PackageHistoryPage";
 import PartnerOnboarding from "./components/PartnerOnboarding";
+import PartnerInfoPage from "./components/PartnerInfoPage";
+import Footer from "./components/Footer";
 import { auth, db } from "./firebase";
 import "./App.css";
 
@@ -180,6 +182,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
+        <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
         <Header
           authLoading={authLoading}
           isAdmin={isAdmin}
@@ -280,6 +283,7 @@ function App() {
               )
             }
           />
+          <Route path="/partner/:partnerId" element={<PartnerInfoPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/register" element={<Register />} />
@@ -416,6 +420,8 @@ function App() {
 
           {/* <Route path="/one-time-product" element={<OneTimeProduct />} /> */}
         </Routes>
+        <Footer />
+        </div>
       </BrowserRouter>
     </>
   );

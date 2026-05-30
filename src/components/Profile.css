@@ -570,3 +570,16 @@
   background: #121212;
   color: #fff;
 }
+
+.profile-partner-link {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgba(180, 140, 50, 0.4);
+  text-underline-offset: 2px;
+  transition: color 0.15s, text-decoration-color 0.15s;
+}
+
+.profile-partner-link:hover {
+  color: #b88a00;
+  text-decoration-color: #b88a00;
+}

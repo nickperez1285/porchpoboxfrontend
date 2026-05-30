@@ -12,7 +12,6 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
-import Footer from "./Footer";
 import { db } from "../firebase";
 import "./MainPage.css";
 
@@ -312,14 +311,30 @@ const MainPage = ({ user, userStatus }) => {
               {isActiveMember ? (
                 <>
                   Your subscription is active.
-                  {userWaitingCount !== null && (
-                    <strong>
-                      {" "}
-                      You currently have {userWaitingCount} package
-                      {userWaitingCount !== 1 ? "s" : ""} waiting for pickup.
-                    </strong>
+                  {userWaitingCount !== null &&
+                    userWaitingCount > 0 && (
+                      <strong>
+                        {" "}
+                        <Link
+                          to="/profile"
+                          style={{ color: "inherit", textDecoration: "underline" }}
+                        >
+                          You currently have {userWaitingCount} package
+                          {userWaitingCount !== 1 ? "s" : ""} waiting for
+                          pickup.
+                        </Link>
+                      </strong>
+                    )}
+                  {userWaitingCount === 0 && (
+                    <> &nbsp;No packages waiting for pickup.</>
                   )}
-                  &nbsp;You can manage your deliveries from your profile.
+                  &nbsp;
+                  <Link
+                    to="/profile"
+                    style={{ color: "inherit", textDecoration: "underline" }}
+                  >
+                    You can manage your deliveries from your profile.
+                  </Link>
                 </>
               ) : (
                 "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."
@@ -374,7 +389,6 @@ const MainPage = ({ user, userStatus }) => {
           </section>
         </div>
       </div>
-      <Footer />
     </div>
   );
 };
