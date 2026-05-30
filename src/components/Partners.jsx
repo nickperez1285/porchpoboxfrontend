@@ -343,7 +343,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                 flex: "1 1 320px",
               }}
             >
-              {/* Stat card */}
               <div
                 style={{
                   background: "rgba(255,255,255,0.06)",
@@ -374,7 +373,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                 </div>
               </div>
 
-              {/* Secondary actions */}
               <div
                 style={{
                   background: "rgba(255,255,255,0.06)",
@@ -401,13 +399,13 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
                   to="/partner/activity-log"
                   style={{ color: "#d4af37", fontSize: 14, fontWeight: 600 }}
                 >
-                  📋 Activity Log
+                  Activity Log
                 </Link>
                 <Link
                   to="/partner/profile"
                   style={{ color: "#d4af37", fontSize: 14, fontWeight: 600 }}
                 >
-                  👤 Partner Profile
+                  Partner Profile
                 </Link>
               </div>
             </div>
@@ -442,10 +440,9 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
               boxShadow: "0 4px 16px rgba(212,175,55,0.35)",
             }}
           >
-            <span style={{ fontSize: 22 }}>📦</span> Check In Packages
+            Check In Packages
           </Link>
 
-          {/* LEFT — Activity Log */}
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
             <div
               style={{
@@ -463,7 +460,6 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
             </div>
           </div>
 
-          {/* RIGHT — Package check-in list */}
           <div
             style={{
               background: "#fff",
@@ -501,15 +497,11 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
       >
         <h2 style={{ marginTop: 0 }}>Partner Portal</h2>
         <p style={{ color: "#d6d6d6" }}>
-          Sign up here to become a Porch P.O. Box partner and start accepting
-          package deliveries for customers in your area. If you already have an
-          account, please log in to access your partner dashboard.
+          If you already have a partner account, please log in to access your
+          partner dashboard.
         </p>
-        {/* <p>
-                    <Link to="/partner/login">Partner Login</Link>
-                </p> */}
         <p>
-          <Link to="/partner/register">Become a Partner</Link>
+          <Link to="/partner/login">Partner Login</Link>
         </p>
         {user && !partnerProfile && (
           <p>

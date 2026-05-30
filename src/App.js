@@ -412,7 +412,7 @@ function App() {
 
           <Route
             path="/"
-            element={<MainPage user={user} userStatus={userStatus} />}
+            element={<MainPage user={user} userStatus={userStatus} partnerProfile={partnerProfile} />}
           />
           <Route path="/contact" element={<Contact />} />
           <Route path="/referrals" element={<ReferralForm />} />

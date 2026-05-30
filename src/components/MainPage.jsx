@@ -28,7 +28,7 @@ const MAIN_PAGE_TITLE =
 const MAIN_PAGE_MESSAGE =
   "Get your packages delivered and securely stored at a trusted local neighborhood Porch P.O. Box.";
 
-const MainPage = ({ user, userStatus }) => {
+const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
   const [vendorsError, setVendorsError] = useState("");
@@ -345,7 +345,7 @@ const MainPage = ({ user, userStatus }) => {
                 "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."
               )}
             </p>
-            {!isActiveMember && (
+            {!isActiveMember && !partnerProfile?.approved && (
               <div style={{ marginTop: 20 }}>
                 <OneTimeProduct user={user} />
               </div>
