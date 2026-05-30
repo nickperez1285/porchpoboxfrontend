@@ -88,4 +88,75 @@ describe("UserSettings — Notifications", () => {
     });
     expect(await screen.findByText("On")).toBeInTheDocument();
   });
+
+  describe("Location change limit", () => {
+    it("shows confirmation popup when clicking Change Location", async () => {
+      renderSettings({
+        status: "active",
+        prefLocation: { id: "p1", businessName: "Shop" },
+      });
+
+      await screen.findByText("Change Location");
+      fireEvent.click(screen.getByText("Change Location"));
+
+      expect(
+        screen.getByText(/once per month/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Cancel" }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Yes, continue" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows blocked popup when location changed within last 30 days", async () => {
+      const recentChange = new Date(Date.now() - 5 * 24 * 60 * 60 * 1000);
+      renderSettings({
+        status: "active",
+        prefLocation: { id: "p1", businessName: "Shop" },
+        prefLocationLastChangedAt: recentChange,
+      });
+
+      await screen.findByText("Change Location");
+      fireEvent.click(screen.getByText("Change Location"));
+
+      expect(
+        screen.getByText("Change limit reached"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Got it" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows confirmation popup when last change was 30+ days ago", async () => {
+      const oldChange = new Date(Date.now() - 35 * 24 * 60 * 60 * 1000);
+      renderSettings({
+        status: "active",
+        prefLocation: { id: "p1", businessName: "Shop" },
+        prefLocationLastChangedAt: oldChange,
+      });
+
+      await screen.findByText("Change Location");
+      fireEvent.click(screen.getByText("Change Location"));
+
+      expect(
+        screen.getByRole("button", { name: "Yes, continue" }),
+      ).toBeInTheDocument();
+    });
+
+    it("shows Set Location without limit for first-time", async () => {
+      renderSettings({
+        status: "active",
+        prefLocation: null,
+      });
+
+      await screen.findByText("Set Location");
+      fireEvent.click(screen.getByText("Set Location"));
+
+      expect(
+        screen.getByText(/once per month/i),
+      ).toBeInTheDocument();
+    });
+  });
 });

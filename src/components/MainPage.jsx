@@ -302,7 +302,11 @@ const MainPage = ({ user, userStatus }) => {
             aria-labelledby="signup-heading"
           >
             <div className="mp-card__label">
-              {isActiveMember ? "Member access" : "Subscription plans"}
+              {isActiveMember
+                ? userStatus === "trial"
+                  ? "Trial"
+                  : "Member access"
+                : "Subscription plans"}
             </div>
             <h2 id="signup-heading" className="mp-card__title">
               {isActiveMember ? "Welcome to Porch P.O. Box" : "Sign up"}
@@ -310,7 +314,8 @@ const MainPage = ({ user, userStatus }) => {
             <p className="mp-card__desc">
               {isActiveMember ? (
                 <>
-                  Your subscription is active.
+                  Your subscription is{" "}
+                  {userStatus === "trial" ? "in trial status" : "active"}.
                   {userWaitingCount !== null &&
                     userWaitingCount > 0 && (
                       <strong>

@@ -161,12 +161,12 @@ describe("Profile Component", () => {
     expect(screen.queryByText("Loading...")).not.toBeInTheDocument();
   });
 
-  test("displays 'No delivery address yet' if prefLocation is not set", async () => {
+  test("shows location selection prompt when prefLocation is not set", async () => {
     const mockUserData = {
       name: "Test User",
       email: "test@example.com",
       status: "active",
-      prefLocation: null, // No preferred location
+      prefLocation: null,
     };
 
     mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
@@ -180,11 +180,123 @@ describe("Profile Component", () => {
 
     renderProfile();
 
-    expect(screen.getByText(/No delivery address yet/)).toBeInTheDocument();
+    expect(
+      screen.getByText("Your Package Delivery Address"),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Set a preferred partner location to get your package delivery address.",
+        "Please select your preferred Porch P.O. Box location",
       ),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText("You need to choose a partner location before subscribing."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Select Location" }),
+    ).toBeInTheDocument();
+  });
+
+  test("partner name links to partner page in delivery address card", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+      prefLocation: {
+        id: "partner123",
+        businessName: "Test Partner",
+        streetAddress: "123 Main St",
+        city: "Anytown",
+        state: "CA",
+        zipCode: "12345",
+      },
+    };
+
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ exists: () => true, data: () => mockUserData });
+      return mockUnsubscribe;
+    });
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ docs: [] });
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
+
+    const partnerLinks = screen.getAllByText("Test Partner");
+    partnerLinks.forEach((link) => {
+      expect(link.closest("a")).toHaveAttribute(
+        "href",
+        "/partner/partner123",
+      );
+    });
+  });
+
+  test("package history item links to partner page", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+      prefLocation: { id: "p1", businessName: "Shop" },
+    };
+
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ exists: () => true, data: () => mockUserData });
+      return mockUnsubscribe;
+    });
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({
+        docs: [
+          {
+            id: "partner-abc",
+            data: () => ({
+              partnerId: "partner-abc",
+              partnerName: "ABC Store",
+              currentWaiting: 2,
+              totalReceived: 5,
+              totalPickedUp: 3,
+            }),
+          },
+        ],
+      });
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
+
+    await waitFor(() => {
+      const packageItem = screen.getByText(/ABC Store/);
+      const link = packageItem.closest("a");
+      expect(link).toHaveAttribute("href", "/partner/partner-abc");
+    });
+  });
+
+  test("preferred location name links to partner page", async () => {
+    const mockUserData = {
+      name: "Test User",
+      email: "test@example.com",
+      status: "active",
+      prefLocation: {
+        id: "loc-456",
+        businessName: "My Partner",
+      },
+    };
+
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ exists: () => true, data: () => mockUserData });
+      return mockUnsubscribe;
+    });
+    mockOnSnapshot.mockImplementationOnce((_ref, callback) => {
+      callback({ docs: [] });
+      return mockUnsubscribe;
+    });
+
+    renderProfile();
+
+    await waitFor(() => {
+      const partnerLinks = screen.getAllByText("My Partner");
+      // The link should have the correct href
+      const linkEl = partnerLinks[0].closest("a");
+      expect(linkEl).toHaveAttribute("href", "/partner/loc-456");
+    });
   });
 });

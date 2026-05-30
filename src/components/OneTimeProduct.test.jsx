@@ -47,7 +47,10 @@ describe("OneTimeProduct (ProductList)", () => {
     };
 
     // Mock fetch for the backend API
-    global.fetch = jest.fn();
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: () => Promise.resolve({ priceIds: {} }),
+    });
 
     // Mock window.location.assign for the Stripe redirect
     delete window.location;
@@ -73,9 +76,7 @@ describe("OneTimeProduct (ProductList)", () => {
     expect(screen.getByText("$20")).toBeInTheDocument();
   });
 
-  it("shows an error message if the Price ID is missing from environment variables", async () => {
-    process.env.REACT_APP_STRIPE_PRICE_ID_MONTHLY = ""; // Simulate missing var
-
+  it("shows an error when pricing config is empty", async () => {
     render(
       <Router>
         <ProductList user={mockUser} />
@@ -90,14 +91,29 @@ describe("OneTimeProduct (ProductList)", () => {
     const signupBtn = screen.getByText(/Sign Up For 1 Month/i);
     fireEvent.click(signupBtn);
 
+    // The fetch mock returns empty priceIds, so the selected plan has no priceId
     await waitFor(() => {
       expect(
-        screen.getByText(/Missing REACT_APP_STRIPE_PRICE_ID_MONTHLY/),
+        screen.getByText(/Pricing configuration not loaded/i),
       ).toBeInTheDocument();
     });
   });
 
   it("initiates checkout when the user has a preferred location set", async () => {
+    // Override the default fetch mock to return valid price IDs on the first call
+    // and a successful checkout response on the second call.
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve({ priceIds: { monthly: "price_monthly_123", semiannual: "price_semi_123", yearly: "price_yearly_123" } }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: () =>
+          Promise.resolve(JSON.stringify({ url: "https://stripe.com/checkout" })),
+      });
+    global.fetch = fetchMock;
+
     render(
       <Router>
         <ProductList user={mockUser} />
@@ -110,17 +126,19 @@ describe("OneTimeProduct (ProductList)", () => {
       data: () => ({ prefLocation: { id: "loc1" } }),
     });
 
-    global.fetch.mockResolvedValue({
-      ok: true,
-      text: () =>
-        Promise.resolve(JSON.stringify({ url: "https://stripe.com/checkout" })),
+    // Wait for the stripe-config fetch to resolve
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        expect.stringContaining("/api/stripe-config"),
+      );
     });
 
+    await screen.findByText(/Sign Up For 1 Month/i);
     const signupBtn = screen.getByText(/Sign Up For 1 Month/i);
     fireEvent.click(signupBtn);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(fetchMock).toHaveBeenCalledWith(
         expect.stringContaining("/api/create-checkout-session"),
         expect.objectContaining({
           headers: expect.objectContaining({

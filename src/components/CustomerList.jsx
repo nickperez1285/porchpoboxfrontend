@@ -183,12 +183,32 @@ const CustomerList = ({
   };
 
   const getCustomerBackgroundColor = (user) => {
-    // Priority: dynamic user details, then data cached in packageCounts
     const status = (userDetails[user.id]?.status || user.status || "")
       .trim()
       .toLowerCase();
-    if (status === "active" || status === "member") return "#d4edda";
+
     if (status === "trial") return "#fff6bf";
+
+    if (status === "active" || status === "member") {
+      const details = userDetails[user.id];
+      const endsAt = details?.subscriptionEndsAt;
+      // If we have user details, verify the subscription hasn't expired
+      if (details && endsAt) {
+        const endDate =
+          typeof endsAt.toDate === "function"
+            ? endsAt.toDate()
+            : endsAt.seconds
+              ? new Date(endsAt.seconds * 1000)
+              : new Date(endsAt);
+        if (endDate.getTime() > Date.now()) return "#d4edda";
+      } else if (!details) {
+        // No user details loaded yet — trust the packageCounts status
+        return "#d4edda";
+      }
+      // Subscription expired or never had one — treat like trial
+      return "#fff6bf";
+    }
+
     return "#ffd9d9";
   };
 
