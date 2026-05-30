@@ -353,4 +353,30 @@
     min-width: 0;
     justify-content: center;
   }
+
+  .mp-map-wrap {
+    min-height: 240px;
+    height: 280px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mp-inner {
+    padding: 20px 20px 40px;
+  }
+
+  .mp-hero {
+    padding: 20px 18px;
+    border-radius: 14px;
+  }
+
+  .mp-card--white,
+  .mp-card--cream {
+    padding: 18px;
+  }
+
+  .mp-map-wrap {
+    min-height: 200px;
+    height: 220px;
+  }
 }
