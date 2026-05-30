@@ -386,19 +386,12 @@ const UserSettings = ({ user }) => {
             </div>
           </div>
 
-          <div
-            className="settings-card-full"
-            style={{
-              display: "flex",
-              gap: 12,
-              flexWrap: "wrap",
-              alignItems: "center",
-            }}
-          >
-            <button type="button" onClick={() => setEditing(true)}>
+          <div className="settings-card settings-card-full settings-action-bar">
+            <button type="button" className="settings-action-btn settings-action-btn--primary" onClick={() => setEditing(true)}>
               Edit
             </button>
             <Link
+              className="settings-action-btn"
               to={`/forgot-password?email=${encodeURIComponent(user.email || "")}`}
             >
               Change Password
@@ -490,16 +483,12 @@ const UserSettings = ({ user }) => {
                 />
               </button>
               <span
-                style={{
-                  fontSize: 15,
-                  fontWeight: 600,
-                  color: notificationsEnabled ? "#1a7f37" : "#888",
-                }}
+                className={`notif-toggle-label ${notificationsEnabled ? "notif-toggle-label--on" : "notif-toggle-label--off"}`}
               >
                 {notificationsEnabled ? "On" : "Off"}
               </span>
               {savingNotif && (
-                <span style={{ fontSize: 13, color: "#888" }}>Saving...</span>
+                <span className="notif-saving">Saving...</span>
               )}
             </div>
           </div>

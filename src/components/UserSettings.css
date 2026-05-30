@@ -38,7 +38,7 @@
 }
 
 .settings-label {
-  fontSize: 12px;
+  font-size: 12px;
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -204,6 +204,24 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
+.notif-toggle-label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.notif-toggle-label--on {
+  color: #1a7f37;
+}
+
+.notif-toggle-label--off {
+  color: #888;
+}
+
+.notif-saving {
+  font-size: 13px;
+  color: #888;
+}
+
 .location-highlight {
   background: #fff8e1;
   border: 2px solid #d4af37;
@@ -218,6 +236,13 @@
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .btn-cancel {
@@ -225,10 +250,77 @@
   color: #666;
   padding: 10px 20px;
   border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.settings-action-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 20px 24px;
+}
+
+.settings-action-btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: #f5f5f5;
+  color: #333;
+  font-family: inherit;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.settings-action-btn:hover {
+  background: #eaeaea;
+  border-color: #aaa;
+}
+
+.settings-action-btn--primary {
+  background: #121212;
+  color: #fff;
+  border-color: #121212;
+}
+
+.settings-action-btn--primary:hover {
+  background: #333;
+  border-color: #333;
+}
+
+.settings-link-btn {
+  background: none;
+  border: none;
+  color: #0b57d0;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  font-size: 14px;
 }
 
 @media (max-width: 520px) {
   .settings-subscription-header {
     flex-direction: column;
+  }
+
+  .settings-hero {
+    border-radius: 0;
+    margin-left: -20px;
+    margin-right: -20px;
+  }
+
+  .settings-card {
+    padding: 18px;
   }
 }
