@@ -8,6 +8,10 @@ const PAD = (PICKER_HEIGHT - ITEM_HEIGHT) / 2;
 
 const HOURS_12 = Array.from({ length: 12 }, (_, i) => i + 1);
 const MINUTES = [0, 15, 30, 45];
+
+const parsedEq = (a, b) =>
+  a.oh === b.oh && a.om === b.om && a.op === b.op &&
+  a.ch === b.ch && a.cm === b.cm && a.cp === b.cp;
 const PERIODS = ["AM", "PM"];
 
 export const DEFAULT_STORE_HOURS = "9:00 AM – 5:00 PM";
@@ -158,9 +162,12 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
     Boolean(value && !parseStoreHours(value).matched)
   );
 
+  const prevParsedRef = useRef(null);
+
   useEffect(() => {
     const p = parseStoreHours(value);
-    if (oh === p.oh && om === p.om && op === p.op && ch === p.ch && cm === p.cm && cp === p.cp) return;
+    if (prevParsedRef.current && parsedEq(p, prevParsedRef.current)) return;
+    prevParsedRef.current = p;
     setOh(p.oh);
     setOm(p.om);
     setOp(p.op);
