@@ -497,15 +497,64 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
       >
         <h2 style={{ marginTop: 0 }}>Partner Portal</h2>
         <p style={{ color: "#d6d6d6" }}>
-          If you already have a partner account, please log in to access your
-          partner dashboard.
+          If you already have a partner account, log in to access your partner
+          dashboard. If you don't have one yet, register and apply to become a
+          partner.
         </p>
-        <p>
-          <Link to="/partner/login">Partner Login</Link>
-        </p>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            gap: 16,
+            flexWrap: "wrap",
+          }}
+        >
+          <Link
+            to="/partner/login"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: "#d4af37",
+              borderRadius: 12,
+              padding: "12px 24px",
+              textDecoration: "none",
+              fontWeight: 700,
+              fontSize: 15,
+              color: "#121212",
+            }}
+          >
+            Partner Login
+          </Link>
+          <Link
+            to="/partner/register"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              borderRadius: 12,
+              padding: "12px 24px",
+              textDecoration: "none",
+              fontWeight: 700,
+              fontSize: 15,
+              color: "#fff",
+            }}
+          >
+            Register &amp; Apply
+          </Link>
+        </div>
         {user && !partnerProfile && (
-          <p>
-            This account is signed in, but it is not registered as a partner.
+          <p style={{ marginTop: 20, color: "#aaa" }}>
+            You're signed in but don't have a partner account yet —
+            <Link
+              to="/partner/register"
+              style={{ color: "#d4af37", marginLeft: 4 }}
+            >
+              register here
+            </Link>
+            .
           </p>
         )}
       </div>
