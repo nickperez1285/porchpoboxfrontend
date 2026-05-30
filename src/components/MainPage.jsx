@@ -350,6 +350,11 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                 <OneTimeProduct user={user} />
               </div>
             )}
+            {!isActiveMember && partnerProfile && (
+              <p style={{ marginTop: 20, color: "#888", fontStyle: "italic" }}>
+                Log in as user to view current subscription plans.
+              </p>
+            )}
           </section>
         </div>
 
