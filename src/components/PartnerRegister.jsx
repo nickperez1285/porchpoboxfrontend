@@ -136,10 +136,7 @@ const PartnerRegister = () => {
           );
         }
       } catch (emailError) {
-        console.error("Partner notification email failed:", emailError);
-        setError(emailError.message);
-        setLoading(false);
-        return;
+        console.warn("Partner notification email failed (non-blocking):", emailError);
       }
 
       navigate("/partner/pending");
