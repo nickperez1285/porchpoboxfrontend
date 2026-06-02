@@ -5,7 +5,7 @@ import { db } from "../firebase";
 import CustomerList from "./CustomerList";
 import PartnerStatusLegend from "./PartnerStatusLegend";
 
-const PAYOUT_RATE = 5;
+const PAYOUT_RATE = 10;
 
 const AdminPartnerView = () => {
   const { partnerId } = useParams();
@@ -218,7 +218,7 @@ const AdminPartnerView = () => {
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "#fafafa", borderRadius: 10, border: "1px solid #eee" }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 14 }}>{p.month || "—"}</div>
-                    <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{p.subscriberCount} subscriber{p.subscriberCount !== 1 ? "s" : ""} × $5</div>
+                    <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{p.subscriberCount} subscriber{p.subscriberCount !== 1 ? "s" : ""} × $10</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ textAlign: "right" }}>

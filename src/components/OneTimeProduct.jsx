@@ -10,7 +10,7 @@ const PLAN_CONFIG = [
     id: "monthly",
     label: "1 Month",
     price: "$20",
-    description: "Unlimited packages for 30 days",
+    description: "Package delivery for 30 days",
   },
   {
     id: "semiannual",

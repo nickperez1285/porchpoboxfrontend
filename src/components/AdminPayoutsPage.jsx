@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 
-const PAYOUT_RATE = 5;
+const PAYOUT_RATE = 10;
 
 const AdminPayoutsPage = () => {
   const [partners, setPartners] = useState([]);
@@ -589,7 +589,7 @@ const AdminPayoutsPage = () => {
                           style={{ fontSize: 12, color: "#888", marginTop: 2 }}
                         >
                           {p.subscriberCount} subscriber
-                          {p.subscriberCount !== 1 ? "s" : ""} × $5
+                          {p.subscriberCount !== 1 ? "s" : ""} × $10
                         </div>
                       </div>
                       <div

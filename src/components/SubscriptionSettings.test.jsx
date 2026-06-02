@@ -104,7 +104,7 @@ describe("SubscriptionSettings", () => {
     global.fetch = jest.fn().mockResolvedValueOnce(configResponse);
     renderSettings({});
     expect(
-      await screen.findByText("Monthly unlimited package receiving"),
+      await screen.findByText("Monthly package receiving"),
     ).toBeInTheDocument();
   });
 

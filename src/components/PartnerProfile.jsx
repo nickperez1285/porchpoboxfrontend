@@ -12,7 +12,7 @@ import {
 import { auth, db } from "../firebase";
 import "./PartnerProfile.css";
 
-const PAYOUT_RATE = 5; // $5 per active subscriber
+const PAYOUT_RATE = 10; // $10 per active subscriber
 
 const PartnerProfile = ({ user, partnerProfile }) => {
   const navigate = useNavigate();
@@ -444,7 +444,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                   <div className="stat-label">This Month</div>
                   <div className="stat-value">${currentMonthEarnings}</div>
                   <div className="stat-hint">
-                    {prefCount || 0} subscribers × $5
+                    {prefCount || 0} subscribers × $10
                   </div>
                 </div>
                 <div className="stat-box stat-box-gold">
