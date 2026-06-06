@@ -30,6 +30,7 @@ const PartnerRegister = () => {
   const [referralCode, setReferralCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPhoneInfo, setShowPhoneInfo] = useState(false);
 
   const validate = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
@@ -136,7 +137,10 @@ const PartnerRegister = () => {
           );
         }
       } catch (emailError) {
-        console.warn("Partner notification email failed (non-blocking):", emailError);
+        console.warn(
+          "Partner notification email failed (non-blocking):",
+          emailError,
+        );
       }
 
       navigate("/partner/pending");
@@ -170,24 +174,79 @@ const PartnerRegister = () => {
         </div>
         <RegField
           id="vendor-business"
-          label="Business name"
+          label="Business or Apartment name"
           type="text"
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           required
           autoComplete="organization"
-          placeholder="Your business name"
+          placeholder="Your business or apartment name"
         />
-        <RegField
-          id="vendor-phone"
-          label="Business phone"
-          type="tel"
-          value={phoneNumber}
-          onChange={(e) => setPhoneNumber(e.target.value)}
-          required
-          autoComplete="tel"
-          placeholder="(555) 555-0100"
-        />
+        <div className="reg-field-container">
+          <label htmlFor="vendor-phone" className="reg-field-label">
+            Business phone{" "}
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                border: "1.5px solid #aaa",
+                color: "#aaa",
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: "pointer",
+                marginLeft: 4,
+                lineHeight: 1,
+              }}
+              onClick={() => setShowPhoneInfo((p) => !p)}
+              role="button"
+              tabIndex={0}
+              aria-label="Phone number help"
+            >
+              ?
+            </span>
+          </label>
+          {showPhoneInfo && (
+            <div
+              style={{
+                background: "#fefcf5",
+                border: "1px solid #d4af37",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontSize: 13,
+                color: "#444",
+                marginBottom: 8,
+                lineHeight: 1.5,
+              }}
+            >
+              If you don't want to use your personal number, you can get a free
+              one using{" "}
+              <a
+                href="https://voice.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#0b57d0", fontWeight: 600 }}
+              >
+                Google Voice
+              </a>
+              .
+            </div>
+          )}
+          <input
+            id="vendor-phone"
+            name="vendor-phone"
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+            autoComplete="tel"
+            placeholder="(555) 555-0100"
+            className="reg-field-input"
+          />
+        </div>
         <RegField
           id="vendor-email"
           label="Email"

@@ -10,8 +10,12 @@ const HOURS_12 = Array.from({ length: 12 }, (_, i) => i + 1);
 const MINUTES = [0, 15, 30, 45];
 
 const parsedEq = (a, b) =>
-  a.oh === b.oh && a.om === b.om && a.op === b.op &&
-  a.ch === b.ch && a.cm === b.cm && a.cp === b.cp;
+  a.oh === b.oh &&
+  a.om === b.om &&
+  a.op === b.op &&
+  a.ch === b.ch &&
+  a.cm === b.cm &&
+  a.cp === b.cp;
 const PERIODS = ["AM", "PM"];
 
 export const DEFAULT_STORE_HOURS = "9:00 AM – 5:00 PM";
@@ -23,7 +27,7 @@ function pad2(n) {
 function snapMinute(m) {
   const allowed = MINUTES;
   return allowed.reduce((best, x) =>
-    Math.abs(x - m) < Math.abs(best - m) ? x : best
+    Math.abs(x - m) < Math.abs(best - m) ? x : best,
   );
 }
 
@@ -64,9 +68,12 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
       const el = ref.current;
       if (!el) return;
       const i = Math.max(0, Math.min(values.length - 1, index));
-      el.scrollTo({ top: i * ITEM_HEIGHT, behavior: smooth ? "smooth" : "auto" });
+      el.scrollTo({
+        top: i * ITEM_HEIGHT,
+        behavior: smooth ? "smooth" : "auto",
+      });
     },
-    [values.length]
+    [values.length],
   );
 
   useEffect(() => {
@@ -96,7 +103,7 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
       style={{
         width,
         height: PICKER_HEIGHT,
-        position: "relative"
+        position: "relative",
       }}
     >
       <div
@@ -104,7 +111,7 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
         className="reg-scroll-column-window"
         style={{
           top: PAD,
-          height: ITEM_HEIGHT
+          height: ITEM_HEIGHT,
         }}
       />
       <div
@@ -114,7 +121,7 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
           height: PICKER_HEIGHT,
           overflowY: "auto",
           scrollSnapType: "y mandatory",
-          scrollbarWidth: "thin"
+          scrollbarWidth: "thin",
         }}
       >
         <div style={{ height: PAD }} />
@@ -137,7 +144,7 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
                 fontWeight: active ? 600 : 500,
                 color: active ? "#2a2620" : "#9a948a",
                 cursor: "pointer",
-                userSelect: "none"
+                userSelect: "none",
               }}
             >
               {format ? format(v) : v}
@@ -159,7 +166,7 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
   const [cm, setCm] = useState(initial.cm);
   const [cp, setCp] = useState(initial.cp);
   const [legacyHint, setLegacyHint] = useState(
-    Boolean(value && !parseStoreHours(value).matched)
+    Boolean(value && !parseStoreHours(value).matched),
   );
 
   const prevParsedRef = useRef(null);
@@ -181,7 +188,7 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
     (next) => {
       onChange(formatStoreHours(next));
     },
-    [onChange]
+    [onChange],
   );
 
   const setPart = (patch) => {
@@ -198,16 +205,19 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
 
   return (
     <div id={id} style={{ width: "100%" }}>
-      <p className="reg-section-label" style={{ marginTop: 16 }}>
-        Store hours
-      </p>
+      <center>
+        <p className="reg-section-label" style={{ marginTop: 16 }}>
+          Hours of Operation
+          <br /> (When can customers pick up deliveries?)
+        </p>
+      </center>
       <div
         style={{
           display: "flex",
           alignItems: "flex-end",
           justifyContent: "center",
           gap: 8,
-          flexWrap: "wrap"
+          flexWrap: "wrap",
         }}
       >
         <div>
@@ -239,7 +249,7 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
             paddingBottom: PAD + 6,
             fontSize: 18,
             color: "#b8b0a3",
-            fontWeight: 600
+            fontWeight: 600,
           }}
         >
           –
@@ -274,8 +284,8 @@ const StoreHoursScrollPicker = ({ value, onChange, id }) => {
       </div>
       {legacyHint && (
         <p className="reg-hint" style={{ marginTop: 10, textAlign: "center" }}>
-          Saved hours used a different format. Scroll a column to replace them with the
-          times above.
+          Saved hours used a different format. Scroll a column to replace them
+          with the times above.
         </p>
       )}
     </div>
