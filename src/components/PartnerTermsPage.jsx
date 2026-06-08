@@ -13,6 +13,9 @@ const PartnerTermsPage = () => {
           You agree to accept customer packages shipped to your store location as a Porch P.O. Box partner.
         </li>
         <li>
+          You agree to have your business or apartment location listed publicly on the Porch P.O. Box website for customers to view and select as a package delivery location.
+        </li>
+        <li>
           You agree this is a paid service for subscribed customers and that only active subscribers are eligible for package receiving.
         </li>
         <li>
