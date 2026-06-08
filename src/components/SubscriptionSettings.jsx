@@ -10,7 +10,7 @@ const PLAN_CONFIG = [
     id: "monthly",
     label: "1 Month",
     price: "$20",
-    description: "Monthly package receiving",
+    description: "Monthly  package receiving",
   },
   {
     id: "semiannual",
@@ -53,9 +53,7 @@ const SubscriptionSettings = ({ user, profileData }) => {
   const plans = useMemo(
     () =>
       PLAN_CONFIG.map((plan) => ({
-        ...plan,
-        priceId: priceIds?.[plan.id] || "",
-      })),
+        
     [priceIds],
   );
   const [showPrefModal, setShowPrefModal] = useState(false);

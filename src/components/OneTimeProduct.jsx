@@ -10,7 +10,7 @@ const PLAN_CONFIG = [
     id: "monthly",
     label: "1 Month",
     price: "$20",
-    description: "Package delivery for 30 days",
+    description: " Get service  for 30 days",
   },
   {
     id: "semiannual",
@@ -39,7 +39,9 @@ const ProductList = ({ user }) => {
         if (!cancelled) setPriceIds(data.priceIds);
       })
       .catch((err) => console.error("[stripe-config] Error:", err));
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const plans = useMemo(
@@ -151,7 +153,8 @@ const ProductList = ({ user }) => {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 160px), 1fr))",
+          gridTemplateColumns:
+            "repeat(auto-fit, minmax(min(100%, 160px), 1fr))",
           gap: 12,
         }}
       >
@@ -214,7 +217,16 @@ const ProductList = ({ user }) => {
               : `Sign Up For ${selectedPlan?.label || "Plan"}`}
           </button>
         ) : (
-          <Link to="/login" className="btn btn-dark hover:btn-outline" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+          <Link
+            to="/login"
+            className="btn btn-dark hover:btn-outline"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              textDecoration: "none",
+            }}
+          >
             SIGN UP
           </Link>
         )}
