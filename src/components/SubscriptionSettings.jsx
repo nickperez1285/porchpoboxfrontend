@@ -53,7 +53,9 @@ const SubscriptionSettings = ({ user, profileData }) => {
   const plans = useMemo(
     () =>
       PLAN_CONFIG.map((plan) => ({
-        
+        ...plan,
+        priceId: priceIds?.[plan.id],
+      })),
     [priceIds],
   );
   const [showPrefModal, setShowPrefModal] = useState(false);

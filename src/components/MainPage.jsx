@@ -164,8 +164,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
 
   return (
     <div className="mp">
-      <div className="mp-blur">
-        <div className="mp-inner">
+      <div className="mp-inner">
           <section className="mp-hero" aria-label="Introduction">
             <div className="mp-hero__text">
               <div className="mp-hero__eyebrow">Porch P.O. Box</div>
@@ -410,15 +409,6 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
         </div>
       </div>
-
-      <div className="mp-overlay">
-        <img src="/logo.png" alt="Porch P.O. Box" className="mp-overlay-logo" />
-        <h1 className="mp-overlay-title">Launching soon</h1>
-        <Link className="mp-overlay-link" to="/partner/register">
-          Register to be a partner<div style={{ color: "blue" }}> HERE</div>
-        </Link>
-      </div>
-    </div>
   );
 };
 

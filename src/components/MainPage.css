@@ -4,65 +4,6 @@
   padding: 60px 0 80px;
   background: linear-gradient(180deg, #fefcf5 0%, #f5f5f5 100%);
   min-height: 100vh;
-  position: relative;
-}
-
-.mp-blur {
-  filter: blur(8px);
-  pointer-events: none;
-  user-select: none;
-}
-
-.mp-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-.mp-overlay-logo {
-  width: 240px;
-  height: auto;
-  margin-bottom: 32px;
-}
-
-.mp-overlay-title {
-  font-size: 48px;
-  font-weight: 900;
-  color: #121212;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin: 0 0 24px;
-}
-
-.mp-overlay-link {
-  font-size: 18px;
-  font-weight: 600;
-  color: #d4af37;
-  text-decoration: none;
-  border: 2px solid #d4af37;
-  border-radius: 12px;
-  padding: 14px 32px;
-  transition: background 0.2s, color 0.2s;
-}
-
-.mp-overlay-link:hover {
-  background: #d4af37;
-  color: #121212;
-}
-
-@media (max-width: 520px) {
-  .mp-overlay-title {
-    font-size: 32px;
-  }
-  .mp-overlay-logo {
-    width: 180px;
-  }
 }
 
 .mp-inner {
