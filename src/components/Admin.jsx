@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { apiPost } from "../utils/apiClient";
 import { auth, db } from "../firebase";
+import AdminGroupEmail from "./AdminGroupEmail";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -1014,6 +1015,8 @@ const Admin = () => {
             </ul>
           )}
         </section>
+
+        <AdminGroupEmail />
       </div>
 
       <div
