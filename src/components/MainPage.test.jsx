@@ -74,20 +74,23 @@ describe("MainPage", () => {
   it("renders hero section with title and message", async () => {
     renderMainPage();
     expect(
-      await screen.findByText("Never Worry About Package Theft Again."),
+      await screen.findByText("📦 STOP PACKAGE THEFT"),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Protect your deliveries from theft and missed drop-offs. Porch P.O. Box connects you with trusted local businesses and community partners who securely receive, store, and safeguard your packages until you're ready to pick them up.",
+        "Secure package delivery through trusted neighbors and local businesses.",
       ),
     ).toBeInTheDocument();
   });
 
   it("renders hero action links", async () => {
     renderMainPage();
-    expect(await screen.findByText("View plans")).toBeInTheDocument();
-    expect(screen.getByText("Become a partner")).toBeInTheDocument();
-    expect(screen.getByText("Contact")).toBeInTheDocument();
+    expect(
+      await screen.findByText("Find a PorchPObox"),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText("Become a Partner").length,
+    ).toBeGreaterThan(0);
   });
 
   it("renders vendor list after loading", async () => {

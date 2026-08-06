@@ -6,6 +6,7 @@ const Footer = () => (
     <center>
       <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 20px" }}>
         <Link to="/partner" style={{ color: "#ccc" }}>Partners</Link>
+        <Link to="/how-it-works" style={{ color: "#ccc" }}>How it Works</Link>
         <Link to="/contact" style={{ color: "#ccc" }}>Contact</Link>
         <Link to="/about" style={{ color: "#ccc" }}>About</Link>
         <Link to="/terms" style={{ color: "#ccc" }}>Terms &amp; Policies</Link>

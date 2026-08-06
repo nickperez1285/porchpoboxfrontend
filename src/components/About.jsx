@@ -50,14 +50,6 @@ const About = () => {
           are ready to be picked up.
         </p>
 
-        <h3>How It Works</h3>
-        <p>
-          Customers subscribe to a Porch P.O. Box plan and use a partner
-          location's address as their delivery address. When a package arrives,
-          the partner checks it in and you receive an email notification. Pick
-          it up at your convenience — no more missed deliveries or porch piracy.
-        </p>
-
         <h3>Our Partners</h3>
         <p>
           Our partners are local businesses in your neighborhood who have agreed

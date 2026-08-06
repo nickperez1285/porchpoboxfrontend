@@ -10,7 +10,7 @@ const STEPS = [
     ],
     links: [
       { to: "/terms/partner", label: "Read partner terms →" },
-      { to: "/about", label: "How Porch P.O. Box works →" },
+      { to: "/how-it-works", label: "How Porch P.O. Box works →" },
     ],
   },
   {

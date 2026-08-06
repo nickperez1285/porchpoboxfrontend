@@ -38,6 +38,7 @@ import PartnerTermsPage from "./components/PartnerTermsPage";
 import ReferralForm from "./components/ReferralForm";
 import PlansPage from "./components/PlansPage";
 import About from "./components/About";
+import HowItWorks from "./components/HowItWorks";
 import TermsIndex from "./components/TermsIndex";
 import PackageHistoryPage from "./components/PackageHistoryPage";
 import PartnerOnboarding from "./components/PartnerOnboarding";
@@ -99,8 +100,11 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
         </div>
         {!authLoading && !hideAuthLinks && (
           <nav className="header-nav">
-            <Link to="/about" className="header-link">
+            <Link to="/how-it-works" className="header-link">
               How it Works
+            </Link>
+            <Link to="/about" className="header-link">
+              About
             </Link>
             <Link to="/plans" className="header-link">
               Pricing
@@ -127,20 +131,18 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
                 </button>
               </>
             ) : (
-              <Link to="/login" className="header-link">
-                Login
-              </Link>
+              <>
+                <Link to="/login" className="header-link">
+                  Login
+                </Link>
+                <Link to="/register" className="header-signup-btn">
+                  Sign Up
+                </Link>
+              </>
             )}
           </nav>
         )}
       </div>
-      {!authLoading && !hideAuthLinks && !user && (
-        <div className="header-signup-row">
-          <Link to="/register" className="header-signup-btn">
-            Sign Up
-          </Link>
-        </div>
-      )}
     </header>
   );
 };
@@ -426,6 +428,7 @@ function App() {
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
           <Route path="/onboarding" element={<PartnerOnboarding />} />
           <Route path="/about" element={<About />} />
+          <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/become-a-partner" element={<PartnerPage />} />
           <Route path="/terms" element={<TermsIndex />} />
           <Route path="/terms/user" element={<UserTermsPage />} />
