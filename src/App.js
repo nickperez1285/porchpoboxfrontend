@@ -42,6 +42,7 @@ import TermsIndex from "./components/TermsIndex";
 import PackageHistoryPage from "./components/PackageHistoryPage";
 import PartnerOnboarding from "./components/PartnerOnboarding";
 import PartnerInfoPage from "./components/PartnerInfoPage";
+import PartnerPage from "./components/PartnerPage";
 import Footer from "./components/Footer";
 import { auth, db } from "./firebase";
 import "./App.css";
@@ -86,39 +87,58 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
 
   return (
     <header className="app-header">
-      <div className="header-logo-wrap">
-        <a href="https://porchpobox.com/" className="header-logo-link">
-          <img
-            src="/logo.png"
-            alt="Porch P.O. Box"
-            className="header-logo"
-          />
-        </a>
+      <div className="header-top">
+        <div className="header-logo-wrap">
+          <a href="https://porchpobox.com/" className="header-logo-link">
+            <img
+              src="/logo.png"
+              alt="Porch P.O. Box"
+              className="header-logo"
+            />
+          </a>
+        </div>
+        {!authLoading && !hideAuthLinks && (
+          <nav className="header-nav">
+            <Link to="/about" className="header-link">
+              How it Works
+            </Link>
+            <Link to="/plans" className="header-link">
+              Pricing
+            </Link>
+            <Link to="/become-a-partner" className="header-link">
+              Partners
+            </Link>
+            {isAdmin && (
+              <Link to="/admin" className="header-link">
+                Admin
+              </Link>
+            )}
+            {user ? (
+              <>
+                <Link to={primaryLink.to} className="header-link">
+                  {primaryLink.label}
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="header-logout-btn"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="header-link">
+                Login
+              </Link>
+            )}
+          </nav>
+        )}
       </div>
-      {!authLoading && !hideAuthLinks && (
-        <div className="header-nav">
-          <Link to={primaryLink.to} className="header-link">
-            {primaryLink.label}
+      {!authLoading && !hideAuthLinks && !user && (
+        <div className="header-signup-row">
+          <Link to="/register" className="header-signup-btn">
+            Sign Up
           </Link>
-          {isAdmin && (
-            <Link to="/admin" className="header-link">
-              Admin
-            </Link>
-          )}
-          {!user && (
-            <Link to="/register" className="header-link">
-              Register
-            </Link>
-          )}
-          {user && (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="header-logout-btn"
-            >
-              Logout
-            </button>
-          )}
         </div>
       )}
     </header>
@@ -406,6 +426,7 @@ function App() {
           <Route path="/checkout/cancel" element={<CheckoutCancel />} />
           <Route path="/onboarding" element={<PartnerOnboarding />} />
           <Route path="/about" element={<About />} />
+          <Route path="/become-a-partner" element={<PartnerPage />} />
           <Route path="/terms" element={<TermsIndex />} />
           <Route path="/terms/user" element={<UserTermsPage />} />
           <Route path="/terms/partner" element={<PartnerTermsPage />} />

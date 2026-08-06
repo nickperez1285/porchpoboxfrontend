@@ -74,13 +74,11 @@ describe("MainPage", () => {
   it("renders hero section with title and message", async () => {
     renderMainPage();
     expect(
-      await screen.findByText(
-        "Secure Package Receiving Through Local Partner Locations",
-      ),
+      await screen.findByText("Never Worry About Package Theft Again."),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Get your packages delivered and securely stored at a trusted local neighborhood Porch P.O. Box.",
+        "Protect your deliveries from theft and missed drop-offs. Porch P.O. Box connects you with trusted local businesses and community partners who securely receive, store, and safeguard your packages until you're ready to pick them up.",
       ),
     ).toBeInTheDocument();
   });
@@ -88,7 +86,7 @@ describe("MainPage", () => {
   it("renders hero action links", async () => {
     renderMainPage();
     expect(await screen.findByText("View plans")).toBeInTheDocument();
-    expect(screen.getByText("How it works")).toBeInTheDocument();
+    expect(screen.getByText("Become a partner")).toBeInTheDocument();
     expect(screen.getByText("Contact")).toBeInTheDocument();
   });
 
@@ -167,20 +165,14 @@ describe("MainPage", () => {
   it("shows Trial card label for trial user", async () => {
     renderMainPage({ user: { uid: "u1" }, userStatus: "trial" });
     expect(await screen.findByText("Trial")).toBeInTheDocument();
-    expect(
-      screen.getByText(/in trial status/),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByText("Member access"),
-    ).not.toBeInTheDocument();
+    expect(screen.getByText(/in trial status/)).toBeInTheDocument();
+    expect(screen.queryByText("Member access")).not.toBeInTheDocument();
   });
 
   it("shows Member access card label for active user", async () => {
     renderMainPage({ user: { uid: "u1" }, userStatus: "active" });
     expect(await screen.findByText("Member access")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Your subscription is active/),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Your subscription is active/)).toBeInTheDocument();
   });
 
   it("shows Subscription plans / Sign up for non-logged-in user", async () => {
@@ -221,9 +213,7 @@ describe("MainPage", () => {
   it("shows No packages waiting when count is 0", async () => {
     renderMainPage({ user: { uid: "u1" }, userStatus: "active" });
 
-    expect(
-      await screen.findByText(/No packages waiting/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/No packages waiting/i)).toBeInTheDocument();
   });
 
   it("manage deliveries link points to /profile", async () => {
@@ -238,23 +228,20 @@ describe("MainPage", () => {
   it("renders promotion banner", async () => {
     renderMainPage();
     expect(
-      await screen.findByText("Try Porch P.O. Box for free"),
+      await screen.findByText("Try Porch P.O. Box for free!"),
     ).toBeInTheDocument();
   });
 
   it("renders referral banner", async () => {
     renderMainPage();
-    expect(
-      await screen.findByText("Submit a referral →"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Submit a referral →")).toBeInTheDocument();
   });
 
   it("renders map when markers are available", async () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        json: () =>
-          Promise.resolve([{ lat: "45.5152", lon: "-122.6784" }]),
+        json: () => Promise.resolve([{ lat: "45.5152", lon: "-122.6784" }]),
       }),
     );
 

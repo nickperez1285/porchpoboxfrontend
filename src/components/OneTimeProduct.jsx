@@ -169,8 +169,8 @@ const ProductList = ({ user }) => {
               style={{
                 textAlign: "left",
                 borderRadius: 16,
-                border: isSelected ? "2px solid #b88a00" : "1px solid #d8d8d8",
-                background: isSelected ? "#f8f1d6" : "#ffffff",
+                border: isSelected ? "2px solid #2563eb" : "1px solid #d8d8d8",
+                background: isSelected ? "#eff6ff" : "#ffffff",
                 padding: 18,
                 cursor: "pointer",
               }}
@@ -180,7 +180,7 @@ const ProductList = ({ user }) => {
                   fontSize: 12,
                   letterSpacing: 1,
                   textTransform: "uppercase",
-                  color: "#8a6a00",
+                  color: "#2563eb",
                 }}
               >
                 {plan.label}
