@@ -13,6 +13,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
 import { db } from "../firebase";
+import { getApiUrl } from "../config/api";
 import "./MainPage.css";
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -30,7 +31,7 @@ const MAIN_PAGE_TITLE =
 const MAIN_PAGE_MESSAGE =
   // "Protect your deliveries from theft and missed drop-offs. Porch P.O. Box connects you with trusted local businesses and community partners who securely receive, store, and safeguard your packages until you're ready to pick them up.";
   // "Have your deliveries securely received by a trusted Porch P.O. Box community partner in your neighborhood."
-  "Secure package delivery through trusted neighbors and local businesses.";
+  "Secure package delivery through trusted local community partners.";
 
 const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [activeVendors, setActiveVendors] = useState([]);
@@ -40,6 +41,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [vendorMarkers, setVendorMarkers] = useState([]);
   const [userWaitingCount, setUserWaitingCount] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [plansExpanded, setPlansExpanded] = useState(false);
 
   const filteredVendors = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -81,15 +83,13 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           if (!addr) return null;
           try {
             const res = await fetch(
-              `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}&limit=1`,
+              `${getApiUrl("/api/geocode")}?q=${encodeURIComponent(addr)}&limit=1`,
               {
-                headers: {
-                  "Accept-Language": "en",
-                  "User-Agent": "PorchPOBox/1.0 (https://porchpobox.com)",
-                },
+                headers: { "Accept-Language": "en" },
               },
             );
-            const data = await res.json();
+            const payload = await res.json();
+            const data = payload.results || [];
             if (data[0])
               return {
                 vendor,
@@ -180,6 +180,23 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             <div className="mp-hero__eyebrow">Porch P.O. Box</div>
             <h2 className="mp-hero__title">{MAIN_PAGE_TITLE}</h2>
             <p className="mp-hero__lead">{MAIN_PAGE_MESSAGE}</p>
+            <center>
+              <div
+              // style={{
+              //   boder: "solid",
+              //   borderColor: "black",
+              //   borderWidth: 1,
+              //   padding: 10,
+              // }}
+              >
+                <div> Now Serving Bay Area Residents at </div>
+
+                <h5>
+                  <u>{activeVendors.length} Active Locations </u>{" "}
+                </h5>
+              </div>
+            </center>
+
             <div className="mp-hero__actions">
               <button
                 type="button"
@@ -209,24 +226,6 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
         </section>
 
-        <section className="mp-promo-hero" aria-labelledby="promo-heading">
-          <div className="mp-promo-hero__text">
-            <div className="mp-promo-hero__badge">Limited-time offer</div>
-            <h2 id="promo-heading" className="mp-promo-hero__title">
-              Try Porch P.O. Box for free!
-            </h2>
-            <p className="mp-promo-hero__desc">
-              Sign up today and get your first package delivered to a Porch
-              P.O. Box for free!
-            </p>
-          </div>
-          <div className="mp-promo-hero__actions">
-            <Link className="mp-btn mp-btn--primary" to="/plans">
-              See plans
-            </Link>
-          </div>
-        </section>
-
         <section className="mp-how" aria-labelledby="how-heading">
           <h2 id="how-heading" className="mp-section-heading">
             How it works
@@ -244,7 +243,9 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
               <div className="mp-how__icon" aria-hidden>
                 📦
               </div>
-              <h3 className="mp-how__title">Ship Packages to Address</h3>
+              <h3 className="mp-how__title">
+                Ship Packages to the Selected PorchPObox Address
+              </h3>
             </div>
             <div className="mp-how__step">
               <div className="mp-how__num">3</div>
@@ -255,131 +256,20 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             </div>
           </div>
         </section>
-
-        <section className="mp-why" aria-labelledby="why-heading">
-          <h2 id="why-heading" className="mp-section-heading">
-            Why People Love PorchPObox
-          </h2>
-          <ul className="mp-why__list">
-            <li>No porch pirates</li>
-            <li>Never miss deliveries</li>
-            <li>Apartment friendly</li>
-            <li>Safe neighborhood pickup</li>
-            <li>Affordable monthly pricing</li>
-          </ul>
-        </section>
-
-        <section className="mp-audience" aria-labelledby="audience-heading">
-          <h2 id="audience-heading" className="mp-section-heading">
-            Who it's for
-          </h2>
-          <div className="mp-audience__grid">
-            <div className="mp-audience__card">
-              <div className="mp-audience__photo" aria-hidden>
-                🏢
-              </div>
-              <h3 className="mp-audience__title">Apartment Buildings</h3>
-              <Link className="mp-audience__link" to="/plans">
-                Learn More
-              </Link>
-            </div>
-            <div className="mp-audience__card">
-              <div className="mp-audience__photo" aria-hidden>
-                🏪
-              </div>
-              <h3 className="mp-audience__title">Small Businesses</h3>
-              <Link className="mp-audience__link" to="/become-a-partner">
-                Learn More
-              </Link>
-            </div>
-            <div className="mp-audience__card">
-              <div className="mp-audience__photo" aria-hidden>
-                🏠
-              </div>
-              <h3 className="mp-audience__title">Homeowners</h3>
-              <Link className="mp-audience__link" to="/plans">
-                Learn More
-              </Link>
-            </div>
-            <div className="mp-audience__card">
-              <div className="mp-audience__photo" aria-hidden>
-                🏬
-              </div>
-              <h3 className="mp-audience__title">Storage Facilities</h3>
-              <Link className="mp-audience__link" to="/become-a-partner">
-                Learn More
-              </Link>
-            </div>
+        <section className="mp-promo-hero" aria-labelledby="promo-heading">
+          <div className="mp-promo-hero__text">
+            <div className="mp-promo-hero__badge">Limited-time offer</div>
+            <h2 id="promo-heading" className="mp-promo-hero__title">
+              Try Porch P.O. Box for free!
+            </h2>
+            <p className="mp-promo-hero__desc">
+              Sign up today and get your first package delivered to a Porch P.O.
+              Box for free!
+            </p>
           </div>
-        </section>
-
-        <section className="mp-income" aria-labelledby="income-heading">
-          <div className="mp-income__eyebrow">Earn Extra Income</div>
-          <h2 id="income-heading" className="mp-income__title">
-            Become a PorchPObox Partner
-          </h2>
-          <ul className="mp-income__list">
-            <li>Monthly payments</li>
-            <li>No lockers required</li>
-            <li>No remodeling</li>
-            <li>Takes just a few minutes a day</li>
-          </ul>
-          <Link className="mp-btn mp-btn--primary" to="/become-a-partner">
-            Become a Partner
-          </Link>
-        </section>
-
-        <section
-          className="mp-testimonials"
-          aria-labelledby="testimonials-heading"
-        >
-          <h2 id="testimonials-heading" className="mp-section-heading">
-            What people say
-          </h2>
-          <div className="mp-testimonials__grid">
-            <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
-                ★★★★★
-              </div>
-              <p className="mp-testimonials__quote">
-                "I don't worry about Amazon packages anymore."
-              </p>
-              <div className="mp-testimonials__author">— Sarah M.</div>
-            </div>
-            <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
-                ★★★★★
-              </div>
-              <p className="mp-testimonials__quote">
-                "Our apartment residents love it."
-              </p>
-              <div className="mp-testimonials__author">— Property Manager</div>
-            </div>
-            <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
-                ★★★★★
-              </div>
-              <p className="mp-testimonials__quote">
-                "We earn extra income every month."
-              </p>
-              <div className="mp-testimonials__author">— Local Business</div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mp-final-cta" aria-label="Get started">
-          <h2 className="mp-final-cta__title">Ready to stop package theft?</h2>
-          <div className="mp-final-cta__actions">
-            <button
-              type="button"
-              className="mp-btn mp-btn--primary"
-              onClick={scrollToLocations}
-            >
-              Find My PorchPObox
-            </button>
-            <span className="mp-final-cta__or">OR</span>
-            <Link className="mp-btn mp-btn--ghost" to="/become-a-partner">
-              Become a Partner
+          <div className="mp-promo-hero__actions">
+            <Link className="mp-btn mp-btn--primary" to="/plans">
+              See plans
             </Link>
           </div>
         </section>
@@ -495,7 +385,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           )}
 
           <section
-            className="mp-card mp-card--white"
+            className="mp-card mp-card--white mp-card--signup"
             aria-labelledby="signup-heading"
           >
             <div className="mp-card__label">
@@ -506,7 +396,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                 : "Subscription plans"}
             </div>
             <h2 id="signup-heading" className="mp-card__title">
-              {isActiveMember ? "Welcome to Porch P.O. Box" : "Sign up"}
+              {isActiveMember ? "Welcome to Porch P.O. Box" : "From $20/month"}
             </h2>
             <p className="mp-card__desc">
               {isActiveMember ? (
@@ -531,13 +421,36 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                   </Link>
                 </>
               ) : (
-                "Choose a subscription that fits your deliveries and start sending packages to a nearby partner location."
+                "Pick a plan and start sending packages to a nearby partner location."
               )}
             </p>
             {!isActiveMember && !partnerProfile && (
-              <div style={{ marginTop: 20 }}>
-                <OneTimeProduct user={user} />
-              </div>
+              <>
+                <ul className="mp-plans-features">
+                  <li>Unlimited package receiving</li>
+                  <li>No contracts or hidden fees</li>
+                  <li>Cancel anytime</li>
+                </ul>
+                <Link className="mp-btn mp-btn--dark mp-plans-cta" to="/plans">
+                  Choose your plan
+                </Link>
+                <button
+                  type="button"
+                  className="mp-plans-toggle"
+                  onClick={() => setPlansExpanded((v) => !v)}
+                  aria-expanded={plansExpanded}
+                >
+                  {plansExpanded ? "Hide plan options" : "Compare plan options"}
+                  <span className="mp-plans-toggle__chevron" aria-hidden>
+                    {plansExpanded ? "▲" : "▼"}
+                  </span>
+                </button>
+                {plansExpanded && (
+                  <div style={{ marginTop: 14 }}>
+                    <OneTimeProduct user={user} compact />
+                  </div>
+                )}
+              </>
             )}
             {!isActiveMember && partnerProfile && (
               <p
@@ -549,6 +462,152 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             )}
           </section>
         </div>
+        <section className="mp-why" aria-labelledby="why-heading">
+          <h2 id="why-heading" className="mp-section-heading">
+            Why People Love PorchPObox
+          </h2>
+          <ul className="mp-why__list">
+            <li>Stop porch pirates</li>
+            <li>Never miss deliveries</li>
+            <li>Apartment friendly</li>
+            <li>Safe neighborhood pickup</li>
+            <li>Affordable monthly pricing</li>
+          </ul>
+        </section>
+
+        {/* <section className="mp-audience" aria-labelledby="audience-heading">
+          <h2 id="audience-heading" className="mp-section-heading">
+            Who it's for
+          </h2>
+          <div className="mp-audience__grid">
+            <div className="mp-audience__card">
+              <div className="mp-audience__photo" aria-hidden>
+                🏢
+              </div>
+              <h3 className="mp-audience__title">Apartment Buildings</h3>
+              <Link className="mp-audience__link" to="/plans">
+                Learn More
+              </Link>
+            </div>
+            <div className="mp-audience__card">
+              <div className="mp-audience__photo" aria-hidden>
+                🏪
+              </div>
+              <h3 className="mp-audience__title">Small Businesses</h3>
+              <Link className="mp-audience__link" to="/become-a-partner">
+                Learn More
+              </Link>
+            </div>
+            <div className="mp-audience__card">
+              <div className="mp-audience__photo" aria-hidden>
+                🏠
+              </div>
+              <h3 className="mp-audience__title">Homeowners</h3>
+              <Link className="mp-audience__link" to="/plans">
+                Learn More
+              </Link>
+            </div>
+            <div className="mp-audience__card">
+              <div className="mp-audience__photo" aria-hidden>
+                🏬
+              </div>
+              <h3 className="mp-audience__title">Storage Facilities</h3>
+              <Link className="mp-audience__link" to="/become-a-partner">
+                Learn More
+              </Link>
+            </div>
+          </div>
+        </section> */}
+
+        <section className="mp-pricing" aria-labelledby="pricing-heading">
+          <h2 id="pricing-heading" className="mp-section-heading">
+            Simple, affordable pricing
+          </h2>
+          <div className="mp-pricing__card">
+            <div className="mp-pricing__price">
+              $20<span className="mp-pricing__per">/month</span>
+            </div>
+            <ul className="mp-pricing__list">
+              <li>Unlimited package receiving</li>
+              <li>No contracts</li>
+              <li>Cancel anytime</li>
+            </ul>
+            <Link className="mp-btn mp-btn--primary" to="/register">
+              Start Free
+            </Link>
+          </div>
+        </section>
+
+        <section
+          className="mp-testimonials"
+          aria-labelledby="testimonials-heading"
+        >
+          <h2 id="testimonials-heading" className="mp-section-heading">
+            What people say
+          </h2>
+          <div className="mp-testimonials__grid">
+            <div className="mp-testimonials__card">
+              <div className="mp-testimonials__stars" aria-hidden>
+                ★★★★★
+              </div>
+              <p className="mp-testimonials__quote">
+                "I don't worry about Amazon packages anymore."
+              </p>
+              <div className="mp-testimonials__author">— Sarah M.</div>
+            </div>
+            <div className="mp-testimonials__card">
+              <div className="mp-testimonials__stars" aria-hidden>
+                ★★★★★
+              </div>
+              <p className="mp-testimonials__quote">
+                "Our apartment residents love it."
+              </p>
+              <div className="mp-testimonials__author">— Property Manager</div>
+            </div>
+            <div className="mp-testimonials__card">
+              <div className="mp-testimonials__stars" aria-hidden>
+                ★★★★★
+              </div>
+              <p className="mp-testimonials__quote">
+                "We earn extra income every month."
+              </p>
+              <div className="mp-testimonials__author">— Local Business</div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mp-final-cta" aria-label="Get started">
+          <h2 className="mp-final-cta__title">Ready to stop package theft?</h2>
+          <div className="mp-final-cta__actions">
+            <button
+              type="button"
+              className="mp-btn mp-btn--primary"
+              onClick={scrollToLocations}
+            >
+              Find My PorchPObox
+            </button>
+            <span className="mp-final-cta__or">OR</span>
+            <Link className="mp-btn mp-btn--ghost" to="/become-a-partner">
+              Become a Partner
+            </Link>
+          </div>
+        </section>
+
+        <section className="mp-income" aria-labelledby="income-heading">
+          <div className="mp-income__eyebrow">Earn Extra Income</div>
+          <h2 id="income-heading" className="mp-income__title">
+            Become a PorchPObox Partner
+          </h2>
+          <ul className="mp-income__list">
+            <li>Monthly payments</li>
+            <li>No lockers required</li>
+            <li>No remodeling</li>
+            <li>Takes just a few minutes a day</li>
+          </ul>
+          <Link className="mp-btn mp-btn--primary" to="/become-a-partner">
+            Become a Partner
+          </Link>
+        </section>
 
         <div className="mp-banners">
           <section

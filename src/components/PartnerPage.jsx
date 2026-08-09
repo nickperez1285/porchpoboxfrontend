@@ -57,41 +57,41 @@ const PartnerPage = () => {
       }}
     >
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
-        <div
-          style={{
-            background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-            color: "#fff",
-            borderRadius: 24,
-            padding: "32px 28px",
-            marginBottom: 32,
-            boxShadow: "0 16px 36px rgba(37, 99, 235, 0.25)",
-          }}
-        >
-          <div
+        <section className="mp-income" aria-labelledby="income-heading">
+          <div className="mp-income__eyebrow">Earn Extra Income</div>
+          <h2 id="income-heading" className="mp-income__title">
+            Become a PorchPObox Partner
+          </h2>
+          <p
             style={{
-              color: "rgba(255,255,255,0.85)",
-              fontSize: 12,
-              letterSpacing: 1.4,
-              textTransform: "uppercase",
+              margin: 0,
+              color: "rgba(60, 16, 16, 0.9)",
+              lineHeight: 1.6,
             }}
           >
-            Porch P.O. Box
-          </div>
-          <h2 style={{ margin: "10px 0 8px", color: "#fff" }}>Become a Partner</h2>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.9)", lineHeight: 1.6 }}>
             Turn your location into a neighborhood package hub — earn monthly
             payouts while helping your community receive packages safely.
           </p>
-        </div>
+          <ul className="mp-income__list">
+            <li>Monthly payments</li>
+            <li>No lockers required</li>
+            <li>No remodeling</li>
+            <li>Takes just a few minutes a day</li>
+          </ul>
+          <Link className="mp-btn mp-btn--primary" to="/partner/register">
+            Apply to become a partner
+          </Link>
+        </section>
 
         <div style={sectionCardStyle}>
           <h3 style={sectionHeadingStyle}>What it means to be a partner</h3>
           <p style={{ lineHeight: 1.75, margin: "0 0 8px" }}>
-            Porch P.O. Box partners are trusted local businesses — shops, stores,
-            and other community locations — that securely receive and hold
-            packages for our customers. Customers subscribe and use your address
-            as their delivery address. When a package arrives, you check it in,
-            the customer is notified, and they pick it up at their convenience.
+            Porch P.O. Box partners are trusted local businesses — shops,
+            stores, and other community locations — that securely receive and
+            hold packages for our customers. Customers subscribe and use your
+            address as their delivery address. When a package arrives, you check
+            it in, the customer is notified, and they pick it up at their
+            convenience.
           </p>
           <p style={{ lineHeight: 1.75, margin: 0 }}>
             By becoming a partner, you are also supporting your neighbors who
@@ -133,9 +133,9 @@ const PartnerPage = () => {
             <li style={listItemStyle}>
               <span style={markerStyle}>✓</span>
               <span>
-                <strong>Use good judgment</strong> — you may refuse packages that
-                appear damaged, leaking, or that you reasonably believe contain
-                prohibited or illegal items.
+                <strong>Use good judgment</strong> — you may refuse packages
+                that appear damaged, leaking, or that you reasonably believe
+                contain prohibited or illegal items.
               </span>
             </li>
             <li style={listItemStyle}>
@@ -195,8 +195,8 @@ const PartnerPage = () => {
             <li style={listItemStyle}>
               <span style={markerStyle}>✓</span>
               <span>
-                <strong>More foot traffic</strong> from your neighbors — and a way
-                to support your community.
+                <strong>More foot traffic</strong> from your neighbors — and a
+                way to support your community.
               </span>
             </li>
             <li style={listItemStyle}>
@@ -232,8 +232,8 @@ const PartnerPage = () => {
               live on our site.
             </li>
             <li>
-              <strong>Start receiving packages</strong> — check deliveries in and
-              earn payouts every month.
+              <strong>Start receiving packages</strong> — check deliveries in
+              and earn payouts every month.
             </li>
           </ol>
           <div style={{ marginTop: 24 }}>

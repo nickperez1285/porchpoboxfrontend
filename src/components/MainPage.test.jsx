@@ -181,8 +181,32 @@ describe("MainPage", () => {
   it("shows Subscription plans / Sign up for non-logged-in user", async () => {
     renderMainPage();
     expect(await screen.findByText("Subscription plans")).toBeInTheDocument();
-    expect(screen.getByText("Sign up")).toBeInTheDocument();
-    expect(screen.getByText("OneTimeProduct")).toBeInTheDocument();
+    expect(screen.getByText("From $20/month")).toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /compare plan options/i }),
+    );
+    expect(await screen.findByText("OneTimeProduct")).toBeInTheDocument();
+  });
+
+  it("plans area collapses and links to the plans page", async () => {
+    renderMainPage();
+    await screen.findByText("Subscription plans");
+
+    expect(screen.queryByText("OneTimeProduct")).not.toBeInTheDocument();
+
+    fireEvent.click(
+      screen.getByRole("button", { name: /compare plan options/i }),
+    );
+    expect(await screen.findByText("OneTimeProduct")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /hide plan options/i }));
+    expect(screen.queryByText("OneTimeProduct")).not.toBeInTheDocument();
+
+    const plansLink = screen.getByRole("link", {
+      name: /choose your plan/i,
+    });
+    expect(plansLink).toHaveAttribute("href", "/plans");
   });
 
   it("shows package waiting count as a link when count > 0", async () => {
@@ -244,7 +268,11 @@ describe("MainPage", () => {
     global.fetch = jest.fn(() =>
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve([{ lat: "45.5152", lon: "-122.6784" }]),
+        json: () =>
+          Promise.resolve({
+            success: true,
+            results: [{ lat: "45.5152", lon: "-122.6784" }],
+          }),
       }),
     );
 

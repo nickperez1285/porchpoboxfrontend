@@ -280,6 +280,76 @@
   padding: clamp(24px, 3vw, 30px);
 }
 
+.mp-card--signup {
+  padding: clamp(18px, 2.2vw, 22px);
+}
+
+.mp-card--signup .mp-card__title {
+  margin: 6px 0 8px;
+  font-size: 1.05rem;
+}
+
+.mp-card--signup .mp-card__desc {
+  font-size: 0.88rem;
+}
+
+.mp-plans-features {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.mp-plans-features li {
+  position: relative;
+  padding-left: 26px;
+  color: #374151;
+  font-size: 0.92rem;
+}
+
+.mp-plans-features li::before {
+  content: "✓";
+  position: absolute;
+  left: 4px;
+  top: 0;
+  color: #10b981;
+  font-weight: 700;
+}
+
+.mp-plans-cta {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.mp-plans-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.mp-plans-toggle:hover {
+  background: #eff6ff;
+  border-color: #2563eb;
+}
+
+.mp-plans-toggle__chevron {
+  font-size: 10px;
+}
+
 .mp-card__label {
   font-size: 11px;
   color: #2563eb;
@@ -638,12 +708,26 @@
 /* ── Shared section heading ────────────────────────────────────── */
 
 .mp-section-heading {
-  margin: 0 0 28px;
+  position: relative;
+  margin: 0 0 30px;
+  padding-bottom: 14px;
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #1f2937;
   text-align: center;
+}
+
+.mp-section-heading::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #2563eb 0%, #10b981 100%);
 }
 
 /* ── How it works ─────────────────────────────────────────────── */
@@ -861,6 +945,8 @@
 
 .mp-testimonials {
   padding: clamp(32px, 4vw, 48px) 0;
+  background: linear-gradient(180deg, #f8fafc 0%, #ffffff 70%);
+  border-radius: 20px;
 }
 
 .mp-testimonials__grid {
@@ -901,6 +987,8 @@
 
 .mp-pricing {
   padding: clamp(32px, 4vw, 48px) 0;
+  background: linear-gradient(180deg, #eff6ff 0%, #ffffff 70%);
+  border-radius: 20px;
 }
 
 .mp-pricing__card {

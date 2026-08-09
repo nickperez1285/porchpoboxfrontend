@@ -27,7 +27,7 @@ const PLAN_CONFIG = [
   },
 ];
 
-const ProductList = ({ user }) => {
+const ProductList = ({ user, compact = false }) => {
   const [priceIds, setPriceIds] = useState(null);
 
   useEffect(() => {
@@ -155,7 +155,7 @@ const ProductList = ({ user }) => {
           display: "grid",
           gridTemplateColumns:
             "repeat(auto-fit, minmax(min(100%, 160px), 1fr))",
-          gap: 12,
+          gap: compact ? 8 : 12,
         }}
       >
         {plans.map((plan) => {
@@ -171,13 +171,13 @@ const ProductList = ({ user }) => {
                 borderRadius: 16,
                 border: isSelected ? "2px solid #2563eb" : "1px solid #d8d8d8",
                 background: isSelected ? "#eff6ff" : "#ffffff",
-                padding: 18,
+                padding: compact ? 12 : 18,
                 cursor: "pointer",
               }}
             >
               <div
                 style={{
-                  fontSize: 12,
+                  fontSize: compact ? 11 : 12,
                   letterSpacing: 1,
                   textTransform: "uppercase",
                   color: "#2563eb",
@@ -185,10 +185,23 @@ const ProductList = ({ user }) => {
               >
                 {plan.label}
               </div>
-              <div style={{ marginTop: 8, fontSize: 28, fontWeight: 700 }}>
+              <div
+                style={{
+                  marginTop: compact ? 4 : 8,
+                  fontSize: compact ? 22 : 28,
+                  fontWeight: 700,
+                }}
+              >
                 {plan.price}
               </div>
-              <div style={{ marginTop: 8, color: "#555", lineHeight: 1.5 }}>
+              <div
+                style={{
+                  marginTop: compact ? 4 : 8,
+                  color: "#555",
+                  lineHeight: 1.4,
+                  fontSize: compact ? 13 : 16,
+                }}
+              >
                 {plan.description}
               </div>
             </button>
@@ -197,7 +210,7 @@ const ProductList = ({ user }) => {
       </div>
       <div
         style={{
-          marginTop: 18,
+          marginTop: compact ? 12 : 18,
           width: "100%",
           display: "flex",
           flexDirection: "column",
