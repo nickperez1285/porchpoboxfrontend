@@ -1,0 +1,97 @@
+/* ── Footer — matches the reference layout1.html ──────────────────── */
+
+.mp-footer {
+  background: #0b1e3b;
+  color: #9eacc4;
+  padding: 45px 0 25px;
+  margin-top: auto;
+}
+
+.mp-footer-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+.mp-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 50px;
+  margin-bottom: 40px;
+}
+
+.mp-footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 19px;
+  line-height: 1.05;
+}
+
+.mp-footer-logo-img {
+  height: 43px;
+  width: auto;
+  object-fit: contain;
+}
+
+.mp-footer-brand p {
+  margin-top: 15px;
+  max-width: 310px;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.mp-footer-title {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+  margin-bottom: 15px;
+}
+
+.mp-footer-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mp-footer-links li {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.mp-footer-links a {
+  color: #9eacc4;
+  text-decoration: none;
+}
+
+.mp-footer-links a:hover {
+  color: #ffffff;
+}
+
+.mp-footer-copyright {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 22px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+@media (max-width: 950px) {
+  .mp-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .mp-footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .mp-footer-copyright {
+    flex-direction: column;
+  }
+}

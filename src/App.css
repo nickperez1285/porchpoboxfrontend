@@ -33,6 +33,15 @@
   max-width: 260px;
 }
 
+.header-logo-name {
+  color: #172033;
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.3px;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
 .header-nav {
   display: flex;
   gap: 22px;

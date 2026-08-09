@@ -96,6 +96,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
               alt="Porch P.O. Box"
               className="header-logo"
             />
+            <span className="header-logo-name">Porch P.O. Box</span>
           </a>
         </div>
         {!authLoading && !hideAuthLinks && (

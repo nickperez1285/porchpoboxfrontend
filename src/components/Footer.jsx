@@ -1,20 +1,78 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./Footer.css";
 
 const Footer = () => (
-  <footer style={{ padding: "1.5em", background: "#111", color: "#aaa", fontSize: 14, marginTop: "auto" }}>
-    <center>
-      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "6px 20px" }}>
-        <Link to="/partner" style={{ color: "#ccc" }}>Partners</Link>
-        <Link to="/how-it-works" style={{ color: "#ccc" }}>How it Works</Link>
-        <Link to="/contact" style={{ color: "#ccc" }}>Contact</Link>
-        <Link to="/about" style={{ color: "#ccc" }}>About</Link>
-        <Link to="/terms" style={{ color: "#ccc" }}>Terms &amp; Policies</Link>
+  <footer className="mp-footer">
+    <div className="mp-footer-container">
+      <div className="mp-footer-grid">
+        <div className="mp-footer-brand">
+          <Link to="/" className="mp-footer-logo">
+            <img
+              src="/logo.png"
+              alt="Porch P.O. Box"
+              className="mp-footer-logo-img"
+            />
+            <span>Porch P.O. Box</span>
+          </Link>
+          <span>Secure. Local. Convenient.</span>
+        </div>
+
+        <div>
+          <div className="mp-footer-title">Customers</div>
+          <ul className="mp-footer-links">
+            <li>
+              <Link to="/">Find a Location</Link>
+            </li>
+            <li>
+              <Link to="/how-it-works">How It Works</Link>
+            </li>
+            <li>
+              <Link to="/plans">Pricing</Link>
+            </li>
+            <li>
+              <Link to="/register">Sign Up</Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div className="mp-footer-title">Partners</div>
+          <ul className="mp-footer-links">
+            <li>
+              <Link to="/become-a-partner">Become a Partner</Link>
+            </li>
+            <li>
+              <Link to="/partner/login">Partner Login</Link>
+            </li>
+            <li>
+              <Link to="/partner">Partner Portal</Link>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <div className="mp-footer-title">Company</div>
+          <ul className="mp-footer-links">
+            <li>
+              <Link to="/about">About Us</Link>
+            </li>
+            <li>
+              <Link to="/contact">Contact</Link>
+            </li>
+            <li>
+              <Link to="/terms">Terms &amp; Policies</Link>
+            </li>
+          </ul>
+        </div>
       </div>
-      <div style={{ marginTop: 10, color: "#555", fontSize: 12 }}>
-        &copy; {new Date().getFullYear()} Porch P.O. Box
+
+      <div className="mp-footer-copyright">
+        <span>
+          &copy; {new Date().getFullYear()} Porch P.O. Box. All rights reserved.
+        </span>
       </div>
-    </center>
+    </div>
   </footer>
 );
 

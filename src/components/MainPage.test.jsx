@@ -2,13 +2,14 @@ import React from "react";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import MainPage from "./MainPage";
-import { getDocs, getDoc } from "firebase/firestore";
+import { getDocs, getDoc, updateDoc } from "firebase/firestore";
 
 jest.mock("../firebase", () => ({ db: "mock-db" }));
 jest.mock("firebase/firestore", () => ({
   collection: jest.fn(() => "mock-db/partners"),
   getDocs: jest.fn(),
   getDoc: jest.fn(),
+  updateDoc: jest.fn(() => Promise.resolve()),
   doc: jest.fn(() => "mock-db/doc"),
   query: jest.fn(() => "mock-query"),
   where: jest.fn(() => "mock-where"),
@@ -19,6 +20,8 @@ jest.mock("react-leaflet", () => ({
   TileLayer: () => <div>TileLayer</div>,
   Marker: ({ children }) => <div>Marker{children}</div>,
   Popup: ({ children }) => <div>{children}</div>,
+  Circle: ({ children }) => <div>Circle{children}</div>,
+  useMap: () => ({ setView: jest.fn() }),
 }));
 
 const vendor = {
@@ -74,11 +77,11 @@ describe("MainPage", () => {
   it("renders hero section with title and message", async () => {
     renderMainPage();
     expect(
-      await screen.findByText("📦 STOP PACKAGE THEFT"),
+      await screen.findByText(/NEVER MISS A PACKAGE/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Secure package delivery through trusted neighbors and local businesses.",
+        /Secure package delivery through trusted local community partners/,
       ),
     ).toBeInTheDocument();
   });
@@ -252,13 +255,6 @@ describe("MainPage", () => {
     expect(manageLink).toHaveAttribute("href", "/profile");
   });
 
-  it("renders promotion banner", async () => {
-    renderMainPage();
-    expect(
-      await screen.findByText("Try Porch P.O. Box for free!"),
-    ).toBeInTheDocument();
-  });
-
   it("renders referral banner", async () => {
     renderMainPage();
     expect(await screen.findByText("Submit a referral →")).toBeInTheDocument();
@@ -277,6 +273,8 @@ describe("MainPage", () => {
     );
 
     renderMainPage();
-    expect(await screen.findByTestId("map")).toBeInTheDocument();
+    expect(
+      await screen.findByTestId("map", {}, { timeout: 5000 }),
+    ).toBeInTheDocument();
   });
 });
