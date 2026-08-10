@@ -1,0 +1,11 @@
+{
+  "watcher": {
+    "ignore": [
+      "node_modules/**",
+      "build/**",
+      "coverage/**",
+      ".git/**",
+      ".vercel/**"
+    ]
+  }
+}
