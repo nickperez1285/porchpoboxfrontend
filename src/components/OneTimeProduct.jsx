@@ -150,14 +150,7 @@ const ProductList = ({ user, compact = false }) => {
           required
         />
       )}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "repeat(auto-fit, minmax(min(100%, 160px), 1fr))",
-          gap: compact ? 8 : 12,
-        }}
-      >
+      <div className={`otp-grid${compact ? " otp-grid--compact" : ""}`}>
         {plans.map((plan) => {
           const isSelected = plan.id === selectedPlanId;
 
@@ -166,62 +159,25 @@ const ProductList = ({ user, compact = false }) => {
               key={plan.id}
               type="button"
               onClick={() => setSelectedPlanId(plan.id)}
-              style={{
-                textAlign: "left",
-                borderRadius: 16,
-                border: isSelected ? "2px solid #2563eb" : "1px solid #d8d8d8",
-                background: isSelected ? "#eff6ff" : "#ffffff",
-                padding: compact ? 12 : 18,
-                cursor: "pointer",
-              }}
+              className={`otp-plan${isSelected ? " otp-plan--selected" : ""}${
+                compact ? " otp-plan--compact" : ""
+              }`}
             >
-              <div
-                style={{
-                  fontSize: compact ? 11 : 12,
-                  letterSpacing: 1,
-                  textTransform: "uppercase",
-                  color: "#2563eb",
-                }}
-              >
-                {plan.label}
-              </div>
-              <div
-                style={{
-                  marginTop: compact ? 4 : 8,
-                  fontSize: compact ? 22 : 28,
-                  fontWeight: 700,
-                }}
-              >
-                {plan.price}
-              </div>
-              <div
-                style={{
-                  marginTop: compact ? 4 : 8,
-                  color: "#555",
-                  lineHeight: 1.4,
-                  fontSize: compact ? 13 : 16,
-                }}
-              >
-                {plan.description}
-              </div>
+              <div className="otp-plan__label">{plan.label}</div>
+              <div className="otp-plan__price">{plan.price}</div>
+              <div className="otp-plan__desc">{plan.description}</div>
+              {plan.id === "yearly" && (
+                <div className="otp-plan__badge">Best value</div>
+              )}
             </button>
           );
         })}
       </div>
-      <div
-        style={{
-          marginTop: compact ? 12 : 18,
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-        }}
-      >
+      <div className="otp-action">
         {user ? (
           <button
             type="button"
-            className="btn btn-dark hover:btn-outline"
+            className="btn btn-dark hover:btn-outline mp-btn mp-btn--dark"
             onClick={startCheckout}
             disabled={Boolean(loadingPlanId)}
           >
@@ -232,7 +188,7 @@ const ProductList = ({ user, compact = false }) => {
         ) : (
           <Link
             to="/login"
-            className="btn btn-dark hover:btn-outline"
+            className="btn btn-dark hover:btn-outline mp-btn mp-btn--dark"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -243,19 +199,7 @@ const ProductList = ({ user, compact = false }) => {
             SIGN UP
           </Link>
         )}
-        {error && (
-          <p
-            style={{
-              color: "red",
-              marginTop: 12,
-              maxWidth: 420,
-              marginLeft: "auto",
-              marginRight: "auto",
-            }}
-          >
-            {error}
-          </p>
-        )}
+        {error && <p className="otp-error">{error}</p>}
       </div>
     </div>
   );

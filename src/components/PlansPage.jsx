@@ -1,71 +1,40 @@
 import React from "react";
 import OneTimeProduct from "./OneTimeProduct";
+import "./PlansPage.css";
 
 const PlansPage = ({ user }) => {
   return (
-    <div
-      style={{
-        minHeight: "calc(100vh - 180px)",
-        background: "radial-gradient(circle at top, rgba(37, 99, 235, 0.1), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
-        padding: "48px 20px"
-      }}
-    >
-      <div style={{ maxWidth: 860, margin: "0 auto" }}>
-        <div
-          style={{
-            background: "linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)",
-            color: "#fff",
-            borderRadius: 24,
-            padding: "32px 28px",
-            marginBottom: 32,
-            boxShadow: "0 16px 36px rgba(37, 99, 235, 0.25)"
-          }}
-        >
-          <div style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, letterSpacing: 1.4, textTransform: "uppercase" }}>
-            Porch P.O. Box
-          </div>
-          <h2 style={{ margin: "10px 0 8px", color: "#fff" }}>Subscription Plans</h2>
-          <p style={{ margin: 0, color: "rgba(255,255,255,0.9)", lineHeight: 1.6 }}>
-            Choose the plan that fits your delivery needs and start receiving packages today.
+    <div className="plans-page">
+      <div className="plans-page__inner">
+        <div className="plans-hero">
+          <div className="plans-hero__label">Porch P.O. Box</div>
+          <h2 className="plans-hero__title">Subscription Plans</h2>
+          <p className="plans-hero__sub">
+            Choose the plan that fits your delivery needs and start receiving
+            packages today.
           </p>
         </div>
 
-        <div
-          style={{
-            background: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)",
-            color: "#fff",
-            borderRadius: 16,
-            padding: "18px 24px",
-            marginBottom: 24,
-            boxShadow: "0 8px 20px rgba(249, 115, 22, 0.25)",
-            display: "flex",
-            flexWrap: "wrap",
-            alignItems: "center",
-            gap: 12
-          }}
-        >
-          <div style={{ flex: "1 1 260px", minWidth: 0 }}>
-            <div style={{ fontSize: 15, fontWeight: 700, lineHeight: 1.35 }}>
-              Try Porch P.O. Box for free
-            </div>
-            <p style={{ margin: "4px 0 0", color: "rgba(255,255,255,0.85)", fontSize: 13, lineHeight: 1.55 }}>
-              As soon as you sign up, you are eligible to use the service without
-              any commitments or payment information required. If you like it, then
-              you can subscribe to any one of the affordable monthly plans.
+        <div className="plans-free">
+          <div className="plans-free__icon">🎁</div>
+          <div>
+            <div className="plans-free__title">Try Porch P.O. Box for Free</div>
+            <p className="plans-free__text">
+              Sign up and start using Porch P.O. Box today.
+              <strong> No payment information. No commitments.</strong> When
+              you're ready, choose an affordable monthly plan.
             </p>
           </div>
         </div>
 
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid rgba(0,0,0,0.08)",
-            borderRadius: 20,
-            padding: 28,
-            boxShadow: "0 12px 28px rgba(0,0,0,0.08)"
-          }}
-        >
+        <div className="plans-card">
           <OneTimeProduct user={user} />
+        </div>
+
+        <div className="plans-trust">
+          <span>✓ Cancel anytime</span>
+          <span>✓ No hidden fees</span>
+          <span>✓ Trusted local locations</span>
         </div>
       </div>
     </div>

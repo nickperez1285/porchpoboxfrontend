@@ -2,6 +2,19 @@
    Palette: navy / blue / green
 */
 
+:root {
+  --navy: #102b55;
+  --blue: #1557d6;
+  --blue-dark: #0d43aa;
+  --green: #2e9e44;
+  --green-dark: #237d35;
+  --light-blue: #f3f7ff;
+  --light-green: #f0f9f1;
+  --gray: #667085;
+  --dark: #172033;
+  --border: #e5eaf2;
+}
+
 .mp {
   --navy: #102b55;
   --blue: #1557d6;
@@ -267,41 +280,6 @@
   min-height: 460px;
   object-fit: cover;
   display: block;
-}
-
-.mp-hero__card {
-  position: absolute;
-  bottom: 22px;
-  left: 22px;
-  background: #fff;
-  border-radius: 13px;
-  padding: 15px 18px;
-  box-shadow: 0 12px 30px rgba(16, 43, 85, 0.15);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mp-hero__card-icon {
-  width: 40px;
-  height: 40px;
-  background: #e9f6eb;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-  flex-shrink: 0;
-}
-
-.mp-hero__card strong {
-  display: block;
-  color: var(--navy);
-  font-size: 14px;
-}
-
-.mp-hero__card small {
-  color: var(--gray);
-  font-size: 13px;
 }
 
 /* ── Promo ────────────────────────────────────────────────────── */
@@ -1192,6 +1170,305 @@
 .mp-earn-card span {
   font-size: 12px;
   opacity: 0.9;
+}
+
+/* ── Partner earnings (Partner page) ──────────────────────────── */
+
+.mp-earnings {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 12px 28px rgba(16, 43, 85, 0.08);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.mp-earnings__label {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 8px;
+}
+
+.mp-earnings__title {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--navy);
+}
+
+.mp-earnings__sub {
+  margin: 0 auto 30px;
+  max-width: 520px;
+  color: var(--gray);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.mp-earnings__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.mp-earnings__tier {
+  background: var(--light-blue);
+  border: 1px solid #dbe6fb;
+  border-radius: 16px;
+  padding: 22px 14px;
+}
+
+.mp-earnings__tier--highlight {
+  background: var(--navy);
+  border-color: var(--navy);
+}
+
+.mp-earnings__count {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.1;
+}
+
+.mp-earnings__tier--highlight .mp-earnings__count {
+  color: #fff;
+}
+
+.mp-earnings__people {
+  color: var(--gray);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+.mp-earnings__tier--highlight .mp-earnings__people {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.mp-earnings__amount {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--green-dark);
+  line-height: 1.1;
+}
+
+.mp-earnings__tier--highlight .mp-earnings__amount {
+  color: #74d984;
+}
+
+.mp-earnings__per {
+  color: var(--gray);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.mp-earnings__tier--highlight .mp-earnings__per {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+@media (max-width: 720px) {
+  .mp-earnings__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mp-earnings {
+    padding: 28px 18px 24px;
+  }
+}
+
+/* ── Partnership steps (Partner page) ─────────────────────────── */
+
+.mp-partnership {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 12px 28px rgba(16, 43, 85, 0.08);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.mp-partnership__label {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 8px;
+}
+
+.mp-partnership__title {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--navy);
+}
+
+.mp-partnership__sub {
+  margin: 0 auto 30px;
+  max-width: 520px;
+  color: var(--gray);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.mp-partnership__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.mp-partnership__step {
+  position: relative;
+  background: var(--light-blue);
+  border: 1px solid #dbe6fb;
+  border-radius: 16px;
+  padding: 24px 16px 20px;
+  text-align: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.mp-partnership__step:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(16, 43, 85, 0.1);
+  border-color: var(--blue);
+}
+
+.mp-partnership__step-num {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--blue);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+.mp-partnership__step-icon {
+  font-size: 30px;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.mp-partnership__step-title {
+  color: var(--navy);
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.mp-partnership__step-desc {
+  color: var(--gray);
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .mp-partnership__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .mp-partnership {
+    padding: 28px 18px 24px;
+  }
+}
+
+/* ── Partner FAQ (Partner page) ───────────────────────────────── */
+
+.mp-faq {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px 32px 32px;
+  box-shadow: 0 12px 28px rgba(16, 43, 85, 0.08);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.mp-faq__label {
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.4px;
+  margin-bottom: 8px;
+}
+
+.mp-faq__title {
+  margin: 0 0 10px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+  color: var(--navy);
+}
+
+.mp-faq__sub {
+  margin: 0 auto 30px;
+  max-width: 520px;
+  color: var(--gray);
+  line-height: 1.65;
+  font-size: 15px;
+}
+
+.mp-faq__grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  text-align: left;
+}
+
+.mp-faq__item {
+  background: var(--light-blue);
+  border: 1px solid #dbe6fb;
+  border-radius: 16px;
+  padding: 22px 22px;
+}
+
+.mp-faq__item:hover {
+  border-color: var(--blue);
+}
+
+.mp-faq__q {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.mp-faq__q-icon {
+  flex-shrink: 0;
+  color: var(--blue);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.mp-faq__a {
+  color: var(--gray);
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0;
+}
+
+@media (max-width: 720px) {
+  .mp-faq__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mp-faq {
+    padding: 28px 18px 24px;
+  }
 }
 
 /* ── Final CTA ────────────────────────────────────────────────── */

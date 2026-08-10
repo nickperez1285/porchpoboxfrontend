@@ -73,6 +73,17 @@ export default function ContactPage() {
           Send Message
         </button>
         {status && <p className="contact-status">{status}</p>}
+        <center>
+          <div>
+            <p>You can also email us at</p>
+            <a
+              href="mailto:contact@porchpobox.com"
+              style={{ color: "#2563eb", fontWeight: 600 }}
+            >
+              contact@porchpobox.com
+            </a>{" "}
+          </div>
+        </center>
       </form>
     </div>
   );

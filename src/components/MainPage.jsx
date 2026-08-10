@@ -490,13 +490,6 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
               src="/partnerPic.png"
               alt="A delivery being received at a Porch P.O. Box partner location"
             />
-            <div className="mp-hero__card">
-              <div className="mp-hero__card-icon">📦</div>
-              <div>
-                <strong>Your package is safe.</strong>
-                <small>Stored at a trusted local location.</small>
-              </div>
-            </div>
           </div>
         </div>
       </section>
