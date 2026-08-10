@@ -121,6 +121,13 @@ const Profile = ({ user }) => {
     profileData?.referralCode ||
     (user?.email ? user.email.substring(0, 2).toUpperCase() + "26" : "—");
 
+  const hasPrefLocation = !!(
+    profileData?.prefLocation &&
+    (profileData.prefLocation.id ||
+      profileData.prefLocation.businessName ||
+      profileData.prefLocation.streetAddress)
+  );
+
   return (
     <div className="profile-wrap">
       <div className="profile-container">
@@ -151,6 +158,11 @@ const Profile = ({ user }) => {
               <div
                 className={`profile-hero-sub-card ${isSubActive ? "profile-hero-sub-card--ok" : "profile-hero-sub-card--warn"}`}
               >
+                {profileData?.status === "trial" && (
+                  <div className="profile-trial-popup">
+                    Your first delivery is still free on your trial.
+                  </div>
+                )}
                 <div className="profile-hero-sub-label">Subscription</div>
                 <div className="profile-hero-sub-body">
                   <span className={`profile-status-pill ${subClass}`}>
@@ -159,19 +171,46 @@ const Profile = ({ user }) => {
                   {!isSubActive && (
                     <span className="profile-sub-cta">
                       {profileData?.status === "trial"
-                        ? "Upgrade to keep receiving packages"
+                        ? "You have ONE FREE delivery left."
                         : "Choose a plan to get started"}
                     </span>
                   )}
                 </div>
               </div>
             );
-            return isSubActive ? card : <Link to="/plans" className="profile-sub-link-wrap">{card}</Link>;
+            return isSubActive ? (
+              card
+            ) : (
+              <Link to="/plans" className="profile-sub-link-wrap">
+                {card}
+              </Link>
+            );
           })()}
         </div>
 
         {/* ── Delivery Address ── (show whenever a preferred partner is set; street may be filled later) */}
         <div style={{ marginBottom: 28 }}>
+          {profileData && !hasPrefLocation && (
+            <div className="profile-location-cta">
+              <div className="profile-location-cta-icon">📍</div>
+              <div className="profile-location-cta-body">
+                <div className="profile-location-cta-title">
+                  Set up your delivery location
+                </div>
+                <div className="profile-location-cta-sub">
+                  Pick a trusted Porch P.O. Box partner so your packages have a
+                  safe place to go.
+                </div>
+              </div>
+              <button
+                type="button"
+                className="profile-location-cta-btn"
+                onClick={() => setShowPrefModal(true)}
+              >
+                Choose Your Location →
+              </button>
+            </div>
+          )}
           {profileData?.prefLocation &&
           (profileData.prefLocation.id ||
             profileData.prefLocation.businessName ||
@@ -280,6 +319,7 @@ const Profile = ({ user }) => {
                 <div className="no-address-title">
                   Please select your preferred Porch P.O. Box location
                 </div>
+
                 <div className="no-address-text">
                   You need to choose a partner location before subscribing.
                 </div>

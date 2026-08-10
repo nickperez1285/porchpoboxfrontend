@@ -774,16 +774,16 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                                 vendor.store_hours ||
                                 "Not provided"}
                             </div>
-                            <button
-                              type="button"
-                              className="mp-btn mp-btn--green mp-vendor-pref-btn"
-                              onClick={() => handleSetPreferred(vendor)}
-                              disabled={prefSaving}
-                            >
-                              {isPreferred(vendor.id)
-                                ? "✓ Set as preferred"
-                                : "Set as my preferred Porch P.O. Box"}
-                            </button>
+                            {user?.uid && !prefLocation && (
+                              <button
+                                type="button"
+                                className="mp-btn mp-btn--green mp-vendor-pref-btn"
+                                onClick={() => handleSetPreferred(vendor)}
+                                disabled={prefSaving}
+                              >
+                                Set as my preferred Porch P.O. Box
+                              </button>
+                            )}
                           </div>
                         )}
                       </li>
