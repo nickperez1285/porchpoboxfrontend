@@ -16,7 +16,7 @@ const PlansPage = ({ user }) => {
         </div>
 
         <div className="plans-free">
-          <div className="plans-free__icon">🎁</div>
+          <div className="plans-free__icon" aria-hidden="true">🎁</div>
           <div>
             <div className="plans-free__title">Try Porch P.O. Box for Free</div>
             <p className="plans-free__text">
@@ -32,9 +32,9 @@ const PlansPage = ({ user }) => {
         </div>
 
         <div className="plans-trust">
-          <span>✓ Cancel anytime</span>
-          <span>✓ No hidden fees</span>
-          <span>✓ Trusted local locations</span>
+          <span><span aria-hidden="true">✓</span> Cancel anytime</span>
+          <span><span aria-hidden="true">✓</span> No hidden fees</span>
+          <span><span aria-hidden="true">✓</span> Trusted local locations</span>
         </div>
       </div>
     </div>

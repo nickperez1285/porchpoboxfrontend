@@ -35,7 +35,7 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div className="info-step" key={step.title}>
               <div className="info-step__number">{index + 1}</div>
-              <div className="info-step__icon">{step.icon}</div>
+              <div className="info-step__icon" aria-hidden="true">{step.icon}</div>
               <h3 className="info-step__title">{step.title}</h3>
               <p className="info-step__desc">{step.text}</p>
             </div>
@@ -55,9 +55,9 @@ const HowItWorks = () => {
         </div>
 
         <div className="info-trust">
-          <span>✓ Trusted local partners</span>
-          <span>✓ Email notifications</span>
-          <span>✓ Pick up on your schedule</span>
+          <span><span aria-hidden="true">✓</span> Trusted local partners</span>
+          <span><span aria-hidden="true">✓</span> Email notifications</span>
+          <span><span aria-hidden="true">✓</span> Pick up on your schedule</span>
         </div>
       </div>
     </div>

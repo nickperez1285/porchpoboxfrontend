@@ -39,7 +39,7 @@ const PartnerInfoPage = () => {
   if (loading) {
     return (
       <div style={{ maxWidth: 640, margin: "80px auto", padding: "0 20px", textAlign: "center" }}>
-        <p style={{ color: "#888" }}>Loading partner information…</p>
+        <p style={{ color: "#667085" }}>Loading partner information…</p>
       </div>
     );
   }
@@ -116,7 +116,7 @@ const PartnerInfoPage = () => {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {partner.phoneNumber && (
               <div>
-                <div style={{ fontSize: 12, color: "#888" }}>Phone</div>
+                <div style={{ fontSize: 12, color: "#667085" }}>Phone</div>
                 <div style={{ fontSize: 15, color: "#333" }}>
                   <a href={`tel:${partner.phoneNumber}`} style={{ color: "#1557d6", textDecoration: "none" }}>
                     {partner.phoneNumber}
@@ -126,7 +126,7 @@ const PartnerInfoPage = () => {
             )}
             {partner.email && (
               <div>
-                <div style={{ fontSize: 12, color: "#888" }}>Email</div>
+                <div style={{ fontSize: 12, color: "#667085" }}>Email</div>
                 <div style={{ fontSize: 15, color: "#333" }}>
                   <a href={`mailto:${partner.email}`} style={{ color: "#1557d6", textDecoration: "none" }}>
                     {partner.email}

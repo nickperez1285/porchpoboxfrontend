@@ -384,7 +384,7 @@ const AdminPayoutsPage = () => {
             </span>
           )}
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: 12, color: "#888" }}>
+        <p style={{ margin: "10px 0 0", fontSize: 12, color: "#667085" }}>
           Skips partners who already have a payout this month. Adjust individual
           amounts below before creating if needed.
         </p>
@@ -442,11 +442,11 @@ const AdminPayoutsPage = () => {
                     flexWrap: "wrap",
                   }}
                 >
-                  <div style={{ fontSize: 13, color: "#888" }}>
+                  <div style={{ fontSize: 13, color: "#667085" }}>
                     Owed:{" "}
                     <strong
                       style={{
-                        color: partnerTotalOwed > 0 ? "#856404" : "#888",
+                        color: partnerTotalOwed > 0 ? "#856404" : "#667085",
                       }}
                     >
                       ${partnerTotalOwed}
@@ -586,7 +586,7 @@ const AdminPayoutsPage = () => {
                           {p.month || "—"}
                         </div>
                         <div
-                          style={{ fontSize: 12, color: "#888", marginTop: 2 }}
+                          style={{ fontSize: 12, color: "#667085", marginTop: 2 }}
                         >
                           {p.subscriberCount} subscriber
                           {p.subscriberCount !== 1 ? "s" : ""} × $10
@@ -696,7 +696,7 @@ const AdminPayoutsPage = () => {
                               ✓ Paid
                             </span>
                             {p.paidAt && (
-                              <span style={{ fontSize: 11, color: "#888" }}>
+                              <span style={{ fontSize: 11, color: "#667085" }}>
                                 {p.paidAt?.toDate
                                   ? p.paidAt.toDate().toLocaleDateString()
                                   : ""}
@@ -729,7 +729,7 @@ const AdminPayoutsPage = () => {
               )}
 
               {payouts.length === 0 && (
-                <p style={{ margin: 0, fontSize: 13, color: "#aaa" }}>
+                <p style={{ margin: 0, fontSize: 13, color: "#667085" }}>
                   No payout history yet.
                 </p>
               )}

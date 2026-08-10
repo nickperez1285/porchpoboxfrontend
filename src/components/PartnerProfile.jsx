@@ -264,7 +264,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                     </span>
                   )}
                   {u.phoneNumber && (
-                    <span style={{ fontSize: 13, color: "#888", marginTop: 1 }}>
+                    <span style={{ fontSize: 13, color: "#667085", marginTop: 1 }}>
                       {u.phoneNumber}
                     </span>
                   )}
@@ -319,7 +319,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                 );
               })()
             ) : (
-              <p style={{ color: "#888", margin: 0 }}>
+              <p style={{ color: "#667085", margin: 0 }}>
                 No payment method set. Click Change to add one.
               </p>
             )
@@ -437,7 +437,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           return (
             <div className="partner-card">
               <h3 style={{ marginTop: 0, marginBottom: 16 }}>
-                💰 Payout Tracking
+                <span aria-hidden="true">💰</span> Payout Tracking
               </h3>
               <div className="stat-grid">
                 <div className="stat-box stat-box-green">
@@ -471,7 +471,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                           <div
                             style={{
                               fontSize: 12,
-                              color: "#888",
+                              color: "#667085",
                               marginTop: 2,
                             }}
                           >
@@ -493,7 +493,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
                 </div>
               )}
               {!payoutsLoading && payouts.length === 0 && (
-                <p style={{ color: "#888", fontSize: 13, margin: 0 }}>
+                <p style={{ color: "#667085", fontSize: 13, margin: 0 }}>
                   No payout history yet. Payouts are processed monthly based on
                   your active subscriber count.
                 </p>

@@ -330,7 +330,7 @@ const PartnerActivityLog = ({ partnerProfile }) => {
                           <div style={{ fontWeight: 600 }}>
                             {entry.month || "—"}
                           </div>
-                          <div style={{ fontSize: 12, color: "#888" }}>
+                          <div style={{ fontSize: 12, color: "#667085" }}>
                             {entry.subscriberCount} subscriber
                             {entry.subscriberCount !== 1 ? "s" : ""}
                           </div>
@@ -341,7 +341,7 @@ const PartnerActivityLog = ({ partnerProfile }) => {
                             {entry.customerName || "Unknown"}
                           </div>
                           {entry.customerEmail && (
-                            <div style={{ fontSize: 12, color: "#888" }}>
+                            <div style={{ fontSize: 12, color: "#667085" }}>
                               {entry.customerEmail}
                             </div>
                           )}

@@ -60,7 +60,7 @@ export default function ReferralForm() {
             for your support!
           </p>
           <p className="referral-code-callout">
-            💡 Your personal referral code can be found on your{" "}
+            <span aria-hidden="true">💡</span> Your personal referral code can be found on your{" "}
             <Link to="/profile" style={{ color: "#8a6a00", fontWeight: 600 }}>
               Profile page
             </Link>

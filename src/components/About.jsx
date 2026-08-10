@@ -27,7 +27,7 @@ const About = () => {
 
         <div className="info-features">
           <div className="info-feature">
-            <div className="info-feature__icon">🏪</div>
+            <div className="info-feature__icon" aria-hidden="true">🏪</div>
             <h3 className="info-feature__title">Our Partners</h3>
             <p className="info-feature__text">
               Our partners are local community members in your neighborhood who
@@ -38,7 +38,7 @@ const About = () => {
           </div>
 
           <div className="info-feature">
-            <div className="info-feature__icon">📬</div>
+            <div className="info-feature__icon" aria-hidden="true">📬</div>
             <h3 className="info-feature__title">Our Mission</h3>
             <p className="info-feature__text">
               We're on a mission to end missed deliveries and porch piracy by
@@ -48,7 +48,7 @@ const About = () => {
           </div>
 
           <div className="info-feature">
-            <div className="info-feature__icon">✉️</div>
+            <div className="info-feature__icon" aria-hidden="true">✉️</div>
             <h3 className="info-feature__title">Contact Us</h3>
             <p className="info-feature__text">
               Have questions or want to learn more? Reach us at{" "}
@@ -59,9 +59,9 @@ const About = () => {
         </div>
 
         <div className="info-trust">
-          <span>✓ Community focused</span>
-          <span>✓ Trusted local partners</span>
-          <span>✓ Secure deliveries</span>
+          <span><span aria-hidden="true">✓</span> Community focused</span>
+          <span><span aria-hidden="true">✓</span> Trusted local partners</span>
+          <span><span aria-hidden="true">✓</span> Secure deliveries</span>
         </div>
       </div>
     </div>

@@ -18,12 +18,12 @@ const PackageHistoryPage = ({ user }) => {
   // Helper function to determine styling and label for activity types
   const getTypeStyle = (type) => {
     if (type === "check-in")
-      return { background: "#fff8e1", color: "#856404", label: "📦 Received" };
+      return { background: "#fff8e1", color: "#856404", label: "Received", symbol: "📦" };
     if (type === "delivery")
-      return { background: "#d4edda", color: "#1a7f37", label: "✓ Picked Up" };
+      return { background: "#d4edda", color: "#1a7f37", label: "Picked Up", symbol: "✓" };
     if (type === "subscription" || type === "signup")
-      return { background: "#e7f1ff", color: "#1557d6", label: "✓ Account" };
-    return { background: "#f0f0f0", color: "#444", label: type }; // Default
+      return { background: "#e7f1ff", color: "#1557d6", label: "Account", symbol: "✓" };
+    return { background: "#f0f0f0", color: "#444", label: type, symbol: null }; // Default
   };
 
   useEffect(() => {
@@ -175,7 +175,7 @@ const PackageHistoryPage = ({ user }) => {
           <div style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>
             Package History
           </div>
-          <div style={{ fontSize: 14, color: "#999" }}>
+          <div style={{ fontSize: 14, color: "#667085" }}>
             A full record of every package received and picked up.
           </div>
 
@@ -204,7 +204,7 @@ const PackageHistoryPage = ({ user }) => {
                 <div
                   style={{
                     fontSize: 11,
-                    color: "#aaa",
+                    color: "#667085",
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
                     marginBottom: 6,
@@ -230,7 +230,7 @@ const PackageHistoryPage = ({ user }) => {
         </div>
 
         {loading ? (
-          <p style={{ color: "#aaa", textAlign: "center", marginTop: 40 }}>
+          <p style={{ color: "#667085", textAlign: "center", marginTop: 40 }}>
             Loading history...
           </p>
         ) : entries.length === 0 ? (
@@ -243,11 +243,11 @@ const PackageHistoryPage = ({ user }) => {
               border: "1px solid #ebebeb",
             }}
           >
-            <div style={{ fontSize: 32, marginBottom: 12 }}>📦</div>
+            <div style={{ fontSize: 32, marginBottom: 12 }} aria-hidden="true">📦</div>
             <div style={{ fontWeight: 600, fontSize: 16, color: "#333" }}>
               No package history yet
             </div>
-            <div style={{ fontSize: 14, color: "#aaa", marginTop: 6 }}>
+            <div style={{ fontSize: 14, color: "#667085", marginTop: 6 }}>
               Your deliveries will appear here once a partner checks in your
               first package.
             </div>
@@ -297,22 +297,28 @@ const PackageHistoryPage = ({ user }) => {
                           color: ts.color,
                         }}
                       >
-                        {ts.label}
+                        {ts.symbol && <span aria-hidden="true">{ts.symbol}</span>} {ts.label}
                       </span>
-                      <span style={{ fontSize: 13, color: "#aaa" }}>
+                      <span style={{ fontSize: 13, color: "#667085" }}>
                         {formatTime(entry.timestamp)}
                       </span>
                     </div>
                     <div
                       style={{ fontWeight: 600, fontSize: 15, color: "#222" }}
                     >
-                      {isAccount
-                        ? "🏠 Account Activity"
-                        : `📍 ${entry.partnerName}`}
+                      {isAccount ? (
+                        <>
+                          <span aria-hidden="true">🏠</span> Account Activity
+                        </>
+                      ) : (
+                        <>
+                          <span aria-hidden="true">📍</span> {entry.partnerName}
+                        </>
+                      )}
                     </div>
                     {entry.partnerAddress && (
                       <div
-                        style={{ fontSize: 12, color: "#999", marginTop: 2 }}
+                        style={{ fontSize: 12, color: "#667085", marginTop: 2 }}
                       >
                         {entry.partnerAddress}
                       </div>
@@ -344,7 +350,7 @@ const PackageHistoryPage = ({ user }) => {
                             style={{
                               fontSize: 13,
                               fontWeight: 500,
-                              color: "#aaa",
+                              color: "#667085",
                             }}
                           >
                             pkg{entry.packageCount !== 1 ? "s" : ""}
@@ -352,7 +358,7 @@ const PackageHistoryPage = ({ user }) => {
                         </>
                       )}
                     </div>
-                    <div style={{ fontSize: 12, color: "#aaa", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "#667085", marginTop: 2 }}>
                       {formatDate(entry.timestamp)}
                     </div>
                   </div>

@@ -142,7 +142,7 @@ function ScrollNumberColumn({ values, selected, onSelect, width, format }) {
                 justifyContent: "center",
                 fontSize: active ? 17 : 15,
                 fontWeight: active ? 600 : 500,
-                color: active ? "#2a2620" : "#9a948a",
+                color: active ? "#2a2620" : "#667085",
                 cursor: "pointer",
                 userSelect: "none",
               }}

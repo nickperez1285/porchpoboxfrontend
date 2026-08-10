@@ -647,7 +647,7 @@
 }
 
 .mp-search::placeholder {
-  color: #9ca3af;
+  color: #667085;
 }
 
 .mp-search:focus {
@@ -769,7 +769,7 @@
 }
 
 .mp-locate__input::placeholder {
-  color: #9ca3af;
+  color: #667085;
 }
 
 .mp-locate__submit {
@@ -839,7 +839,7 @@
 
 .mp-muted--italic {
   font-style: italic;
-  color: #9ca3af;
+  color: #667085;
 }
 
 .mp-error {
@@ -982,6 +982,18 @@
   height: 460px;
   border-radius: 18px;
   overflow: hidden;
+}
+
+.leaflet-control-zoom a:focus-visible,
+.leaflet-marker-icon:focus-visible {
+  outline: 4px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.leaflet-control-zoom a:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--blue);
+  z-index: 1;
 }
 
 /* ── Pricing ──────────────────────────────────────────────────── */

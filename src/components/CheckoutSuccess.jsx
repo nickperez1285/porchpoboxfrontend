@@ -121,9 +121,9 @@ const CheckoutSuccess = ({ user, authLoading }) => {
           padding: "0 20px",
         }}
       >
-        <div style={{ fontSize: 48, marginBottom: 16 }}>⏳</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }} aria-hidden="true">⏳</div>
         <h2 style={{ color: "#333" }}>Verifying your payment...</h2>
-        <p style={{ color: "#888" }}>
+        <p style={{ color: "#667085" }}>
           Please wait while we confirm your subscription.
         </p>
       </div>
@@ -140,7 +140,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
           padding: "0 20px",
         }}
       >
-        <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+        <div style={{ fontSize: 48, marginBottom: 16 }} aria-hidden="true">⚠️</div>
         <h2 style={{ color: "#333" }}>Something went wrong</h2>
         <p
           style={{
@@ -190,7 +190,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
     >
       <div style={{ maxWidth: 560, width: "100%", textAlign: "center" }}>
         {/* Celebration header */}
-        <div style={{ fontSize: 64, marginBottom: 8 }}>🎉</div>
+        <div style={{ fontSize: 64, marginBottom: 8 }} aria-hidden="true">🎉</div>
         <div
           style={{
             fontSize: 12,
@@ -246,7 +246,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
                 marginBottom: 16,
               }}
             >
-              📋 Subscription Details
+              <span aria-hidden="true">📋</span> Subscription Details
             </div>
             <div
               style={{
@@ -259,7 +259,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
                 <div
                   style={{
                     fontSize: 11,
-                    color: "#888",
+                    color: "#667085",
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
                     marginBottom: 4,
@@ -270,14 +270,14 @@ const CheckoutSuccess = ({ user, authLoading }) => {
                 <div
                   style={{ fontWeight: 700, color: "#28a745", fontSize: 16 }}
                 >
-                  ✓ Active
+                  <span aria-hidden="true">✓</span> Active
                 </div>
               </div>
               <div>
                 <div
                   style={{
                     fontSize: 11,
-                    color: "#888",
+                    color: "#667085",
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
                     marginBottom: 4,
@@ -293,7 +293,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
                 <div
                   style={{
                     fontSize: 11,
-                    color: "#888",
+                    color: "#667085",
                     textTransform: "uppercase",
                     letterSpacing: 0.8,
                     marginBottom: 4,
@@ -355,7 +355,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
                 marginBottom: i < 2 ? 12 : 0,
               }}
             >
-              <span style={{ fontSize: 20, flexShrink: 0 }}>{step.icon}</span>
+              <span style={{ fontSize: 20, flexShrink: 0 }} aria-hidden="true">{step.icon}</span>
               <span style={{ fontSize: 14, color: "#444", lineHeight: 1.5 }}>
                 {step.text}
               </span>
@@ -403,7 +403,7 @@ const CheckoutSuccess = ({ user, authLoading }) => {
           </Link>
         </div>
 
-        <p style={{ marginTop: 24, fontSize: 13, color: "#aaa" }}>
+        <p style={{ marginTop: 24, fontSize: 13, color: "#667085" }}>
           A confirmation email has been sent to{" "}
           {user?.email || "your email address"}.
         </p>

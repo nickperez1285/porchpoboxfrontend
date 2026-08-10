@@ -352,7 +352,7 @@ const Admin = () => {
           textAlign: "center",
         }}
       >
-        <p style={{ color: "#888", fontSize: 16 }}>Loading admin data...</p>
+        <p style={{ color: "#667085", fontSize: 16 }}>Loading admin data...</p>
       </div>
     );
   }
@@ -523,7 +523,7 @@ const Admin = () => {
             textDecoration: "none",
           }}
         >
-          📋 Full Activity Log
+          <span aria-hidden="true">📋</span> Full Activity Log
         </Link>
         <Link
           to="/admin/payouts"
@@ -538,7 +538,7 @@ const Admin = () => {
             textDecoration: "none",
           }}
         >
-          💰 Payout Management
+          <span aria-hidden="true">💰</span> Payout Management
         </Link>
         <button
           type="button"
@@ -679,12 +679,13 @@ const Admin = () => {
                             fontWeight: 700,
                           }}
                         >
-                          📦 {customer.packageCount}
+                          <span aria-hidden="true">📦</span> {customer.packageCount}
                         </span>
                       )}
                       <button
                         type="button"
                         onClick={() => toggleCustomerExpanded(customer.id)}
+                        aria-expanded={expandedCustomerIds.includes(customer.id)}
                         style={{
                           padding: "4px 10px",
                           border: "1px solid #ccc",
@@ -695,9 +696,10 @@ const Admin = () => {
                           fontSize: 12,
                         }}
                       >
-                        {expandedCustomerIds.includes(customer.id)
-                          ? "Hide ▲"
-                          : "Info ▼"}
+                        {expandedCustomerIds.includes(customer.id) ? "Hide" : "Info"}{" "}
+                        <span aria-hidden="true">
+                          {expandedCustomerIds.includes(customer.id) ? "▲" : "▼"}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -715,33 +717,33 @@ const Admin = () => {
                       }}
                     >
                       <div>
-                        <span style={{ color: "#888" }}>Status:</span>{" "}
+                        <span style={{ color: "#667085" }}>Status:</span>{" "}
                         {customer.status || "inactive"}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Days Left:</span>{" "}
+                        <span style={{ color: "#667085" }}>Days Left:</span>{" "}
                         {getDaysLeft(customer.subscriptionEndsAt)}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Subscribed:</span>{" "}
+                        <span style={{ color: "#667085" }}>Subscribed:</span>{" "}
                         {formatDate(customer.subscribedAt)}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Ends:</span>{" "}
+                        <span style={{ color: "#667085" }}>Ends:</span>{" "}
                         {formatDate(customer.subscriptionEndsAt)}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Phone:</span>{" "}
+                        <span style={{ color: "#667085" }}>Phone:</span>{" "}
                         {customer.phoneNumber || "—"}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Location:</span>{" "}
+                        <span style={{ color: "#667085" }}>Location:</span>{" "}
                         {customer.packageLocations?.length
                           ? customer.packageLocations.join(", ")
                           : "—"}
                       </div>
                       <div style={{ gridColumn: "1 / -1" }}>
-                        <span style={{ color: "#888" }}>Address:</span>{" "}
+                        <span style={{ color: "#667085" }}>Address:</span>{" "}
                         {[
                           customer.streetAddress,
                           customer.city,
@@ -877,7 +879,7 @@ const Admin = () => {
                             fontWeight: 700,
                           }}
                         >
-                          📦 {vendor.packageCountTotal}
+                          <span aria-hidden="true">📦</span> {vendor.packageCountTotal}
                         </span>
                       )}
                       <Link
@@ -897,6 +899,7 @@ const Admin = () => {
                       <button
                         type="button"
                         onClick={() => toggleVendorExpanded(vendor.id)}
+                        aria-expanded={expandedVendorIds.includes(vendor.id)}
                         style={{
                           padding: "4px 10px",
                           border: "1px solid #ccc",
@@ -907,9 +910,10 @@ const Admin = () => {
                           fontSize: 12,
                         }}
                       >
-                        {expandedVendorIds.includes(vendor.id)
-                          ? "Hide ▲"
-                          : "Info ▼"}
+                        {expandedVendorIds.includes(vendor.id) ? "Hide" : "Info"}{" "}
+                        <span aria-hidden="true">
+                          {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -927,19 +931,19 @@ const Admin = () => {
                       }}
                     >
                       <div>
-                        <span style={{ color: "#888" }}>Email:</span>{" "}
+                        <span style={{ color: "#667085" }}>Email:</span>{" "}
                         {vendor.email || "—"}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Phone:</span>{" "}
+                        <span style={{ color: "#667085" }}>Phone:</span>{" "}
                         {vendor.phoneNumber || "—"}
                       </div>
                       <div>
-                        <span style={{ color: "#888" }}>Hours:</span>{" "}
+                        <span style={{ color: "#667085" }}>Hours:</span>{" "}
                         {vendor.storeHours || "—"}
                       </div>
                       <div style={{ gridColumn: "1 / -1" }}>
-                        <span style={{ color: "#888" }}>Address:</span>{" "}
+                        <span style={{ color: "#667085" }}>Address:</span>{" "}
                         {[
                           vendor.streetAddress,
                           vendor.city,
@@ -1060,7 +1064,7 @@ const Admin = () => {
           </Link>
         </div>
         {todayEntries.length === 0 ? (
-          <p style={{ color: "#888", margin: 0 }}>
+          <p style={{ color: "#667085", margin: 0 }}>
             No activity recorded today yet.
           </p>
         ) : (
@@ -1160,7 +1164,7 @@ const Admin = () => {
                       </td>
                       <td style={{ padding: "10px 14px" }}>
                         {isSignup ? (
-                          <span style={{ color: "#aaa" }}>—</span>
+                          <span style={{ color: "#667085" }}>—</span>
                         ) : (
                           <Link
                             to={`/admin/partner/${entry.partnerId}`}
@@ -1176,14 +1180,14 @@ const Admin = () => {
                             ? entry.userName
                             : entry.customerName || "Unknown"}
                         </div>
-                        <div style={{ fontSize: 12, color: "#888" }}>
+                        <div style={{ fontSize: 12, color: "#667085" }}>
                           {isSignup ? entry.userEmail : entry.customerEmail}
                         </div>
                       </td>
                       <td
                         style={{
                           padding: "10px 14px",
-                          color: isSignup ? "#aaa" : "#111",
+                          color: isSignup ? "#667085" : "#111",
                           fontWeight: 600,
                         }}
                       >

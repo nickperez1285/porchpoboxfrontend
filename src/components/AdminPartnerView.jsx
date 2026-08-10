@@ -184,7 +184,7 @@ const AdminPartnerView = () => {
       </div>
 
       <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 20, padding: 20, marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.06)" }}>
-        <div style={{ fontSize: 12, color: "#1a7f37", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>💰 Payout Management</div>
+        <div style={{ fontSize: 12, color: "#1a7f37", letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}><span aria-hidden="true">💰</span> Payout Management</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginBottom: 16 }}>
           <div style={{ background: "#e8f5e9", borderRadius: 12, padding: 14 }}>
             <div style={{ fontSize: 11, color: "#1a7f37", textTransform: "uppercase", letterSpacing: 0.8, marginBottom: 4 }}>Active Subscribers</div>
@@ -218,7 +218,7 @@ const AdminPartnerView = () => {
                 <div key={p.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 14px", background: "#fafafa", borderRadius: 10, border: "1px solid #eee" }}>
                   <div>
                     <div style={{ fontWeight: 600, fontSize: 14 }}>{p.month || "—"}</div>
-                    <div style={{ fontSize: 12, color: "#888", marginTop: 2 }}>{p.subscriberCount} subscriber{p.subscriberCount !== 1 ? "s" : ""} × $10</div>
+                    <div style={{ fontSize: 12, color: "#667085", marginTop: 2 }}>{p.subscriberCount} subscriber{p.subscriberCount !== 1 ? "s" : ""} × $10</div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <div style={{ textAlign: "right" }}>
@@ -242,11 +242,11 @@ const AdminPartnerView = () => {
             </div>
           </div>
         )}
-        {payouts.length === 0 && <p style={{ color: "#888", fontSize: 13, margin: 0 }}>No payouts yet. Click "Create Payout" to generate this month's payout.</p>}
+        {payouts.length === 0 && <p style={{ color: "#667085", fontSize: 13, margin: 0 }}>No payouts yet. Click "Create Payout" to generate this month's payout.</p>}
       </div>
 
       <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 20, padding: 20, marginBottom: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.06)" }}>
-        <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}>🔧 Admin Tools</div>
+        <div style={{ fontSize: 12, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase", marginBottom: 10 }}><span aria-hidden="true">🔧</span> Admin Tools</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
           <button
             type="button"
@@ -254,7 +254,7 @@ const AdminPartnerView = () => {
             disabled={cleaning}
             style={{ padding: "8px 16px", background: "#f0a500", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
           >
-            {cleaning ? "Cleaning..." : "🧹 Clean Stale Counts"}
+            {cleaning ? "Cleaning..." : <><span aria-hidden="true">🧹</span> Clean Stale Counts</>}
           </button>
           <button
             type="button"
@@ -262,7 +262,7 @@ const AdminPartnerView = () => {
             disabled={cleaning}
             style={{ padding: "8px 16px", background: "#dc3545", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: "pointer", fontSize: 13 }}
           >
-            {cleaning ? "Resetting..." : "⚠️ Force Zero All Counts"}
+            {cleaning ? "Resetting..." : <><span aria-hidden="true">⚠️</span> Force Zero All Counts</>}
           </button>
           {cleanResult && (
             <span style={{ fontSize: 13, color: cleanResult.startsWith("✓") ? "#1a7f37" : "#dc3545", fontWeight: 600 }}>
@@ -270,7 +270,7 @@ const AdminPartnerView = () => {
             </span>
           )}
         </div>
-        <p style={{ margin: "10px 0 0", fontSize: 12, color: "#888" }}>
+        <p style={{ margin: "10px 0 0", fontSize: 12, color: "#667085" }}>
           "Clean Stale Counts" zeros records where the user's delivered count matches checked-in count. "Force Zero All" resets everything — use only if all packages are confirmed picked up.
         </p>
       </div>

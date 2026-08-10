@@ -213,7 +213,7 @@ const PackageCheckIn = ({ user, partnerProfile, onPackagesCheckedIn }) => {
               </p>
               <p
                 className="pkg-checkin__lead"
-                style={{ marginTop: 8, fontSize: 13, color: "#b0b0b0" }}
+                style={{ marginTop: 8, fontSize: 13, color: "#667085" }}
               >
                 Checking in at:{" "}
                 <strong style={{ color: "#e8d9a8" }}>{locationLabel}</strong>
@@ -388,6 +388,7 @@ const PackageCheckIn = ({ user, partnerProfile, onPackagesCheckedIn }) => {
                     <button
                       type="button"
                       onClick={() => toggleSelection(user)}
+                      aria-label={`Remove ${user.name || user.email || "selected user"} from package check-in`}
                       style={{
                         background: "none",
                         border: "none",
@@ -397,7 +398,7 @@ const PackageCheckIn = ({ user, partnerProfile, onPackagesCheckedIn }) => {
                         padding: "0 8px",
                       }}
                     >
-                      ✕
+                      <span aria-hidden="true">✕</span>
                     </button>
                   </div>
                 </li>

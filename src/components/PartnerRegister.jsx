@@ -185,7 +185,8 @@ const PartnerRegister = () => {
         <div className="reg-field-container">
           <label htmlFor="vendor-phone" className="reg-field-label">
             Business phone{" "}
-            <span
+            <button
+              type="button"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -193,21 +194,22 @@ const PartnerRegister = () => {
                 width: 18,
                 height: 18,
                 borderRadius: "50%",
-                border: "1.5px solid #aaa",
-                color: "#aaa",
+                border: "1.5px solid #667085",
+                color: "#667085",
+                background: "transparent",
                 fontSize: 12,
                 fontWeight: 700,
                 cursor: "pointer",
                 marginLeft: 4,
+                padding: 0,
                 lineHeight: 1,
               }}
               onClick={() => setShowPhoneInfo((p) => !p)}
-              role="button"
-              tabIndex={0}
+              aria-expanded={showPhoneInfo}
               aria-label="Phone number help"
             >
-              ?
-            </span>
+              <span aria-hidden="true">?</span>
+            </button>
           </label>
           {showPhoneInfo && (
             <div
@@ -435,7 +437,7 @@ const PartnerRegister = () => {
         <p
           style={{
             fontSize: 12,
-            color: "#888",
+            color: "#667085",
             marginBottom: 12,
             lineHeight: 1.4,
           }}

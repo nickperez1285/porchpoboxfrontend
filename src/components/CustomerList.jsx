@@ -444,11 +444,11 @@ const CustomerList = ({
                         Activity
                       </div>
                       {userActivityLog[user.id] === undefined ? (
-                        <span style={{ fontSize: 12, color: "#999" }}>
+                        <span style={{ fontSize: 12, color: "#667085" }}>
                           Loading...
                         </span>
                       ) : userActivityLog[user.id].length === 0 ? (
-                        <span style={{ fontSize: 12, color: "#999" }}>
+                        <span style={{ fontSize: 12, color: "#667085" }}>
                           No activity yet.
                         </span>
                       ) : (
@@ -489,7 +489,7 @@ const CustomerList = ({
                                     ? `${entry.packageCount} pkg`
                                     : ""}
                                 </span>
-                                <span style={{ color: "#999" }}>
+                                <span style={{ color: "#667085" }}>
                                   {ts.toLocaleDateString("en-US", {
                                     month: "short",
                                     day: "numeric",

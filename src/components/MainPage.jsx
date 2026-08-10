@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import {
   collection,
@@ -53,6 +53,35 @@ const MapRecenter = ({ center }) => {
   return null;
 };
 
+const markerAriaLabel = (vendor) => {
+  const address = [vendor.streetAddress, vendor.city, vendor.state]
+    .filter(Boolean)
+    .join(", ");
+  return `Porch P.O. Box - ${vendor.businessName || "Partner location"}${
+    address ? `, ${address}` : ""
+  }`;
+};
+
+const MapA11y = ({ mapRef }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (mapRef) mapRef.current = map;
+    if (!map || typeof map.getContainer !== "function") return;
+    const container = map.getContainer();
+    const zoomIn = container.querySelector(".leaflet-control-zoom-in");
+    const zoomOut = container.querySelector(".leaflet-control-zoom-out");
+    if (zoomIn) {
+      zoomIn.setAttribute("aria-label", "Zoom in on map");
+      zoomIn.setAttribute("title", "Zoom in");
+    }
+    if (zoomOut) {
+      zoomOut.setAttribute("aria-label", "Zoom out on map");
+      zoomOut.setAttribute("title", "Zoom out");
+    }
+  }, [map, mapRef]);
+  return null;
+};
+
 const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [activeVendors, setActiveVendors] = useState([]);
   const [vendorsLoading, setVendorsLoading] = useState(true);
@@ -72,6 +101,8 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [prefLocation, setPrefLocation] = useState(null);
   const [prefSaving, setPrefSaving] = useState(false);
   const [prefMessage, setPrefMessage] = useState("");
+  const [focusedMarkerId, setFocusedMarkerId] = useState(null);
+  const mapRef = useRef(null);
 
   const filteredVendors = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -423,7 +454,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
       <section className="mp-hero" aria-label="Introduction">
         <div className="mp-container mp-hero__grid">
           <div className="mp-hero__content">
-            <div className="mp-eyebrow">📦 Secure Local Package Receiving</div>
+            <div className="mp-eyebrow"><span aria-hidden="true">📦</span> Secure Local Package Receiving</div>
             <h1 className="mp-hero__title">
               NEVER MISS A PACKAGE.
               <br />
@@ -467,17 +498,17 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             </div>
             <div className="mp-hero__trust">
               <span>
-                <span className="mp-check">✓</span> Secure & Safe
+                <span className="mp-check" aria-hidden="true">✓</span> Secure & Safe
               </span>
               <span>
-                <span className="mp-check">✓</span> Convenient Pickup
+                <span className="mp-check" aria-hidden="true">✓</span> Convenient Pickup
               </span>
               <span>
-                <span className="mp-check">✓</span> Trusted Local Partners
+                <span className="mp-check" aria-hidden="true">✓</span> Trusted Local Partners
               </span>
             </div>
             <div className="mp-hero__rating">
-              <span className="mp-hero__stars" aria-hidden>
+              <span className="mp-hero__stars" aria-hidden="true">
                 ★★★★★
               </span>
               <span className="mp-hero__rating-text">
@@ -515,7 +546,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           <div className="mp-steps">
             <div className="mp-step">
               <div className="mp-step__number">1</div>
-              <div className="mp-step__icon" aria-hidden>
+              <div className="mp-step__icon" aria-hidden="true">
                 🏠
               </div>
               <h3 className="mp-step__title">Choose a PorchPObox</h3>
@@ -525,7 +556,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             </div>
             <div className="mp-step">
               <div className="mp-step__number">2</div>
-              <div className="mp-step__icon" aria-hidden>
+              <div className="mp-step__icon" aria-hidden="true">
                 📦
               </div>
               <h3 className="mp-step__title">
@@ -537,7 +568,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             </div>
             <div className="mp-step">
               <div className="mp-step__number">3</div>
-              <div className="mp-step__icon" aria-hidden>
+              <div className="mp-step__icon" aria-hidden="true">
                 😊
               </div>
               <h3 className="mp-step__title">Pick Up Securely</h3>
@@ -563,35 +594,35 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
           <div className="mp-benefit-grid">
             <div className="mp-benefit">
-              <div className="mp-benefit__icon">🛡️</div>
+              <div className="mp-benefit__icon" aria-hidden="true">🛡️</div>
               <h3 className="mp-benefit__title">Stop porch pirates</h3>
               <p className="mp-benefit__text">
                 Packages are received and stored by trusted local partners.
               </p>
             </div>
             <div className="mp-benefit">
-              <div className="mp-benefit__icon">📬</div>
+              <div className="mp-benefit__icon" aria-hidden="true">📬</div>
               <h3 className="mp-benefit__title">Never miss deliveries</h3>
               <p className="mp-benefit__text">
                 Get notified when your package arrives safely.
               </p>
             </div>
             <div className="mp-benefit">
-              <div className="mp-benefit__icon">🏢</div>
+              <div className="mp-benefit__icon" aria-hidden="true">🏢</div>
               <h3 className="mp-benefit__title">Peace of Mind</h3>
               <p className="mp-benefit__text">
                 No more worrying about packages sitting unattended outside.{" "}
               </p>
             </div>
             <div className="mp-benefit">
-              <div className="mp-benefit__icon">📍</div>
+              <div className="mp-benefit__icon" aria-hidden="true">📍</div>
               <h3 className="mp-benefit__title">Safe neighborhood pickup</h3>
               <p className="mp-benefit__text">
                 Pick up close to home at your convenience.
               </p>
             </div>
             <div className="mp-benefit">
-              <div className="mp-benefit__icon">💲</div>
+              <div className="mp-benefit__icon" aria-hidden="true">💲</div>
               <h3 className="mp-benefit__title">Affordable monthly pricing</h3>
               <p className="mp-benefit__text">
                 Simple pricing with no hidden fees.
@@ -614,7 +645,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
           <form className="mp-locate" onSubmit={handleLocate} role="search">
             <div className="mp-locate__bar">
-              <span className="mp-locate__icon" aria-hidden>
+              <span className="mp-locate__icon" aria-hidden="true">
                 📍
               </span>
               <div className="mp-locate__input-wrap">
@@ -698,6 +729,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                   <input
                     type="search"
                     className="mp-search"
+                    aria-label="Filter locations by city or ZIP code"
                     placeholder="Filter by city or zip..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -749,7 +781,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                                 ✓ Preferred
                               </span>
                             )}
-                            <span className="mp-vendor-chevron" aria-hidden>
+                            <span className="mp-vendor-chevron" aria-hidden="true">
                               {expandedVendorIds.includes(vendor.id) ? "▲" : "▼"}
                             </span>
                           </span>
@@ -798,13 +830,21 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                 className="mp-card mp-map-wrap"
                 role="region"
                 aria-label="Map of partner locations"
+                aria-describedby="map-instructions"
               >
+                <span id="map-instructions" className="visually-hidden">
+                  This map shows all partner locations. Use the buttons to zoom
+                  in and out in the top left corner, and pan with the arrow keys
+                  when the map is focused. For full keyboard access, use the
+                  "All partner locations" list below.
+                </span>
                 <MapContainer
                   center={mapCenter}
                   zoom={userCoords ? 13 : 12}
                   style={{ width: "100%", height: "100%" }}
                 >
                   <MapRecenter center={mapCenter} />
+                  <MapA11y mapRef={mapRef} />
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -819,7 +859,15 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                     </Circle>
                   )}
                   {markersWithDistance.map(({ vendor, lat, lng, distance }) => (
-                    <Marker key={vendor.id} position={[lat, lng]}>
+                    <Marker
+                      key={vendor.id}
+                      position={[lat, lng]}
+                      alt={markerAriaLabel(vendor)}
+                      eventHandlers={{
+                        focus: () => setFocusedMarkerId(vendor.id),
+                        blur: () => setFocusedMarkerId(null),
+                      }}
+                    >
                       <Popup>
                         <strong>{vendor.businessName}</strong>
                         <br />
@@ -837,13 +885,43 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                         {isPreferred(vendor.id) && (
                           <>
                             <br />
-                            ✓ Your preferred location
+                            <span aria-hidden="true">✓</span> Your preferred location
                           </>
                         )}
                       </Popup>
                     </Marker>
                   ))}
                 </MapContainer>
+                <ul
+                  className="visually-hidden"
+                  aria-label="All partner locations"
+                >
+                  {markersWithDistance.map(({ vendor, lat, lng }) => (
+                    <li
+                      key={vendor.id}
+                      id={`sr-loc-${vendor.id}`}
+                      aria-current={
+                        focusedMarkerId === vendor.id ? "location" : undefined
+                      }
+                    >
+                      <button
+                        type="button"
+                        onFocus={() => {
+                          setFocusedMarkerId(vendor.id);
+                          if (
+                            mapRef.current &&
+                            typeof mapRef.current.panTo === "function"
+                          ) {
+                            mapRef.current.panTo([lat, lng]);
+                          }
+                        }}
+                        onBlur={() => setFocusedMarkerId(null)}
+                      >
+                        {markerAriaLabel(vendor)}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 
@@ -912,7 +990,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                     {plansExpanded
                       ? "Hide plan options"
                       : "Compare plan options"}
-                    <span className="mp-plans-toggle__chevron" aria-hidden>
+                    <span className="mp-plans-toggle__chevron" aria-hidden="true">
                       {plansExpanded ? "▲" : "▼"}
                     </span>
                   </button>
@@ -1005,7 +1083,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
           <div className="mp-testimonials__grid">
             <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
+              <div className="mp-testimonials__stars" aria-hidden="true">
                 ★★★★★
               </div>
               <p className="mp-testimonials__quote">
@@ -1015,7 +1093,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
               <div className="mp-testimonials__author">— Sarah M.</div>
             </div>
             <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
+              <div className="mp-testimonials__stars" aria-hidden="true">
                 ★★★★★
               </div>
               <p className="mp-testimonials__quote">
@@ -1024,7 +1102,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
               <div className="mp-testimonials__author">— Property Manager</div>
             </div>
             <div className="mp-testimonials__card">
-              <div className="mp-testimonials__stars" aria-hidden>
+              <div className="mp-testimonials__stars" aria-hidden="true">
                 ★★★★★
               </div>
               <p className="mp-testimonials__quote">
@@ -1055,19 +1133,19 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             </p>
             <ul className="mp-partner__list">
               <li>
-                <span className="mp-check">✓</span> Earn $10 for every
+                <span className="mp-check" aria-hidden="true">✓</span> Earn $10 for every
                 subscriber you refer
               </li>
               <li>
-                <span className="mp-check">✓</span> Attract more foot traffic to
+                <span className="mp-check" aria-hidden="true">✓</span> Attract more foot traffic to
                 your business
               </li>
               <li>
-                <span className="mp-check">✓</span> Provide a valuable service
+                <span className="mp-check" aria-hidden="true">✓</span> Provide a valuable service
                 to your community
               </li>
               <li>
-                <span className="mp-check">✓</span> Make money from space you
+                <span className="mp-check" aria-hidden="true">✓</span> Make money from space you
                 already have
               </li>
             </ul>

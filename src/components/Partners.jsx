@@ -122,11 +122,11 @@ const ActivityPanel = ({ partnerProfile }) => {
       </div>
 
       {loading ? (
-        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: 13 }}>
+        <p style={{ padding: "16px 24px", color: "#667085", fontSize: 13 }}>
           Loading...
         </p>
       ) : entries.length === 0 ? (
-        <p style={{ padding: "16px 24px", color: "#aaa", fontSize: 13 }}>
+        <p style={{ padding: "16px 24px", color: "#667085", fontSize: 13 }}>
           No activity yet.
         </p>
       ) : (
@@ -184,7 +184,7 @@ const ActivityPanel = ({ partnerProfile }) => {
                       : entry.customerName || "Unknown"}
                   </div>
                   {!isPayout(entry.type) && entry.customerEmail && (
-                    <div style={{ fontSize: 11, color: "#aaa" }}>
+                    <div style={{ fontSize: 11, color: "#667085" }}>
                       {entry.customerEmail}
                     </div>
                   )}
@@ -546,7 +546,7 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
           </Link>
         </div>
         {user && !partnerProfile && (
-          <p style={{ marginTop: 20, color: "#aaa" }}>
+          <p style={{ marginTop: 20, color: "#667085" }}>
             You're signed in but don't have a partner account yet —
             <Link
               to="/partner/register"

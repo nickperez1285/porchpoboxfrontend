@@ -82,7 +82,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
         {loadError ? (
           <p style={{ color: "#c00", background: "#fff0f0", padding: 12, borderRadius: 8, marginBottom: 24 }}>{loadError}</p>
         ) : partners.length === 0 ? (
-          <p style={{ color: "#888" }}>Loading locations...</p>
+          <p style={{ color: "#667085" }}>Loading locations...</p>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 24, maxHeight: 280, overflowY: "auto" }}>
             {partners.map((partner) => (
@@ -115,7 +115,7 @@ const PrefLocationModal = ({ user, onDone, required = false }) => {
                     </div>
                   )}
                   {partner.storeHours && (
-                    <div style={{ fontSize: 12, color: "#999", marginTop: 2 }}>{partner.storeHours}</div>
+                    <div style={{ fontSize: 12, color: "#667085", marginTop: 2 }}>{partner.storeHours}</div>
                   )}
                 </div>
               </label>

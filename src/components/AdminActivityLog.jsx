@@ -280,7 +280,7 @@ const AdminActivityLog = () => {
                     </td>
                     <td style={{ padding: "12px 18px" }}>
                       {isGlobal ? (
-                        <span style={{ color: "#888", fontStyle: "italic" }}>
+                        <span style={{ color: "#667085", fontStyle: "italic" }}>
                           —
                         </span>
                       ) : (
@@ -312,7 +312,7 @@ const AdminActivityLog = () => {
                           <div style={{ fontWeight: 600 }}>
                             {entry.month || "—"}
                           </div>
-                          <div style={{ fontSize: 12, color: "#888" }}>
+                          <div style={{ fontSize: 12, color: "#667085" }}>
                             ${entry.amount} · {entry.subscriberCount} subscriber
                             {entry.subscriberCount !== 1 ? "s" : ""}
                           </div>
@@ -324,13 +324,13 @@ const AdminActivityLog = () => {
                               ? entry.userName
                               : entry.customerName || "Unknown"}
                           </div>
-                          <div style={{ fontSize: 12, color: "#888" }}>
+                          <div style={{ fontSize: 12, color: "#667085" }}>
                             {isGlobal ? entry.userEmail : entry.customerEmail}
                           </div>
                         </div>
                       )}
                     </td>
-                    <td style={{ padding: "12px 18px", color: "#aaa" }}>
+                    <td style={{ padding: "12px 18px", color: "#667085" }}>
                       {isPayoutType(entry.type)
                         ? "—"
                         : isGlobal
