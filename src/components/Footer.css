@@ -87,8 +87,16 @@
 
 @media (max-width: 600px) {
   .mp-footer-grid {
-    grid-template-columns: 1fr;
-    gap: 30px;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 30px 16px;
+  }
+
+  .mp-footer-brand {
+    grid-column: 1 / -1;
+  }
+
+  .mp-footer-brand p {
+    max-width: none;
   }
 
   .mp-footer-copyright {

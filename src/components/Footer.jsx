@@ -16,7 +16,7 @@ const Footer = () => {
     if (location.pathname === "/") {
       scrollToLocations();
     }
-  }, [location.key]);
+  }, [location.pathname]);
 
   return (
     <footer className="mp-footer">
