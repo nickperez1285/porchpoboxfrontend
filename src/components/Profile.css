@@ -132,7 +132,7 @@
 }
 
 .profile-hero-sub-card--warn .profile-hero-sub-label {
-  color: #ffd54f;
+  color: #7a5d00;
 }
 
 .profile-hero-sub-label {
@@ -159,7 +159,7 @@
 }
 
 .profile-sub-link-wrap:hover .profile-hero-sub-card--warn {
-  border-color: #ffd700;
+  border-color: #7a5d00;
   box-shadow: 0 0 0 4px rgba(255, 200, 60, 0.28);
   transform: scale(1.02);
   transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
@@ -175,7 +175,7 @@
 }
 
 .profile-status--active {
-  color: #1a7f37;
+  color: #157347;
   background: #d4edda;
 }
 
@@ -190,7 +190,7 @@
 }
 
 .profile-hero-sub-card--warn .profile-sub-cta {
-  color: #ffd54f;
+  color: #7a5d00;
   font-weight: 800;
   font-size: 13px;
 }
@@ -204,7 +204,7 @@
 }
 
 .profile-sub-link-wrap:hover .profile-hero-sub-card--warn .profile-sub-cta {
-  color: #ffd700;
+  color: #7a5d00;
   transition: color 0.15s ease;
 }
 
@@ -410,14 +410,14 @@
 
 .profile-address-note {
   font-size: 13px;
-  color: #98a2b3;
+  color: #667085;
   line-height: 1.5;
   margin-top: 6px;
 }
 
 .profile-address-hint {
   font-size: 13px;
-  color: #98a2b3;
+  color: #667085;
   line-height: 1.5;
   margin-top: 12px;
   max-width: 460px;
@@ -466,7 +466,7 @@
 
 .no-address-text {
   font-size: 13px;
-  color: #98a2b3;
+  color: #667085;
   margin-top: 4px;
 }
 
@@ -501,7 +501,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #98a2b3;
+  color: #667085;
   margin-bottom: 8px;
 }
 
@@ -535,7 +535,7 @@
 }
 
 .stat-box--active {
-  border-color: #2e9e44;
+  border-color: #237d35;
   background: #effaf1;
 }
 
@@ -544,7 +544,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #98a2b3;
+  color: #667085;
 }
 
 .stat-value {
@@ -555,7 +555,7 @@
 }
 
 .stat-value--active {
-  color: #1a7f37;
+  color: #157347;
 }
 
 .package-list {
@@ -595,7 +595,7 @@
 
 .package-detail-label {
   font-size: 11px;
-  color: #98a2b3;
+  color: #667085;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   font-weight: 700;
@@ -608,7 +608,7 @@
 }
 
 .package-detail-value--active {
-  color: #1a7f37;
+  color: #157347;
 }
 
 /* ────────────── Account ────────────── */
@@ -700,7 +700,7 @@
 
 .referral-hint {
   font-size: 12px;
-  color: #98a2b3;
+  color: #667085;
   margin-top: 8px;
 }
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   collection,
   getDocs,
@@ -102,7 +102,9 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
   const [prefSaving, setPrefSaving] = useState(false);
   const [prefMessage, setPrefMessage] = useState("");
   const [focusedMarkerId, setFocusedMarkerId] = useState(null);
+  const [mapView, setMapView] = useState(true);
   const mapRef = useRef(null);
+  const locationsListRef = useRef(null);
 
   const filteredVendors = useMemo(() => {
     const term = searchTerm.toLowerCase().trim();
@@ -441,6 +443,20 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
       .getElementById("locations")
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash === "#locations") {
+      scrollToLocations();
+    }
+  }, [location.hash]);
+
+  useEffect(() => {
+    if (!mapView && locationsListRef.current) {
+      locationsListRef.current.focus();
+    }
+  }, [mapView]);
 
   const isActiveMember =
     user &&
@@ -829,99 +845,157 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
               <div
                 className="mp-card mp-map-wrap"
                 role="region"
-                aria-label="Map of partner locations"
+                aria-label={mapView ? "Map of partner locations" : "List of partner locations"}
                 aria-describedby="map-instructions"
               >
-                <span id="map-instructions" className="visually-hidden">
-                  This map shows all partner locations. Use the buttons to zoom
-                  in and out in the top left corner, and pan with the arrow keys
-                  when the map is focused. For full keyboard access, use the
-                  "All partner locations" list below.
-                </span>
-                <MapContainer
-                  center={mapCenter}
-                  zoom={userCoords ? 13 : 12}
-                  style={{ width: "100%", height: "100%" }}
-                >
-                  <MapRecenter center={mapCenter} />
-                  <MapA11y mapRef={mapRef} />
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                  />
-                  {userCoords && (
-                    <Circle
-                      center={[userCoords.lat, userCoords.lng]}
-                      radius={600}
-                      pathOptions={{ color: "#1557d6", fillColor: "#1557d6", fillOpacity: 0.15 }}
+                <div className="mp-map-toolbar">
+                  <span className="mp-map-toolbar__hint" id="map-instructions">
+                    {mapView
+                      ? "Map view. Prefer the list? Switch below."
+                      : "List view. Every location below is a keyboard-accessible button."}
+                  </span>
+                  <button
+                    type="button"
+                    className="mp-map-toggle"
+                    onClick={() => {
+                      setMapView((v) => !v);
+                    }}
+                    aria-expanded={mapView}
+                    aria-controls="locations-list"
+                  >
+                    {mapView ? (
+                      <>
+                        Use the list of locations instead
+                        <span className="visually-hidden"> (hides the map)</span>
+                      </>
+                    ) : (
+                      <>
+                        Show the map
+                        <span className="visually-hidden">
+                          {" "}
+                          (shows interactive map)
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                {mapView ? (
+                  <div className="mp-map-canvas">
+                    <span className="visually-hidden">
+                      This map shows all partner locations. Use the buttons to
+                      zoom in and out in the top left corner, and pan with the
+                      arrow keys when the map is focused. For full keyboard
+                      access, use the "All partner locations" list.
+                    </span>
+                    <MapContainer
+                      center={mapCenter}
+                      zoom={userCoords ? 13 : 12}
+                      style={{ width: "100%", height: "100%" }}
                     >
-                      <Popup>Your address</Popup>
-                    </Circle>
-                  )}
-                  {markersWithDistance.map(({ vendor, lat, lng, distance }) => (
-                    <Marker
-                      key={vendor.id}
-                      position={[lat, lng]}
-                      alt={markerAriaLabel(vendor)}
-                      eventHandlers={{
-                        focus: () => setFocusedMarkerId(vendor.id),
-                        blur: () => setFocusedMarkerId(null),
-                      }}
-                    >
-                      <Popup>
-                        <strong>{vendor.businessName}</strong>
-                        <br />
-                        {[vendor.streetAddress, vendor.city, vendor.state]
-                          .filter(Boolean)
-                          .join(", ")}
-                        {userCoords && Number.isFinite(distance) && (
-                          <>
+                      <MapRecenter center={mapCenter} />
+                      <MapA11y mapRef={mapRef} />
+                      <TileLayer
+                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                      />
+                      {userCoords && (
+                        <Circle
+                          center={[userCoords.lat, userCoords.lng]}
+                          radius={600}
+                          pathOptions={{ color: "#1557d6", fillColor: "#1557d6", fillOpacity: 0.15 }}
+                        >
+                          <Popup>Your address</Popup>
+                        </Circle>
+                      )}
+                      {markersWithDistance.map(({ vendor, lat, lng, distance }) => (
+                        <Marker
+                          key={vendor.id}
+                          position={[lat, lng]}
+                          alt={markerAriaLabel(vendor)}
+                          eventHandlers={{
+                            focus: () => setFocusedMarkerId(vendor.id),
+                            blur: () => setFocusedMarkerId(null),
+                          }}
+                        >
+                          <Popup>
+                            <strong>{vendor.businessName}</strong>
                             <br />
-                            {formatDistance(distance)}
-                          </>
-                        )}
-                        <br />
-                        {vendor.storeHours || vendor.store_hours || ""}
-                        {isPreferred(vendor.id) && (
-                          <>
+                            {[vendor.streetAddress, vendor.city, vendor.state]
+                              .filter(Boolean)
+                              .join(", ")}
+                            {userCoords && Number.isFinite(distance) && (
+                              <>
+                                <br />
+                                {formatDistance(distance)}
+                              </>
+                            )}
                             <br />
-                            <span aria-hidden="true">✓</span> Your preferred location
-                          </>
-                        )}
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
-                <ul
-                  className="visually-hidden"
-                  aria-label="All partner locations"
-                >
-                  {markersWithDistance.map(({ vendor, lat, lng }) => (
-                    <li
-                      key={vendor.id}
-                      id={`sr-loc-${vendor.id}`}
-                      aria-current={
-                        focusedMarkerId === vendor.id ? "location" : undefined
-                      }
-                    >
-                      <button
-                        type="button"
-                        onFocus={() => {
-                          setFocusedMarkerId(vendor.id);
-                          if (
-                            mapRef.current &&
-                            typeof mapRef.current.panTo === "function"
-                          ) {
-                            mapRef.current.panTo([lat, lng]);
-                          }
-                        }}
-                        onBlur={() => setFocusedMarkerId(null)}
+                            {vendor.storeHours || vendor.store_hours || ""}
+                            {isPreferred(vendor.id) && (
+                              <>
+                                <br />
+                                <span aria-hidden="true">✓</span> Your preferred location
+                              </>
+                            )}
+                          </Popup>
+                        </Marker>
+                      ))}
+                    </MapContainer>
+                  </div>
+                ) : (
+                  <ul
+                    ref={locationsListRef}
+                    id="locations-list"
+                    className="mp-map-list"
+                    aria-label="All partner locations"
+                    tabIndex={-1}
+                  >
+                    {markersWithDistance.map(({ vendor, lat, lng, distance }) => (
+                      <li
+                        key={vendor.id}
+                        id={`sr-loc-${vendor.id}`}
+                        aria-current={
+                          focusedMarkerId === vendor.id ? "location" : undefined
+                        }
                       >
-                        {markerAriaLabel(vendor)}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                        <button
+                          type="button"
+                          className="mp-map-list__btn"
+                          onFocus={() => {
+                            setFocusedMarkerId(vendor.id);
+                            if (
+                              mapRef.current &&
+                              typeof mapRef.current.panTo === "function"
+                            ) {
+                              mapRef.current.panTo([lat, lng]);
+                            }
+                          }}
+                          onBlur={() => setFocusedMarkerId(null)}
+                        >
+                          <span className="mp-map-list__name">
+                            {vendor.businessName || "Partner location"}
+                          </span>
+                          <span className="mp-map-list__addr">
+                            {[vendor.streetAddress, vendor.city, vendor.state]
+                              .filter(Boolean)
+                              .join(", ")}
+                          </span>
+                          {userCoords && Number.isFinite(distance) && (
+                            <span className="mp-map-list__dist">
+                              {formatDistance(distance)}
+                            </span>
+                          )}
+                          {isPreferred(vendor.id) && (
+                            <span className="mp-map-list__pref">
+                              <span aria-hidden="true">✓</span> Your preferred
+                              location
+                            </span>
+                          )}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             )}
 

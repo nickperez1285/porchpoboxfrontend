@@ -167,5 +167,5 @@
   text-align: center;
   border: 1px solid transparent;
 }
-.reg-alert--error { background: #fff3f3; border-color: #dc3545; color: #dc3545; }
-.reg-alert--success { background: #e6f4ea; border-color: #1a7f37; color: #1a7f37; }
+.reg-alert--error { background: #fff3f3; border-color: #b02a37; color: #b02a37; }
+.reg-alert--success { background: #e6f4ea; border-color: #157347; color: #157347; }

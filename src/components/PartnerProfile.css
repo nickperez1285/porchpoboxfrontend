@@ -197,7 +197,7 @@
   border-radius: 999px;
   padding: 2px 8px;
 }
-.payout-status--paid { background: #d4edda; color: #1a7f37; }
+.payout-status--paid { background: #d4edda; color: #157347; }
 .payout-status--pending { background: #fff3cd; color: #856404; }
 
 .id-box {

@@ -1,22 +1,8 @@
-import React, { useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+import { Link } from "react-router-dom";
 import "./Footer.css";
 
 const Footer = () => {
-  const location = useLocation();
-
-  const scrollToLocations = () => {
-    document
-      .getElementById("locations")
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  useEffect(() => {
-    // Only call if the current path is the homepage
-    if (location.pathname === "/") {
-      scrollToLocations();
-    }
-  }, [location.pathname]);
 
   return (
     <footer className="mp-footer">
@@ -38,7 +24,7 @@ const Footer = () => {
             <div className="mp-footer-title">Customers</div>
             <ul className="mp-footer-links">
               <li>
-                <Link to="/">Find a Location</Link>
+                <Link to="/#locations">Find a Location</Link>
               </li>
               <li>
                 <Link to="/how-it-works">How It Works</Link>

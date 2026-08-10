@@ -74,7 +74,7 @@
 }
 
 .settings-status--active {
-  color: #1a7f37;
+  color: #157347;
   background: #d4edda;
 }
 
@@ -84,12 +84,12 @@
 }
 
 .settings-status--inactive {
-  color: #dc3545;
+  color: #b02a37;
   background: #ffd9d9;
 }
 
 .settings-status--unknown {
-  color: #667085;
+  color: #475467;
   background: #f0f0f0;
 }
 
@@ -108,7 +108,7 @@
 }
 
 .settings-subscription-label {
-  color: #667085;
+  color: #475467;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.8px;
@@ -139,19 +139,19 @@
 }
 
 .settings-renewal--urgent {
-  color: #dc3545;
+  color: #b02a37;
 }
 
 .settings-renewal--soon {
-  color: #fd7e14;
+  color: #c2410c;
 }
 
 .settings-renewal--ok {
-  color: #1a7f37;
+  color: #157347;
 }
 
 .settings-renewal--unknown {
-  color: #667085;
+  color: #475467;
 }
 
 .settings-renewal-alert.settings-renewal--urgent {
@@ -210,16 +210,16 @@
 }
 
 .notif-toggle-label--on {
-  color: #1a7f37;
+  color: #157347;
 }
 
 .notif-toggle-label--off {
-  color: #667085;
+  color: #475467;
 }
 
 .notif-saving {
   font-size: 13px;
-  color: #667085;
+  color: #475467;
 }
 
 .location-highlight {
@@ -284,7 +284,7 @@
 
 .settings-action-btn:hover {
   background: #eaeaea;
-  border-color: #667085;
+  border-color: #475467;
 }
 
 .settings-action-btn--primary {
