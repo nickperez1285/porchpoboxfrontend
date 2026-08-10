@@ -40,10 +40,6 @@ const Footer = () => {
               <li>
                 <Link to="/">Find a Location</Link>
               </li>
-
-              <li>
-                <Link to="/">Find a Location</Link>
-              </li>
               <li>
                 <Link to="/how-it-works">How It Works</Link>
               </li>
