@@ -212,7 +212,7 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         </Link>
         <Link
           to="/register"
-          style={{ color: "#0b57d0", fontWeight: 700, textDecoration: "none" }}
+          style={{ color: "#1557d6", fontWeight: 700, textDecoration: "none" }}
         >
           Create Account
         </Link>

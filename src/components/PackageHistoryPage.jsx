@@ -22,7 +22,7 @@ const PackageHistoryPage = ({ user }) => {
     if (type === "delivery")
       return { background: "#d4edda", color: "#1a7f37", label: "✓ Picked Up" };
     if (type === "subscription" || type === "signup")
-      return { background: "#e7f1ff", color: "#0b57d0", label: "✓ Account" };
+      return { background: "#e7f1ff", color: "#1557d6", label: "✓ Account" };
     return { background: "#f0f0f0", color: "#444", label: type }; // Default
   };
 
@@ -223,7 +223,7 @@ const PackageHistoryPage = ({ user }) => {
         <div style={{ marginBottom: 20 }}>
           <Link
             to="/profile"
-            style={{ fontSize: 14, color: "#0b57d0", fontWeight: 600 }}
+            style={{ fontSize: 14, color: "#1557d6", fontWeight: 600 }}
           >
             ← Back to Profile
           </Link>
@@ -327,7 +327,7 @@ const PackageHistoryPage = ({ user }) => {
                           entry.type === "check-in"
                             ? "#b8860b"
                             : isAccount
-                              ? "#0b57d0"
+                              ? "#1557d6"
                               : "#1a7f37",
                       }}
                     >

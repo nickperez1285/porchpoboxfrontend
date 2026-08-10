@@ -15,7 +15,7 @@ const getTypeStyle = (type) => {
   if (type === "delivery")
     return { background: "#fff3cd", color: "#856404", label: "Delivered" };
   if (type === "subscription")
-    return { background: "#e7f1ff", color: "#0b57d0", label: "Subscribed" };
+    return { background: "#e7f1ff", color: "#1557d6", label: "Subscribed" };
   if (type === "payout-created")
     return { background: "#e8f5e9", color: "#1a7f37", label: "Payout Created" };
   if (type === "payout-paid")
@@ -349,7 +349,7 @@ const PartnerActivityLog = ({ partnerProfile }) => {
                             <div
                               style={{
                                 fontSize: 12,
-                                color: "#0b57d0",
+                                color: "#1557d6",
                                 marginTop: 4,
                                 fontWeight: 600,
                               }}

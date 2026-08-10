@@ -78,7 +78,7 @@ export default function ContactPage() {
             <p>You can also email us at</p>
             <a
               href="mailto:contact@porchpobox.com"
-              style={{ color: "#2563eb", fontWeight: 600 }}
+              style={{ color: "#1557d6", fontWeight: 600 }}
             >
               contact@porchpobox.com
             </a>{" "}

@@ -78,7 +78,7 @@ const ActivityPanel = ({ partnerProfile }) => {
     if (type === "delivery")
       return { bg: "#fff3cd", color: "#856404", label: "Delivered" };
     if (type === "subscription")
-      return { bg: "#e7f1ff", color: "#0b57d0", label: "Subscribed" };
+      return { bg: "#e7f1ff", color: "#1557d6", label: "Subscribed" };
     if (type === "payout-paid")
       return { bg: "#d4edda", color: "#0f5132", label: "Payout Paid" };
     return { bg: "#f0f0f0", color: "#444", label: type };
@@ -115,7 +115,7 @@ const ActivityPanel = ({ partnerProfile }) => {
         </div>
         <Link
           to="/partner/activity-log"
-          style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}
+          style={{ fontSize: 12, color: "#1557d6", fontWeight: 600 }}
         >
           View All →
         </Link>
@@ -192,7 +192,7 @@ const ActivityPanel = ({ partnerProfile }) => {
                     <div
                       style={{
                         fontSize: 10,
-                        color: "#0b57d0",
+                        color: "#1557d6",
                         fontWeight: 600,
                         marginTop: 2,
                       }}

@@ -286,7 +286,7 @@ const AdminActivityLog = () => {
                       ) : (
                         <Link
                           to={`/admin/partner/${entry.partnerId}`}
-                          style={{ fontWeight: 600, color: "#0b57d0" }}
+                          style={{ fontWeight: 600, color: "#1557d6" }}
                         >
                           {entry.partnerName}
                         </Link>

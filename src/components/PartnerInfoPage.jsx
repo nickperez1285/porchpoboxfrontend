@@ -48,7 +48,7 @@ const PartnerInfoPage = () => {
     return (
       <div style={{ maxWidth: 640, margin: "80px auto", padding: "0 20px", textAlign: "center" }}>
         <p style={{ color: "#c00" }}>{error}</p>
-        <Link to="/" style={{ color: "#0b57d0" }}>← Back to home</Link>
+        <Link to="/" style={{ color: "#1557d6" }}>← Back to home</Link>
       </div>
     );
   }
@@ -61,7 +61,7 @@ const PartnerInfoPage = () => {
     <div style={{ maxWidth: 640, margin: "60px auto", padding: "0 20px" }}>
       <Link
         to="/"
-        style={{ display: "inline-block", marginBottom: 20, color: "#0b57d0", fontSize: 14, fontWeight: 600 }}
+        style={{ display: "inline-block", marginBottom: 20, color: "#1557d6", fontSize: 14, fontWeight: 600 }}
       >
         ← Back
       </Link>
@@ -118,7 +118,7 @@ const PartnerInfoPage = () => {
               <div>
                 <div style={{ fontSize: 12, color: "#888" }}>Phone</div>
                 <div style={{ fontSize: 15, color: "#333" }}>
-                  <a href={`tel:${partner.phoneNumber}`} style={{ color: "#0b57d0", textDecoration: "none" }}>
+                  <a href={`tel:${partner.phoneNumber}`} style={{ color: "#1557d6", textDecoration: "none" }}>
                     {partner.phoneNumber}
                   </a>
                 </div>
@@ -128,7 +128,7 @@ const PartnerInfoPage = () => {
               <div>
                 <div style={{ fontSize: 12, color: "#888" }}>Email</div>
                 <div style={{ fontSize: 15, color: "#333" }}>
-                  <a href={`mailto:${partner.email}`} style={{ color: "#0b57d0", textDecoration: "none" }}>
+                  <a href={`mailto:${partner.email}`} style={{ color: "#1557d6", textDecoration: "none" }}>
                     {partner.email}
                   </a>
                 </div>

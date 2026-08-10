@@ -884,9 +884,9 @@ const Admin = () => {
                         to={`/admin/partner/${vendor.id}`}
                         style={{
                           padding: "4px 10px",
-                          border: "1px solid #0b57d0",
+                          border: "1px solid #1557d6",
                           borderRadius: 6,
-                          color: "#0b57d0",
+                          color: "#1557d6",
                           fontSize: 12,
                           fontWeight: 600,
                           textDecoration: "none",
@@ -1054,7 +1054,7 @@ const Admin = () => {
           </div>
           <Link
             to="/admin/activity-log"
-            style={{ fontSize: 14, color: "#0b57d0", fontWeight: 600 }}
+            style={{ fontSize: 14, color: "#1557d6", fontWeight: 600 }}
           >
             View Complete Log →
           </Link>
@@ -1164,7 +1164,7 @@ const Admin = () => {
                         ) : (
                           <Link
                             to={`/admin/partner/${entry.partnerId}`}
-                            style={{ color: "#0b57d0", fontWeight: 600 }}
+                            style={{ color: "#1557d6", fontWeight: 600 }}
                           >
                             {entry.partnerName}
                           </Link>

@@ -392,7 +392,7 @@ const CustomerList = ({
                         padding: 0,
                         border: "none",
                         background: "none",
-                        color: "#0b57d0",
+                        color: "#1557d6",
                         cursor: "pointer",
                         textDecoration: "underline",
                         fontSize: "0.9em",

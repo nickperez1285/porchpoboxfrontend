@@ -458,7 +458,7 @@ const AdminPayoutsPage = () => {
                   </div>
                   <Link
                     to={`/admin/partner/${partner.id}`}
-                    style={{ fontSize: 12, color: "#0b57d0", fontWeight: 600 }}
+                    style={{ fontSize: 12, color: "#1557d6", fontWeight: 600 }}
                   >
                     View Portal →
                   </Link>

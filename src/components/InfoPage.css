@@ -225,7 +225,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--green-dark);
+  color: var(--blue-dark);
 }
 
 @media (max-width: 640px) {

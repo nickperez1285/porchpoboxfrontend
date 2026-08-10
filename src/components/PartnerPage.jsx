@@ -39,7 +39,7 @@ const markerStyle = {
   width: 22,
   height: 22,
   borderRadius: "50%",
-  background: "#2563eb",
+  background: "#1557d6",
   color: "#fff",
   fontSize: 12,
   fontWeight: 700,
@@ -52,7 +52,7 @@ const PartnerPage = () => {
       style={{
         minHeight: "calc(100vh - 180px)",
         background:
-          "radial-gradient(circle at top, rgba(37, 99, 235, 0.1), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+          "radial-gradient(circle at top, rgba(21, 87, 214, 0.1), transparent 32%), linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
         padding: "48px 20px",
       }}
     >
@@ -387,14 +387,14 @@ const PartnerPage = () => {
                 to="/partner/register"
                 style={{
                   display: "inline-block",
-                  background: "#f97316",
+                  background: "#1557d6",
                   color: "#fff",
                   padding: "14px 26px",
                   borderRadius: 999,
                   fontWeight: 700,
                   fontSize: 15,
                   textDecoration: "none",
-                  boxShadow: "0 4px 14px rgba(249, 115, 22, 0.35)",
+                  boxShadow: "0 4px 14px rgba(21, 87, 214, 0.35)",
                   transition: "transform 0.15s ease, background 0.2s ease",
                 }}
               >
@@ -464,7 +464,7 @@ const PartnerPage = () => {
             through our contact
             <a href="https://www.porchpobox.com/contact"> contact </a> form or
             submit a{" "}
-            <Link to="/referrals" style={{ color: "#2563eb", fontWeight: 600 }}>
+            <Link to="/referrals" style={{ color: "#1557d6", fontWeight: 600 }}>
               referral
             </Link>{" "}
             and we will get in touch.

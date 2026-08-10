@@ -225,7 +225,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
           <div className="partner-card__header">
             <h3 style={{ margin: 0 }}>Monthly Subscribers</h3>
             {prefCount > 0 && (
-              <span style={{ fontSize: 13, color: "#0b57d0" }}>
+              <span style={{ fontSize: 13, color: "#1557d6" }}>
                 {showPrefUsers ? "Hide ▲" : "View ▼"}
               </span>
             )}

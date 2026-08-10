@@ -56,7 +56,7 @@
 .profile-hero {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #102b55 0%, #1557d6 100%);
+  background: linear-gradient(135deg, #0b1e3b 0%, #1557d6 100%);
   color: #fff;
   border-radius: 22px;
   padding: 38px 36px;
@@ -233,7 +233,7 @@
   top: 40px;
   right: 0;
   width: 210px;
-  background: #102b55;
+  background: #0b1e3b;
   color: #fff;
   border-radius: 10px;
   padding: 10px 12px;
@@ -256,7 +256,7 @@
   right: 14px;
   width: 12px;
   height: 12px;
-  background: #102b55;
+  background: #0b1e3b;
   transform: rotate(45deg);
   border-radius: 2px;
 }
@@ -275,7 +275,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  background: linear-gradient(135deg, #102b55 0%, #1557d6 100%);
+  background: linear-gradient(135deg, #0b1e3b 0%, #1557d6 100%);
   border-radius: 18px;
   padding: 20px 24px;
   margin-bottom: 20px;
@@ -316,7 +316,7 @@
 .profile-location-cta-btn {
   flex-shrink: 0;
   background: #fff;
-  color: #102b55;
+  color: #0b1e3b;
   border: none;
   border-radius: 10px;
   padding: 12px 20px;
@@ -368,7 +368,7 @@
   gap: 8px;
   font-size: 15px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
   margin-bottom: 14px;
 }
 
@@ -383,7 +383,7 @@
 .profile-address-name {
   font-size: 15px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
 }
 
 .profile-address-vendor {
@@ -460,7 +460,7 @@
 .no-address-title {
   font-size: 15px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
   margin-top: 4px;
 }
 
@@ -471,7 +471,7 @@
 }
 
 .btn-set-location {
-  background: #102b55;
+  background: #0b1e3b;
   color: #fff;
   border: none;
   border-radius: 10px;
@@ -493,7 +493,7 @@
 .section-label {
   font-size: 15px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
 }
 
 .section-label-inner {
@@ -550,7 +550,7 @@
 .stat-value {
   font-size: 26px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
   margin-top: 2px;
 }
 
@@ -584,7 +584,7 @@
 .package-vendor {
   font-size: 14px;
   font-weight: 700;
-  color: #102b55;
+  color: #0b1e3b;
 }
 
 .package-details {
@@ -604,7 +604,7 @@
 .package-detail-value {
   font-size: 16px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
 }
 
 .package-detail-value--active {
@@ -624,7 +624,7 @@
 .location-name {
   font-size: 14px;
   font-weight: 800;
-  color: #102b55;
+  color: #0b1e3b;
 }
 
 .location-address {
@@ -672,7 +672,7 @@
   font-size: 18px;
   font-weight: 800;
   letter-spacing: 2px;
-  color: #102b55;
+  color: #0b1e3b;
   background: #f7faff;
   border: 1px dashed #1557d6;
   border-radius: 8px;

@@ -34,7 +34,7 @@
 }
 
 .header-logo-name {
-  color: #172033;
+  color: #0b1e3b;
   font-weight: 800;
   font-size: 18px;
   letter-spacing: -0.3px;
@@ -51,7 +51,7 @@
 
 .header-link,
 .header-logout-btn {
-  color: #2563eb;
+  color: #0b1e3b;
   text-decoration: none;
   font-weight: 700;
   font-size: 13px;
@@ -68,13 +68,13 @@
 
 .header-link:hover,
 .header-logout-btn:hover {
-  color: #1d4ed8;
-  border-bottom-color: #2563eb;
+  color: #1557d6;
+  border-bottom-color: #1557d6;
 }
 
 .header-signup-btn {
   display: inline-block;
-  background: #f97316;
+  background: #1557d6;
   color: #fff;
   font-weight: 700;
   font-size: 13px;
@@ -83,16 +83,16 @@
   padding: 10px 22px;
   border-radius: 999px;
   text-decoration: none;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.35);
+  box-shadow: 0 2px 8px rgba(21, 87, 214, 0.35);
   transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
   margin-left: 6px;
   line-height: 1;
 }
 
 .header-signup-btn:hover {
-  background: #ea580c;
+  background: #0d43aa;
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 4px 14px rgba(21, 87, 214, 0.4);
 }
 
 .visually-hidden {

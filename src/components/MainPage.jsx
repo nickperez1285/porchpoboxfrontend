@@ -441,7 +441,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                     <h5>
                       <button
                         onClick={scrollToLocations}
-                        style={{ border: "none", color: "#f97316" }}
+                        style={{ border: "none", color: "#1557d6" }}
                       >
                         <strong>{activeVendors.length} Active Locations</strong>
                       </button>

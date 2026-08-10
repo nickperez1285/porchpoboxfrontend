@@ -228,7 +228,7 @@ const PartnerRegister = () => {
                 href="https://voice.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#0b57d0", fontWeight: 600 }}
+                style={{ color: "#1557d6", fontWeight: 600 }}
               >
                 Google Voice
               </a>
