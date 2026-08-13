@@ -4,19 +4,28 @@ import "./InfoPage.css";
 
 const keyFindings = [
   {
-    icon: "📊",
-    title: "Theft spikes in the holiday window",
-    text: "Package theft is a year-round problem that concentrates in November and December, when delivery volume peaks and more parcels sit unattended.",
+    icon: "🗞️",
+    title: "SF Bay Area ranked #1 for package theft",
+    text: "SafeWise's annual report ranked the San Francisco–Oakland–San Jose metro the #1 worst in the U.S. for package theft — coverage that put Bay Area porch piracy in the national spotlight.",
+    source: "KRON4",
+  },
+  {
+    icon: "📈",
+    title: "Three in four Americans have been hit",
+    text: "Package theft grew 23% in a single year, and SafeWise found three out of four Americans have had a package stolen from their doorstep.",
+    source: "SafeWise",
   },
   {
     icon: "🏘️",
-    title: "Every neighborhood is a target",
-    text: "Thieves target homes and apartments across the Bay Area — from dense urban blocks to quiet suburban streets — wherever packages sit on doorsteps.",
+    title: "California leads the nation in losses",
+    text: "SafeWise's latest report estimates California lost over $1.5 billion to package theft — the most of any state, with 32,000+ incidents every single day.",
+    source: "SafeWise 2025",
   },
   {
     icon: "🔐",
     title: "Recovery is rare",
-    text: "Package theft is overwhelmingly property crime with little chance of recovery, which is why prevention matters more than response.",
+    text: "Package theft is overwhelmingly property crime with little chance of recovery — which is why prevention matters more than response.",
+    source: "Porch P.O. Box analysis",
   },
 ];
 
@@ -82,8 +91,17 @@ const PorchPiracyReport = () => {
             Porch P.O. Box publishes an annual look at package theft in the
             San Francisco Bay Area. We track delivery theft reports, survey
             local shoppers, and compare the protection offered by the
-            delivery methods people actually use. This page is updated as new
-            data becomes available.
+            delivery methods people actually use.
+          </p>
+          <p>
+            The Bay Area's problem is well documented. SafeWise's national
+            package theft report ranked the San Francisco–Oakland–San Jose
+            metro the <strong>#1 worst in the U.S.</strong> — coverage picked
+            up by KRON4 and outlets across the region. Nationally, SafeWise
+            estimates <strong>104 million packages were stolen in the past
+            year</strong> (roughly a quarter of a million every day), costing
+            consumers about <strong>$15 billion</strong> with an average
+            value of <strong>$143 per stolen package</strong>.
           </p>
           <p>
             Journalists and neighborhood groups are welcome to cite this page
@@ -100,6 +118,9 @@ const PorchPiracyReport = () => {
               </div>
               <h3 className="info-step__title">{finding.title}</h3>
               <p className="info-step__desc">{finding.text}</p>
+              {finding.source && (
+                <p className="info-step__source">Source: {finding.source}</p>
+              )}
             </div>
           ))}
         </div>
@@ -117,6 +138,42 @@ const PorchPiracyReport = () => {
             When more packages arrive on doorsteps, more packages disappear.
             Holiday surges bring the largest increases every year.
           </p>
+        </div>
+
+        <div className="info-card" style={{ marginBottom: "20px" }}>
+          <h3>In the news</h3>
+          <ul style={{ color: "var(--gray)", lineHeight: 1.8, paddingLeft: "20px" }}>
+            <li>
+              <a
+                href="https://www.kron4.com/news/bay-area/sf-bay-area-ranks-worst-in-us-for-package-theft-report-finds/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                "SF Bay Area ranks worst in US for package theft, report finds"
+              </a>{" "}
+              — KRON4, covering the SafeWise report
+            </li>
+            <li>
+              <a
+                href="https://sfist.com/2022/11/25/bay-area-ranks-worst-for-package-theft-according-to-report/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                "Bay Area Ranks Worst for Package Theft, According to Report"
+              </a>{" "}
+              — SFist
+            </li>
+            <li>
+              <a
+                href="https://www.safewise.com/research/porch-pirate-package-theft/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                U.S. Package Theft Report — SafeWise research
+              </a>{" "}
+              (national source data)
+            </li>
+          </ul>
         </div>
 
         {reportSections.map((section) => (
