@@ -10,18 +10,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
 });
 
-const toRad = (deg) => (deg * Math.PI) / 180;
-
-const distanceMiles = (a, b) => {
-  const R = 3958.8;
-  const dLat = toRad(b.lat - a.lat);
-  const dLng = toRad(b.lng - a.lng);
-  const s =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(s));
-};
-
 const formatDistance = (mi) => {
   if (mi < 0.1) return `${Math.round(mi * 5280)} ft away`;
   if (mi < 10) return `${mi.toFixed(1)} mi away`;
