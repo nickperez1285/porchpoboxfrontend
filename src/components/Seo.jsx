@@ -22,7 +22,7 @@ const Seo = ({
   useEffect(() => {
     const fullTitle = title
       ? `${title} | Porch P.O. Box`
-      : "Porch P.O. Box | Secure Package Delivery & Receiving Service – Stop Porch Piracy";
+      : "Porch P.O. Box | Secure Package Delivery & Receiving Service";
     const canonical = `${SITE_URL}${path === "/" ? "/" : path}`;
 
     document.title = fullTitle;

@@ -54,6 +54,15 @@ const PackageHistoryPage = lazy(() =>
   import("./components/PackageHistoryPage"),
 );
 const PartnerOnboarding = lazy(() => import("./components/PartnerOnboarding"));
+const PorchPiracyReport = lazy(() =>
+  import("./components/PorchPiracyReport"),
+);
+const PorchPiratesGuide = lazy(() =>
+  import("./components/PorchPiratesGuide"),
+);
+const PorchSafetyScore = lazy(() =>
+  import("./components/PorchSafetyScore"),
+);
 const PartnerInfoPage = lazy(() => import("./components/PartnerInfoPage"));
 const PartnerPage = lazy(() => import("./components/PartnerPage"));
 
@@ -460,6 +469,9 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/become-a-partner" element={<PartnerPage />} />
+          <Route path="/porch-piracy-report" element={<PorchPiracyReport />} />
+          <Route path="/stop-porch-pirates" element={<PorchPiratesGuide />} />
+          <Route path="/porch-safety-score" element={<PorchSafetyScore />} />
           <Route path="/terms" element={<TermsIndex />} />
           <Route path="/terms/user" element={<UserTermsPage />} />
           <Route path="/terms/partner" element={<PartnerTermsPage />} />

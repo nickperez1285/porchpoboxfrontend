@@ -64,6 +64,15 @@ const Footer = () => {
                 <Link to="/about">About Us</Link>
               </li>
               <li>
+                <Link to="/stop-porch-pirates">Stop Porch Pirates</Link>
+              </li>
+              <li>
+                <Link to="/porch-piracy-report">Porch Piracy Report</Link>
+              </li>
+              <li>
+                <Link to="/porch-safety-score">Porch Safety Score</Link>
+              </li>
+              <li>
                 <Link to="/contact">Contact</Link>
               </li>
               <li>
