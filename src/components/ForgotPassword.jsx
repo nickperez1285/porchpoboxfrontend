@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "../firebase";
+import Seo from "./Seo";
 
 const ForgotPassword = () => {
   const [searchParams] = useSearchParams();
@@ -31,6 +32,12 @@ const ForgotPassword = () => {
 
   return (
     <div style={{ maxWidth: 420, margin: "100px auto", textAlign: "center" }}>
+      <Seo
+        title="Forgot Password"
+        description="Reset your Porch P.O. Box password to get back to secure package delivery and package pickup."
+        keywords="reset password, package receiving account, secure package delivery, Porch P.O. Box"
+        path="/forgot-password"
+      />
       <h2>Forgot Password</h2>
       <p>Enter your email address and we will send you a link to create a new password.</p>
 

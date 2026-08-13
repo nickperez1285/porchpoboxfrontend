@@ -1,9 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Seo from "./Seo";
 
 const TermsIndex = () => {
   return (
     <div style={{ maxWidth: 860, margin: "60px auto", padding: "0 20px" }}>
+      <Seo
+        title="Terms & Policies"
+        description="Review the Porch P.O. Box terms and conditions that apply to customers and partners of our secure package receiving service."
+        keywords="Porch P.O. Box terms, package receiving service terms, secure package delivery, terms and conditions"
+        path="/terms"
+      />
       <div
         style={{
           background: "linear-gradient(135deg, #121212 0%, #1d1d1d 100%)",

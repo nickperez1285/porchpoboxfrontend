@@ -1,9 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Seo from "./Seo";
 
 const PartnerTermsPage = () => {
   return (
     <div style={{ maxWidth: 860, margin: "60px auto", padding: "0 20px" }}>
+      <Seo
+        title="Partner Terms & Conditions"
+        description="Partner terms and conditions for Porch P.O. Box package receiving partners earning with secure package delivery."
+        keywords="partner terms, package receiving partner agreement, secure package delivery, earn with packages, Porch P.O. Box"
+        path="/terms/partner"
+      />
       <h2>Partner Terms and Conditions</h2>
       <p>
         By registering as a Porch P.O. Box partner, you agree to the following terms:

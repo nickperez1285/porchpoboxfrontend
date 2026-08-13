@@ -21,6 +21,7 @@ import {
   passwordRequirementsText,
 } from "../utils/passwordValidation";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
+import Seo from "./Seo";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -310,12 +311,19 @@ const Register = () => {
   };
 
   return (
-    <RegPage
-      title="Create account"
-      subtitle={
-        fromGoogle ? "" : "Join Porch P.O. Box with your contact details and mailing address."
-      }
-    >
+    <>
+      <Seo
+        title="Create Account"
+        description="Create a Porch P.O. Box account and start secure package receiving at trusted local pickup locations."
+        keywords="package receiving sign up, secure package delivery, package pickup membership, stop porch pirates, Porch P.O. Box"
+        path="/register"
+      />
+      <RegPage
+        title="Create account"
+        subtitle={
+          fromGoogle ? "" : "Join Porch P.O. Box with your contact details and mailing address."
+        }
+      >
       {fromGoogle ? (
         <>
           <div
@@ -657,6 +665,7 @@ const Register = () => {
       </form>
       )}
     </RegPage>
+    </>
   );
 };
 

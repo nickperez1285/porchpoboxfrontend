@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getApiUrl } from "../config/api";
+import Seo from "./Seo";
 import "./Contact.css";
 
 export default function ContactPage() {
@@ -42,6 +43,12 @@ export default function ContactPage() {
 
   return (
     <div className="contact-page">
+      <Seo
+        title="Contact Us"
+        description="Contact Porch P.O. Box about our secure package receiving service, partnership opportunities, or package pickup questions."
+        keywords="contact Porch P.O. Box, package receiving service, secure package delivery, package pickup support"
+        path="/contact"
+      />
       <form onSubmit={handleSubmit} className="contact-form">
         <h1 className="contact-title">Contact Us</h1>
 

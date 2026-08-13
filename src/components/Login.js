@@ -11,6 +11,7 @@ import {
 } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
+import Seo from "./Seo";
 
 const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   const navigate = useNavigate();
@@ -90,10 +91,17 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   };
 
   return (
-    <RegPage
-      title={title}
-      subtitle="Welcome back to Porch P.O. Box. Sign in to manage your deliveries."
-    >
+    <>
+      <Seo
+        title={title}
+        description="Sign in to Porch P.O. Box to manage your secure package delivery, pickup location, and subscription."
+        keywords="package receiving login, secure package delivery, package pickup account, Porch P.O. Box"
+        path={title === "Partner Login" ? "/partner/login" : "/login"}
+      />
+      <RegPage
+        title={title}
+        subtitle="Welcome back to Porch P.O. Box. Sign in to manage your deliveries."
+      >
       {/* Google Sign-In Button */}
       <button
         type="button"
@@ -218,6 +226,7 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         </Link>
       </div>
     </RegPage>
+    </>
   );
 };
 

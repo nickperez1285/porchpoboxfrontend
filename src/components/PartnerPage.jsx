@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Seo from "./Seo";
 
 const sectionCardStyle = {
   background: "#fff",
@@ -56,6 +57,12 @@ const PartnerPage = () => {
         padding: "48px 20px",
       }}
     >
+      <Seo
+        title="Become a Package Receiving Partner"
+        description="Become a Porch P.O. Box partner and earn money from space you already have by offering secure package receiving to your local community."
+        keywords="become a package receiving partner, earn money with package delivery, package pickup business, stop porch pirates, Porch P.O. Box partner"
+        path="/become-a-partner"
+      />
       <div style={{ maxWidth: 860, margin: "0 auto" }}>
         <section className="mp-income" aria-labelledby="income-heading">
           {/* <div className="mp-income__eyebrow">Earn Extra Income</div> */}

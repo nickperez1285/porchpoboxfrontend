@@ -13,6 +13,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-le
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
+import Seo from "./Seo";
 import { db } from "../firebase";
 import { getApiUrl } from "../config/api";
 import "./MainPage.css";
@@ -466,15 +467,19 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
 
   return (
     <div className="mp">
+      <Seo
+        description="Porch P.O. Box is a secure package receiving service that stops porch piracy. Get packages delivered to trusted local partners near you, with flexible plans and no missed deliveries."
+        keywords="package receiving service, secure package delivery, stop porch pirates, porch piracy protection, package pickup location, Porch P.O. Box"
+      />
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="mp-hero" aria-label="Introduction">
         <div className="mp-container mp-hero__grid">
           <div className="mp-hero__content">
             <div className="mp-eyebrow"><span aria-hidden="true">📦</span> Secure Local Package Receiving</div>
             <h1 className="mp-hero__title">
-              NEVER MISS A PACKAGE.
+              SECURE PACKAGE DELIVERY.
               <br />
-              GET IT DELIVERED SOMEWHERE SAFE.
+              STOP PORCH PIRATES &amp; NEVER MISS A PACKAGE.
               <br />
               <span className="mp-hero__title-accent">GET PAID.</span>
             </h1>
@@ -534,7 +539,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
           <div className="mp-hero__photo">
             <img
-              src="/partnerPic.png"
+              src="/partnerPic.webp"
               alt="A delivery being received at a Porch P.O. Box partner location"
             />
           </div>
@@ -551,7 +556,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           <div className="mp-section-header">
             <div className="mp-section-label">Simple & Convenient</div>
             <h2 id="how-heading" className="mp-section-title">
-              How Porch P.O. Box Works
+              How Porch P.O. Box Package Receiving Works
             </h2>
             <p className="mp-section-sub">
               No more worrying about packages sitting outside. Send your
@@ -602,7 +607,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           <div className="mp-section-header">
             <div className="mp-section-label">Why Porch P.O. Box</div>
             <h2 id="why-heading" className="mp-section-title">
-              A Better Way to Receive Packages
+              A Better Way to Receive Packages – Stop Porch Pirates
             </h2>
             <p className="mp-section-sub">
               Your packages stay off the porch and with someone you trust.
@@ -653,7 +658,9 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
         <div className="mp-container">
           <div className="mp-section-header">
             <div className="mp-section-label">Active Locations</div>
-            <h2 className="mp-section-title">Find a Porch P.O. Box Near You</h2>
+            <h2 className="mp-section-title">
+              Find a Secure Package Pickup Location Near You
+            </h2>
             <p className="mp-section-sub">
               Enter your address to find a trusted package pickup location
               nearby.{" "}
@@ -1229,7 +1236,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
           </div>
           <div className="mp-partner__visual">
             <img
-              src="/partnerPic.png"
+              src="/partnerPic.webp"
               alt="Local business owner receiving a package"
             />
             <div className="mp-earn-card">

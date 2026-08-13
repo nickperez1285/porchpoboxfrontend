@@ -11,7 +11,7 @@ const Footer = () => {
           <div className="mp-footer-brand">
             <Link to="/" className="mp-footer-logo">
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Porch P.O. Box"
                 className="mp-footer-logo-img"
               />

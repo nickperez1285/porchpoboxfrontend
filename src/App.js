@@ -92,7 +92,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
         <div className="header-logo-wrap">
           <a href="https://porchpobox.com/" className="header-logo-link">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="Porch P.O. Box"
               className="header-logo"
             />

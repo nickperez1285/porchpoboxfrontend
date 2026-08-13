@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
+import Seo from "./Seo";
 
 const PartnerInfoPage = () => {
   const { partnerId } = useParams();
@@ -59,6 +60,12 @@ const PartnerInfoPage = () => {
 
   return (
     <div style={{ maxWidth: 640, margin: "60px auto", padding: "0 20px" }}>
+      <Seo
+        title={`${partner.businessName} – Package Pickup Location`}
+        description={`${partner.businessName} is a trusted Porch P.O. Box package pickup location. Send your packages there for secure delivery and stop porch pirates.`}
+        keywords="package pickup location, secure package delivery, package receiving near me, stop porch pirates, Porch P.O. Box"
+        path={`/partner/${partnerId}`}
+      />
       <Link
         to="/"
         style={{ display: "inline-block", marginBottom: 20, color: "#1557d6", fontSize: 14, fontWeight: 600 }}

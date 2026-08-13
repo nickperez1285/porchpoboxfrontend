@@ -12,6 +12,7 @@ import StoreHoursScrollPicker, {
   DEFAULT_STORE_HOURS,
 } from "./StoreHoursScrollPicker";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
+import Seo from "./Seo";
 
 const PartnerRegister = () => {
   const navigate = useNavigate();
@@ -153,10 +154,17 @@ const PartnerRegister = () => {
   };
 
   return (
-    <RegPage
-      title="Become a partner"
-      subtitle="Tell us about your business. We will review your application before you can sign in."
-    >
+    <>
+      <Seo
+        title="Become a Package Receiving Partner"
+        description="Register your business as a Porch P.O. Box package receiving partner and earn from secure package delivery in your community."
+        keywords="package receiving partner registration, secure package delivery, earn money with packages, stop porch pirates, Porch P.O. Box"
+        path="/partner/register"
+      />
+      <RegPage
+        title="Become a partner"
+        subtitle="Tell us about your business. We will review your application before you can sign in."
+      >
       <form className="reg-form" onSubmit={handleRegister} noValidate>
         <div
           style={{
@@ -494,6 +502,7 @@ const PartnerRegister = () => {
         </div>
       </form>
     </RegPage>
+    </>
   );
 };
 

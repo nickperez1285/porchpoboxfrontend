@@ -1,9 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import Seo from "./Seo";
 
 const UserTermsPage = () => {
   return (
     <div style={{ maxWidth: 860, margin: "60px auto", padding: "0 20px" }}>
+      <Seo
+        title="User Terms & Conditions"
+        description="User terms and conditions for the Porch P.O. Box secure package receiving and package delivery service."
+        keywords="user terms, package receiving service agreement, secure package delivery, Porch P.O. Box"
+        path="/terms/user"
+      />
       <h2>User Terms and Conditions</h2>
       <p>By using Porch P.O. Box services, you agree to the following terms:</p>
       <ol style={{ lineHeight: 1.7 }}>

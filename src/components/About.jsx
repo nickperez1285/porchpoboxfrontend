@@ -1,9 +1,16 @@
 import React from "react";
+import Seo from "./Seo";
 import "./InfoPage.css";
 
 const About = () => {
   return (
     <div className="info-page">
+      <Seo
+        title="About Us"
+        description="Porch P.O. Box is a community-based package receiving service that stops porch pirates by connecting customers with trusted local partners for secure package delivery and pickup."
+        keywords="about Porch P.O. Box, package receiving service, secure package delivery, stop porch pirates, community package pickup"
+        path="/about"
+      />
       <div className="info-page__inner">
         <div className="info-hero">
           <div className="info-hero__label">Porch P.O. Box</div>

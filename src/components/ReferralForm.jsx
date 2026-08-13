@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import API_BASE_URL from "../config/api";
+import Seo from "./Seo";
 import "./ReferralForm.css";
 
 export default function ReferralForm() {
@@ -50,6 +51,12 @@ export default function ReferralForm() {
 
   return (
     <div className="referral-page-wrap">
+      <Seo
+        title="Referral Form"
+        description="Refer a friend to Porch P.O. Box, the secure package receiving service that stops porch pirates."
+        keywords="refer a friend, package receiving service, secure package delivery, stop porch pirates, Porch P.O. Box"
+        path="/referrals"
+      />
       <div className="referral-form-container">
         <form onSubmit={handleSubmit} className="referral-form">
           <h1 className="referral-form-title">Referral Form</h1>

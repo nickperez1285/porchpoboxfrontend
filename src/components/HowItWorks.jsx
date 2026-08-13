@@ -1,4 +1,5 @@
 import React from "react";
+import Seo from "./Seo";
 import "./InfoPage.css";
 
 const HowItWorks = () => {
@@ -22,6 +23,12 @@ const HowItWorks = () => {
 
   return (
     <div className="info-page">
+      <Seo
+        title="How It Works"
+        description="Learn how Porch P.O. Box secure package receiving works: choose a trusted local partner, ship your packages, and pick them up on your schedule."
+        keywords="how it works, package receiving service, secure package delivery, package pickup, Porch P.O. Box"
+        path="/how-it-works"
+      />
       <div className="info-page__inner">
         <div className="info-hero">
           <div className="info-hero__label">Porch P.O. Box</div>

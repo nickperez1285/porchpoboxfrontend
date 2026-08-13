@@ -1,10 +1,17 @@
 import React from "react";
 import OneTimeProduct from "./OneTimeProduct";
+import Seo from "./Seo";
 import "./PlansPage.css";
 
 const PlansPage = ({ user }) => {
   return (
     <div className="plans-page">
+      <Seo
+        title="Plans & Pricing"
+        description="Choose an affordable Porch P.O. Box package receiving plan that fits your delivery needs and stop porch pirates today."
+        keywords="package receiving plans, package delivery pricing, secure package delivery, monthly package receiving, Porch P.O. Box"
+        path="/plans"
+      />
       <div className="plans-page__inner">
         <div className="plans-hero">
           <div className="plans-hero__label">Porch P.O. Box</div>
