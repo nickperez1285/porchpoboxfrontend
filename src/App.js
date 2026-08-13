@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -10,43 +10,53 @@ import {
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import MainPage from "./components/MainPage";
-import Customers from "./components/CustomerList";
-import OneTimeProduct from "./components/OneTimeProduct";
 import Login from "./components/Login";
 import Register from "./components/Register";
-import Partners from "./components/Partners";
 import Contact from "./components/Contact";
-import Profile from "./components/Profile";
-import EditProfile from "./components/EditProfile";
-import UserSettings from "./components/UserSettings";
-import PartnerProfile from "./components/PartnerProfile";
-import PartnerRegister from "./components/PartnerRegister";
-import PartnerEditProfile from "./components/PartnerEditProfile";
-import PartnerRegistrationPending from "./components/PartnerRegistrationPending";
-import PackageCheckIn from "./components/PackageCheckIn";
-import PartnerActivityLog from "./components/PartnerActivityLog";
-import Admin from "./components/Admin";
-import AdminLogin from "./components/AdminLogin";
-import AdminPartnerView from "./components/AdminPartnerView";
-import AdminActivityLog from "./components/AdminActivityLog";
-import AdminPayoutsPage from "./components/AdminPayoutsPage";
 import ForgotPassword from "./components/ForgotPassword";
-import CheckoutSuccess from "./components/CheckoutSuccess";
-import CheckoutCancel from "./components/CheckoutCancel";
 import UserTermsPage from "./components/UserTermsPage";
 import PartnerTermsPage from "./components/PartnerTermsPage";
-import ReferralForm from "./components/ReferralForm";
-import PlansPage from "./components/PlansPage";
+import TermsIndex from "./components/TermsIndex";
 import About from "./components/About";
 import HowItWorks from "./components/HowItWorks";
-import TermsIndex from "./components/TermsIndex";
-import PackageHistoryPage from "./components/PackageHistoryPage";
-import PartnerOnboarding from "./components/PartnerOnboarding";
-import PartnerInfoPage from "./components/PartnerInfoPage";
-import PartnerPage from "./components/PartnerPage";
 import Footer from "./components/Footer";
 import { auth, db } from "./firebase";
 import "./App.css";
+
+const Customers = lazy(() => import("./components/CustomerList"));
+const OneTimeProduct = lazy(() => import("./components/OneTimeProduct"));
+const Partners = lazy(() => import("./components/Partners"));
+const Profile = lazy(() => import("./components/Profile"));
+const EditProfile = lazy(() => import("./components/EditProfile"));
+const UserSettings = lazy(() => import("./components/UserSettings"));
+const PartnerProfile = lazy(() => import("./components/PartnerProfile"));
+const PartnerRegister = lazy(() => import("./components/PartnerRegister"));
+const PartnerEditProfile = lazy(() =>
+  import("./components/PartnerEditProfile"),
+);
+const PartnerRegistrationPending = lazy(() =>
+  import("./components/PartnerRegistrationPending"),
+);
+const PackageCheckIn = lazy(() => import("./components/PackageCheckIn"));
+const PartnerActivityLog = lazy(() =>
+  import("./components/PartnerActivityLog"),
+);
+const Admin = lazy(() => import("./components/Admin"));
+const AdminLogin = lazy(() => import("./components/AdminLogin"));
+const AdminPartnerView = lazy(() => import("./components/AdminPartnerView"));
+const AdminActivityLog = lazy(() => import("./components/AdminActivityLog"));
+const AdminPayoutsPage = lazy(() => import("./components/AdminPayoutsPage"));
+const CheckoutSuccess = lazy(() => import("./components/CheckoutSuccess"));
+const CheckoutCancel = lazy(() => import("./components/CheckoutCancel"));
+const ReferralForm = lazy(() => import("./components/ReferralForm"));
+const PlansPage = lazy(() => import("./components/PlansPage"));
+const PackageHistoryPage = lazy(() =>
+  import("./components/PackageHistoryPage"),
+);
+const PartnerOnboarding = lazy(() => import("./components/PartnerOnboarding"));
+const PartnerInfoPage = lazy(() => import("./components/PartnerInfoPage"));
+const PartnerPage = lazy(() => import("./components/PartnerPage"));
+
 
 const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 640);
@@ -94,6 +104,9 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
             <img
               src="/logo.webp"
               alt="Porch P.O. Box"
+              width="300"
+              height="300"
+              decoding="async"
               className="header-logo"
             />
             <span className="header-logo-name">Porch P.O. Box</span>
@@ -214,6 +227,22 @@ function App() {
           partnerProfile={partnerProfile}
         />
 
+        <Suspense
+          fallback={
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minHeight: "40vh",
+                color: "#667085",
+                fontSize: 14,
+              }}
+            >
+              Loading…
+            </div>
+          }
+        >
         <Routes>
           <Route path="/vendor" element={<Navigate to="/partner" replace />} />
           <Route
@@ -445,6 +474,7 @@ function App() {
 
           {/* <Route path="/one-time-product" element={<OneTimeProduct />} /> */}
         </Routes>
+        </Suspense>
         <Footer />
         </div>
       </BrowserRouter>

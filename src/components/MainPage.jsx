@@ -1,4 +1,11 @@
-import React, { useEffect, useState, useMemo, useRef } from "react";
+import React, {
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+  useMemo,
+  useRef,
+} from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
   collection,
@@ -9,21 +16,13 @@ import {
   where,
   updateDoc,
 } from "firebase/firestore";
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from "react-leaflet";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
 import OneTimeProduct from "./OneTimeProduct";
 import Seo from "./Seo";
 import { db } from "../firebase";
 import { getApiUrl } from "../config/api";
 import "./MainPage.css";
 
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require("leaflet/dist/images/marker-icon-2x.png"),
-  iconUrl: require("leaflet/dist/images/marker-icon.png"),
-  shadowUrl: require("leaflet/dist/images/marker-shadow.png"),
-});
+const PartnerMap = lazy(() => import("./PartnerMap"));
 
 const MAIN_PAGE_MESSAGE =
   "Secure package delivery through trusted local community partners .";
@@ -44,43 +43,6 @@ const formatDistance = (mi) => {
   if (mi < 0.1) return `${Math.round(mi * 5280)} ft away`;
   if (mi < 10) return `${mi.toFixed(1)} mi away`;
   return `${Math.round(mi)} mi away`;
-};
-
-const MapRecenter = ({ center }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center);
-  }, [center, map]);
-  return null;
-};
-
-const markerAriaLabel = (vendor) => {
-  const address = [vendor.streetAddress, vendor.city, vendor.state]
-    .filter(Boolean)
-    .join(", ");
-  return `Porch P.O. Box - ${vendor.businessName || "Partner location"}${
-    address ? `, ${address}` : ""
-  }`;
-};
-
-const MapA11y = ({ mapRef }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (mapRef) mapRef.current = map;
-    if (!map || typeof map.getContainer !== "function") return;
-    const container = map.getContainer();
-    const zoomIn = container.querySelector(".leaflet-control-zoom-in");
-    const zoomOut = container.querySelector(".leaflet-control-zoom-out");
-    if (zoomIn) {
-      zoomIn.setAttribute("aria-label", "Zoom in on map");
-      zoomIn.setAttribute("title", "Zoom in");
-    }
-    if (zoomOut) {
-      zoomOut.setAttribute("aria-label", "Zoom out on map");
-      zoomOut.setAttribute("title", "Zoom out");
-    }
-  }, [map, mapRef]);
-  return null;
 };
 
 const MainPage = ({ user, userStatus, partnerProfile }) => {
@@ -541,6 +503,9 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             <img
               src="/partnerPic.webp"
               alt="A delivery being received at a Porch P.O. Box partner location"
+              width="1200"
+              height="800"
+              fetchpriority="high"
             />
           </div>
         </div>
@@ -887,68 +852,27 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                   </button>
                 </div>
                 {mapView ? (
-                  <div className="mp-map-canvas">
-                    <span className="visually-hidden">
-                      This map shows all partner locations. Use the buttons to
-                      zoom in and out in the top left corner, and pan with the
-                      arrow keys when the map is focused. For full keyboard
-                      access, use the "All partner locations" list.
-                    </span>
-                    <MapContainer
-                      center={mapCenter}
+                  <Suspense
+                    fallback={
+                      <div className="mp-map-canvas mp-map-canvas--loading">
+                        <p style={{ color: "#667085", fontSize: 14 }}>
+                          Loading map…
+                        </p>
+                      </div>
+                    }
+                  >
+                    <PartnerMap
+                      mapCenter={mapCenter}
                       zoom={userCoords ? 13 : 12}
-                      style={{ width: "100%", height: "100%" }}
-                    >
-                      <MapRecenter center={mapCenter} />
-                      <MapA11y mapRef={mapRef} />
-                      <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                      />
-                      {userCoords && (
-                        <Circle
-                          center={[userCoords.lat, userCoords.lng]}
-                          radius={600}
-                          pathOptions={{ color: "#1557d6", fillColor: "#1557d6", fillOpacity: 0.15 }}
-                        >
-                          <Popup>Your address</Popup>
-                        </Circle>
-                      )}
-                      {markersWithDistance.map(({ vendor, lat, lng, distance }) => (
-                        <Marker
-                          key={vendor.id}
-                          position={[lat, lng]}
-                          alt={markerAriaLabel(vendor)}
-                          eventHandlers={{
-                            focus: () => setFocusedMarkerId(vendor.id),
-                            blur: () => setFocusedMarkerId(null),
-                          }}
-                        >
-                          <Popup>
-                            <strong>{vendor.businessName}</strong>
-                            <br />
-                            {[vendor.streetAddress, vendor.city, vendor.state]
-                              .filter(Boolean)
-                              .join(", ")}
-                            {userCoords && Number.isFinite(distance) && (
-                              <>
-                                <br />
-                                {formatDistance(distance)}
-                              </>
-                            )}
-                            <br />
-                            {vendor.storeHours || vendor.store_hours || ""}
-                            {isPreferred(vendor.id) && (
-                              <>
-                                <br />
-                                <span aria-hidden="true">✓</span> Your preferred location
-                              </>
-                            )}
-                          </Popup>
-                        </Marker>
-                      ))}
-                    </MapContainer>
-                  </div>
+                      userCoords={userCoords}
+                      markersWithDistance={markersWithDistance}
+                      mapRef={mapRef}
+                      focusedMarkerId={focusedMarkerId}
+                      onMarkerFocus={setFocusedMarkerId}
+                      onMarkerBlur={() => setFocusedMarkerId(null)}
+                      isPreferred={isPreferred}
+                    />
+                  </Suspense>
                 ) : (
                   <ul
                     ref={locationsListRef}
@@ -1238,6 +1162,10 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
             <img
               src="/partnerPic.webp"
               alt="Local business owner receiving a package"
+              width="1200"
+              height="800"
+              loading="lazy"
+              decoding="async"
             />
             <div className="mp-earn-card">
               <small>How Partners Earn</small>

@@ -42,6 +42,10 @@ const Seo = ({
       document.head.appendChild(canonicalLink);
     }
     canonicalLink.setAttribute("href", canonical);
+
+    if (typeof window.gtag === "function") {
+      window.gtag("config", "G-VC8DQKBNCW", { page_path: path });
+    }
   }, [title, description, keywords, path, ogImage]);
 
   return null;

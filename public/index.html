@@ -5,7 +5,11 @@
     <link rel="icon" href="%PUBLIC_URL%/porchlogo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://www.google-analytics.com" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/partnerPic.webp" fetchpriority="high" />
+    <link rel="preload" as="image" href="%PUBLIC_URL%/logo.webp" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous" media="print" onload="this.media='all'">
     <meta
       name="description"
       content="Porch P.O. Box is a secure package receiving service that stops porch piracy. Get packages delivered to trusted local partners near you, with flexible plans and no missed deliveries."
@@ -42,13 +46,56 @@
             },
             "description": "Secure package receiving service that stops porch piracy by delivering packages to trusted local partners.",
             "areaServed": "San Francisco Bay Area",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "3040 Rivera Dr",
+              "addressLocality": "Burlingame",
+              "addressRegion": "CA",
+              "postalCode": "94010",
+              "addressCountry": "US"
+            },
             "contactPoint": {
               "@type": "ContactPoint",
+              "telephone": "+1-650-649-3968",
               "email": "contact@porchpobox.com",
               "contactType": "customer service",
               "availableLanguage": "English"
             },
             "sameAs": []
+          },
+          {
+            "@type": "LocalBusiness",
+            "@id": "https://porchpobox.com/#localbusiness",
+            "name": "Porch P.O. Box",
+            "url": "https://porchpobox.com/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://porchpobox.com/porchlogo.png"
+            },
+            "image": {
+              "@type": "ImageObject",
+              "url": "https://porchpobox.com/porchlogo.png"
+            },
+            "description": "Secure package receiving service that stops porch piracy by delivering packages to trusted local partners.",
+            "telephone": "+1-650-649-3968",
+            "email": "contact@porchpobox.com",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "3040 Rivera Dr",
+              "addressLocality": "Burlingame",
+              "addressRegion": "CA",
+              "postalCode": "94010",
+              "addressCountry": "US"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 37.5703,
+              "longitude": -122.3658
+            },
+            "areaServed": "San Francisco Bay Area",
+            "parentOrganization": {
+              "@id": "https://porchpobox.com/#organization"
+            }
           },
           {
             "@type": "WebSite",
@@ -94,6 +141,15 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Porch P.O. Box | Secure Package Delivery &amp; Receiving Service – Stop Porch Piracy</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VC8DQKBNCW"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VC8DQKBNCW');
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

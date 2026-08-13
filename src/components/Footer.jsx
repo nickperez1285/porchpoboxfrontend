@@ -13,6 +13,10 @@ const Footer = () => {
               <img
                 src="/logo.webp"
                 alt="Porch P.O. Box"
+                width="300"
+                height="300"
+                loading="lazy"
+                decoding="async"
                 className="mp-footer-logo-img"
               />
               <span>Porch P.O. Box</span>
