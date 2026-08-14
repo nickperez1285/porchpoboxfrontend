@@ -43,6 +43,21 @@
   line-height: 1.7;
 }
 
+.mp-footer-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #9eacc4;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mp-footer-social:hover {
+  color: #ffffff;
+}
+
 .mp-footer-title {
   color: #ffffff;
   font-size: 14px;
