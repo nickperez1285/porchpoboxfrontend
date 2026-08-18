@@ -98,8 +98,13 @@ const PartnerPage = () => {
           <br />
           <br />
           <h5>
-            It's simple. We send you the packages. You securely hold them.
-            Customers pick them up. You get paid!
+            It's simple - <br />
+            We send you the packages. <br />
+            You securely hold them.
+            <br />
+            Customers pick them up.
+            <br />
+            <strong>You get paid! </strong>
           </h5>
         </section>
 
@@ -179,7 +184,9 @@ const PartnerPage = () => {
             ].map((step) => (
               <div className="mp-partnership__step" key={step.num}>
                 <div className="mp-partnership__step-num">{step.num}</div>
-                <div className="mp-partnership__step-icon" aria-hidden="true">{step.icon}</div>
+                <div className="mp-partnership__step-icon" aria-hidden="true">
+                  {step.icon}
+                </div>
                 <h3 className="mp-partnership__step-title">{step.title}</h3>
                 <p className="mp-partnership__step-desc">{step.text}</p>
               </div>
@@ -225,33 +232,45 @@ const PartnerPage = () => {
             <li style={listItemStyle}>
               {/* <span style={markerStyle} aria-hidden="true">✓</span> */}
               <span>
-                <strong><span aria-hidden="true">💰</span> Monthly Income</strong> Earn recurring income from
-                customers using your location.
+                <strong>
+                  <span aria-hidden="true">💰</span> Monthly Income
+                </strong>{" "}
+                Earn recurring income from customers using your location.
               </span>
             </li>
             <li style={listItemStyle}>
               {/* <span style={markerStyle} aria-hidden="true">✓</span> */}
               <span>
-                <strong><span aria-hidden="true">📍</span> Bring More People Through Your Door</strong> Become a
-                useful resource for people in your local community.
+                <strong>
+                  <span aria-hidden="true">📍</span> Bring More People Through
+                  Your Door
+                </strong>{" "}
+                Become a useful resource for people in your local community.
               </span>
             </li>
             <li style={listItemStyle}>
               {/* <span style={markerStyle} aria-hidden="true">✓</span> */}
               <span>
-                <strong><span aria-hidden="true">📣</span> Free Promotion</strong> Get featured on the Porch
-                P.O. Box website and help customers find your location.
+                <strong>
+                  <span aria-hidden="true">📣</span> Free Promotion
+                </strong>{" "}
+                Get featured on the Porch P.O. Box website and help customers
+                find your location.
               </span>
             </li>
             <li style={listItemStyle}>
               {/* <span style={markerStyle} aria-hidden="true">✓</span> */}
               <span>
-                <strong><span aria-hidden="true">🤝</span> Support Your Community</strong> Help neighbors
-                receive packages safely and conveniently.
+                <strong>
+                  <span aria-hidden="true">🤝</span> Support Your Community
+                </strong>{" "}
+                Help neighbors receive packages safely and conveniently.
               </span>
             </li>
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Rewards for referrals</strong> —{" "}
                 <Link to="/referrals">refer another business</Link> that becomes
@@ -309,35 +328,43 @@ const PartnerPage = () => {
           </center>
           <ul style={listStyle}>
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Check in packages promptly</strong> so customers are
                 notified as soon as a delivery arrives.
               </span>
             </li>
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Store packages securely</strong> in a safe, dry, indoor
                 area that is not accessible to the general public.
               </span>
             </li>
-            <li style={listItemStyle}>
+            {/* <li style={listItemStyle}>
               <span style={markerStyle} aria-hidden="true">✓</span>
               <span>
                 <strong>Hold packages for up to one month</strong> from the date
                 of check-in until customers pick them up.
               </span>
-            </li>
+            </li> */}
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Respect customer privacy</strong> — never open, inspect,
                 photograph, or tamper with packages. They are private property.
               </span>
             </li>
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Use good judgment</strong> — you may refuse packages
                 that appear damaged, leaking, or that you reasonably believe
@@ -345,7 +372,9 @@ const PartnerPage = () => {
               </span>
             </li>
             <li style={listItemStyle}>
-              <span style={markerStyle} aria-hidden="true">✓</span>
+              <span style={markerStyle} aria-hidden="true">
+                ✓
+              </span>
               <span>
                 <strong>Stay compliant</strong> — maintain appropriate business
                 insurance and follow all applicable laws.

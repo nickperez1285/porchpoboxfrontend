@@ -35,10 +35,13 @@ const PartnerTermsPage = () => {
           You agree to store all packages in a safe, secure, dry, indoor area that is not accessible to the general public.
         </li>
         <li>
-          You agree not to open, inspect the contents of, photograph, or tamper with any customer package. Customer packages must be treated as private property.
+          No one is permitted to open, inspect the contents of, photograph, or tamper with any customer package. Customer packages must be treated as private property.
         </li>
         <li>
-          You may refuse to accept packages that appear visibly damaged, leaking, emit unusual odors, or that you have reasonable cause to believe contain prohibited or illegal items.
+          You agree not to accept delivery of any package that appears to be open, resealed, or clearly tampered with. You may refuse to accept packages that appear visibly damaged, leaking, emit unusual odors, or that you have reasonable cause to believe contain prohibited or illegal items.
+        </li>
+        <li>
+          Porch P.O. Box will not hold responsibility for any package that is opened or clearly tampered with after delivery, and no liability is accepted for items received in such a condition.
         </li>
         <li>
           You will not knowingly accept or handle illegal items, hazardous materials, or any items prohibited by federal, state, or local law.
