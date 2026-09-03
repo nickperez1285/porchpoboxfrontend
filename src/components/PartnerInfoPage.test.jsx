@@ -145,14 +145,14 @@ describe("PartnerInfoPage", () => {
     expect(emailLink).toHaveAttribute("href", "mailto:shop@example.com");
   });
 
-  it("displays store hours", async () => {
+  it("displays hours", async () => {
     renderPartnerInfo();
     expect(
       await screen.findByText("Mon-Fri 9am-5pm"),
     ).toBeInTheDocument();
   });
 
-  it('shows "Not provided" when store hours are missing', async () => {
+  it('shows "Not provided" when hours are missing', async () => {
     renderPartnerInfo({
       getDocResult: {
         id: "p1",
@@ -196,10 +196,10 @@ describe("PartnerInfoPage", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders Store Hours section", async () => {
+  it("renders Hours section", async () => {
     renderPartnerInfo();
     expect(
-      await screen.findByText("Store Hours"),
+      await screen.findByText("Hours"),
     ).toBeInTheDocument();
   });
 });

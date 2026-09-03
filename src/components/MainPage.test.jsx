@@ -162,7 +162,7 @@ describe("MainPage", () => {
 
     fireEvent.click(screen.getByText("Main Street Shop"));
 
-    expect(screen.getByText("Store hours: 9-5 M-F")).toBeInTheDocument();
+    expect(screen.getByText("Hours: 9-5 M-F")).toBeInTheDocument();
     expect(
       screen.getByText("123 Main St, Portland, OR, 97201"),
     ).toBeInTheDocument();

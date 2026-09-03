@@ -144,10 +144,10 @@ const PartnerInfoPage = () => {
           </div>
         </div>
 
-        {/* Store Hours */}
+        {/* Hours */}
         <div style={{ background: "#fff", border: "1px solid rgba(0,0,0,0.08)", borderRadius: 20, padding: 20, boxShadow: "0 4px 12px rgba(0,0,0,0.06)" }}>
           <div style={{ fontSize: 11, color: "#8a6a00", letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, fontWeight: 600 }}>
-            Store Hours
+            Hours
           </div>
           <div style={{ fontSize: 15, color: "#333" }}>
             {partner.storeHours || "Not provided"}

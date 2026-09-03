@@ -61,7 +61,7 @@ const PartnerEditProfile = ({ user, partnerProfile }) => {
   return (
     <RegPage
       title="Edit partner profile"
-      subtitle="Update your public contact details and store hours."
+      subtitle="Update your public contact details and hours."
     >
       <form className="reg-form" onSubmit={handleSubmit} noValidate>
         <p className="reg-section-label">Contact</p>

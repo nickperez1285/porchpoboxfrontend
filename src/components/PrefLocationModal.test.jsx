@@ -120,7 +120,7 @@ describe("PrefLocationModal", () => {
     ).toBeInTheDocument();
   });
 
-  it("shows store hours for partner that has them", async () => {
+  it("shows hours for partner that has them", async () => {
     renderModal();
     expect(
       await screen.findByText("9-5 M-F"),

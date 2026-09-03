@@ -789,7 +789,7 @@ const MainPage = ({ user, userStatus, partnerProfile }) => {
                               </div>
                             )}
                             <div className="mp-vendor-detail__hours">
-                              Store hours:{" "}
+                              Hours:{" "}
                               {vendor.storeHours ||
                                 vendor.store_hours ||
                                 "Not provided"}

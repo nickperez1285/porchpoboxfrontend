@@ -194,7 +194,7 @@ const PartnerProfile = ({ user, partnerProfile }) => {
             </div>
           </div>
           <div className="partner-info-group">
-            <div className="partner-info-label">Store Hours</div>
+            <div className="partner-info-label">Hours</div>
             <div className="partner-info-value">
               {partnerProfile.storeHours || "Not provided"}
             </div>

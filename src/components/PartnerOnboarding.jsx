@@ -16,7 +16,7 @@ const STEPS = [
   {
     title: "Register your business",
     body: [
-      "Navigate to the 'Partners' link on the bottom of the main page or use the link below to create a partner account with your business name, address, contact information, store hours, and a secure password. Accept the partner terms to submit your application.",
+      "Navigate to the 'Partners' link on the bottom of the main page or use the link below to create a partner account with your business name, address, contact information, hours, and a secure password. Accept the partner terms to submit your application.",
     ],
     links: [
       { to: "/partner/register", label: "Go to partner registration →" },
@@ -33,7 +33,7 @@ const STEPS = [
   {
     title: "Complete your profile",
     body: [
-      "After approval, keep your business details and store hours accurate so customers know when to pick up packages. Update your profile whenever something changes.",
+      "After approval, keep your business details and hours accurate so customers know when to pick up packages. Update your profile whenever something changes.",
     ],
     links: [{ to: "/partner/profile/edit", label: "Edit partner profile →" }],
   },

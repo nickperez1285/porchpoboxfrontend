@@ -92,19 +92,21 @@ const PartnerPage = () => {
             <li>No deliveries to make </li>
             <li>Takes just a few minutes a day</li>
           </ul>
-          <Link className="mp-btn mp-btn--primary" to="/become-a-partner">
+          <Link className="mp-btn mp-btn--primary" to="/partner/register">
             Become a Partner
           </Link>
           <br />
           <br />
           <h5>
             It's simple - <br />
-            We send you the packages. <br />
-            You securely hold them.
+            We send you the packages. <br /> <br />
+            You securely hold them. <br />
             <br />
             Customers pick them up.
-            <br />
-            <strong>You get paid! </strong>
+            <br /> <br />
+            <u>
+              <strong>You get paid! </strong>
+            </u>
           </h5>
         </section>
 
