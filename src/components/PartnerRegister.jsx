@@ -1,7 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  onAuthStateChanged,
+} from "firebase/auth";
+import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { getApiUrl } from "../config/api";
 import {
@@ -32,6 +36,28 @@ const PartnerRegister = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showPhoneInfo, setShowPhoneInfo] = useState(false);
+  const [signedInUser, setSignedInUser] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setSignedInUser(currentUser);
+      if (currentUser?.email) {
+        setEmail(currentUser.email);
+      }
+
+      if (currentUser) {
+        const partnerDoc = await getDoc(doc(db, "partners", currentUser.uid));
+        if (partnerDoc.exists()) {
+          navigate(partnerDoc.data().approved ? "/partner" : "/partner/pending");
+        }
+      }
+
+      setAuthReady(true);
+    });
+
+    return unsubscribe;
+  }, [navigate]);
 
   const validate = () => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
@@ -57,18 +83,6 @@ const PartnerRegister = () => {
       return;
     }
 
-    if (!isPasswordValid(password)) {
-      setError(passwordRequirementsText);
-      setLoading(false);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
     if (!termsAccepted) {
       setError(
         "You must agree to the terms and conditions before creating an account.",
@@ -77,18 +91,46 @@ const PartnerRegister = () => {
       return;
     }
 
+    if (
+      signedInUser &&
+      email.trim().toLowerCase() !== signedInUser.email?.toLowerCase()
+    ) {
+      setError("Email must match your signed-in Google account.");
+      setLoading(false);
+      return;
+    }
+
+    if (!signedInUser && !isPasswordValid(password)) {
+      setError(passwordRequirementsText);
+      setLoading(false);
+      return;
+    }
+
+    if (!signedInUser && password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
+      let user = signedInUser;
 
-      const user = userCredential.user;
+      if (!user) {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password,
+        );
+        user = userCredential.user;
 
-      await updateProfile(user, {
-        displayName: businessName,
-      });
+        await updateProfile(user, {
+          displayName: businessName,
+        });
+      } else {
+        await updateProfile(user, {
+          displayName: businessName,
+        });
+      }
 
       await setDoc(doc(db, "partners", user.uid), {
         businessName,
@@ -163,345 +205,358 @@ const PartnerRegister = () => {
       />
       <RegPage
         title="Become a partner"
-        subtitle="Tell us about your business. We will review your application before you can sign in."
+        subtitle={
+          signedInUser
+            ? "You're signed in with Google. Complete your business details to apply."
+            : "Tell us about your business. We will review your application before you can sign in."
+        }
       >
-        <form className="reg-form" onSubmit={handleRegister} noValidate>
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: "#d4af37",
-              textTransform: "uppercase",
-              letterSpacing: 1.2,
-              marginBottom: 16,
-              borderBottom: "1px solid #f0f0f0",
-              paddingBottom: 8,
-            }}
-          >
-            Business Details
-          </div>
-          <RegField
-            id="vendor-business"
-            label="Business or Apartment name"
-            type="text"
-            value={businessName}
-            onChange={(e) => setBusinessName(e.target.value)}
-            required
-            autoComplete="organization"
-            placeholder="Your business or apartment name"
-          />
-          <div className="reg-field-container">
-            <label htmlFor="vendor-phone" className="reg-field-label">
-              Business phone{" "}
-              <button
-                type="button"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  width: 18,
-                  height: 18,
-                  borderRadius: "50%",
-                  border: "1.5px solid #667085",
-                  color: "#667085",
-                  background: "transparent",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  marginLeft: 4,
-                  padding: 0,
-                  lineHeight: 1,
-                }}
-                onClick={() => setShowPhoneInfo((p) => !p)}
-                aria-expanded={showPhoneInfo}
-                aria-label="Phone number help"
-              >
-                <span aria-hidden="true">?</span>
-              </button>
-            </label>
-            {showPhoneInfo && (
-              <div
-                style={{
-                  background: "#fefcf5",
-                  border: "1px solid #d4af37",
-                  borderRadius: 10,
-                  padding: "10px 14px",
-                  fontSize: 13,
-                  color: "#444",
-                  marginBottom: 8,
-                  lineHeight: 1.5,
-                }}
-              >
-                If you don't want to use your personal number, you can get a
-                free one using{" "}
-                <a
-                  href="https://voice.google.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: "#1557d6", fontWeight: 600 }}
-                >
-                  Google Voice
-                </a>
-                .
-              </div>
-            )}
-            <input
-              id="vendor-phone"
-              name="vendor-phone"
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              required
-              autoComplete="tel"
-              placeholder="(555) 555-0100"
-              className="reg-field-input"
-            />
-          </div>
-          <RegField
-            id="vendor-email"
-            label="Email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-            placeholder="contact@yourbusiness.com"
-          />
-
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: "#d4af37",
-              textTransform: "uppercase",
-              letterSpacing: 1.2,
-              marginTop: 32,
-              marginBottom: 16,
-              borderBottom: "1px solid #f0f0f0",
-              paddingBottom: 8,
-            }}
-          >
-            Physical Location
-          </div>
-          <RegField
-            id="vendor-street"
-            label="Street address"
-            type="text"
-            value={streetAddress}
-            onChange={(e) => setStreetAddress(e.target.value)}
-            required
-            autoComplete="street-address"
-          />
-          <RegField
-            id="vendor-city"
-            label="City"
-            type="text"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            required
-            autoComplete="address-level2"
-          />
-          <div className="reg-row-2">
-            <RegField
-              id="vendor-state"
-              label="State"
-              type="text"
-              value={state}
-              onChange={(e) => setState(e.target.value.toUpperCase())}
-              required
-              autoComplete="address-level1"
-              placeholder="ST"
-              maxLength={2}
-            />
-            <RegField
-              id="vendor-zip"
-              label="ZIP code"
-              type="text"
-              value={zipCode}
-              onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
-              required
-              autoComplete="postal-code"
-              maxLength={5}
-            />
-          </div>
-
-          <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
-
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: "#d4af37",
-              textTransform: "uppercase",
-              letterSpacing: 1.2,
-              marginTop: 32,
-              marginBottom: 16,
-              borderBottom: "1px solid #f0f0f0",
-              paddingBottom: 8,
-            }}
-          >
-            Referral Info
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              marginBottom: 8,
-            }}
-          >
-            <label style={{ fontSize: 14, color: "#444" }}>
-              Were you referred by someone?
-            </label>
-            <div style={{ display: "flex", gap: 16 }}>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: "pointer",
-                  fontSize: 14,
-                }}
-              >
-                <input
-                  type="radio"
-                  name="wasReferred"
-                  value="yes"
-                  checked={wasReferred === "yes"}
-                  onChange={() => setWasReferred("yes")}
-                />
-                Yes
-              </label>
-              <label
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 6,
-                  cursor: "pointer",
-                  fontSize: 14,
-                }}
-              >
-                <input
-                  type="radio"
-                  name="wasReferred"
-                  value="no"
-                  checked={wasReferred === "no"}
-                  onChange={() => {
-                    setWasReferred("no");
-                    setReferralCode("");
-                  }}
-                />
-                No
-              </label>
-            </div>
-            {wasReferred === "yes" && (
-              <RegField
-                id="referral-code"
-                label="Referral Code"
-                type="text"
-                value={referralCode}
-                onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                placeholder="e.g. JA120525"
-                autoComplete="off"
-                maxLength={10}
-              />
-            )}
-          </div>
-
-          <div
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: "#d4af37",
-              textTransform: "uppercase",
-              letterSpacing: 1.2,
-              marginTop: 32,
-              marginBottom: 16,
-              borderBottom: "1px solid #f0f0f0",
-              paddingBottom: 8,
-            }}
-          >
-            Security
-          </div>
-          <RegField
-            id="vendor-password"
-            label="Password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            autoComplete="new-password"
-          />
-          <RegField
-            id="vendor-confirm-password"
-            label="Confirm password"
-            type="password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            autoComplete="new-password"
-          />
-
-          <p
-            style={{
-              fontSize: 12,
-              color: "#667085",
-              marginBottom: 12,
-              lineHeight: 1.4,
-            }}
-          >
-            {passwordRequirementsText}
-          </p>
-          <p style={{ fontSize: 13, marginBottom: 16 }}>
-            Review terms:{" "}
-            <Link to="/terms/partner">Partner Terms and Conditions</Link>
-          </p>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              fontSize: 14,
-              cursor: "pointer",
-              marginBottom: 24,
-            }}
-            htmlFor="vendor-register-terms-agree"
-          >
-            <input
-              id="vendor-register-terms-agree"
-              type="checkbox"
-              checked={termsAccepted}
-              onChange={(e) => setTermsAccepted(e.target.checked)}
-              required
-            />
-            <span>I agree to the terms and conditions.</span>
-          </label>
-
-          <RegAlert variant="error">{error}</RegAlert>
-
-          <div className="reg-actions">
+      {!authReady ? (
+        <p style={{ color: "#667085" }}>Loading...</p>
+      ) : (
+      <form className="reg-form" onSubmit={handleRegister} noValidate>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Business Details
+        </div>
+        <RegField
+          id="vendor-business"
+          label="Business or Apartment name"
+          type="text"
+          value={businessName}
+          onChange={(e) => setBusinessName(e.target.value)}
+          required
+          autoComplete="organization"
+          placeholder="Your business or apartment name"
+        />
+        <div className="reg-field-container">
+          <label htmlFor="vendor-phone" className="reg-field-label">
+            Business phone{" "}
             <button
-              type="submit"
-              disabled={loading}
+              type="button"
               style={{
-                width: "100%",
-                padding: "16px",
-                background: "#121212",
-                color: "#fff",
-                border: "none",
-                borderRadius: 12,
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 18,
+                height: 18,
+                borderRadius: "50%",
+                border: "1.5px solid #667085",
+                color: "#667085",
+                background: "transparent",
+                fontSize: 12,
                 fontWeight: 700,
-                fontSize: 16,
-                cursor: loading ? "not-allowed" : "pointer",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                transition: "transform 0.1s",
+                cursor: "pointer",
+                marginLeft: 4,
+                padding: 0,
+                lineHeight: 1,
+              }}
+              onClick={() => setShowPhoneInfo((p) => !p)}
+              aria-expanded={showPhoneInfo}
+              aria-label="Phone number help"
+            >
+              <span aria-hidden="true">?</span>
+            </button>
+          </label>
+          {showPhoneInfo && (
+            <div
+              style={{
+                background: "#fefcf5",
+                border: "1px solid #d4af37",
+                borderRadius: 10,
+                padding: "10px 14px",
+                fontSize: 13,
+                color: "#444",
+                marginBottom: 8,
+                lineHeight: 1.5,
               }}
             >
-              {loading ? "Creating partner…" : "Submit application"}
-            </button>
+              If you don't want to use your personal number, you can get a free
+              one using{" "}
+              <a
+                href="https://voice.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: "#1557d6", fontWeight: 600 }}
+              >
+                Google Voice
+              </a>
+              .
+            </div>
+          )}
+          <input
+            id="vendor-phone"
+            name="vendor-phone"
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            required
+            autoComplete="tel"
+            placeholder="(555) 555-0100"
+            className="reg-field-input"
+          />
+        </div>
+        <RegField
+          id="vendor-email"
+          label="Email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoComplete="email"
+          placeholder="contact@yourbusiness.com"
+          disabled={Boolean(signedInUser)}
+        />
+
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Physical Location
+        </div>
+        <RegField
+          id="vendor-street"
+          label="Street address"
+          type="text"
+          value={streetAddress}
+          onChange={(e) => setStreetAddress(e.target.value)}
+          required
+          autoComplete="street-address"
+        />
+        <RegField
+          id="vendor-city"
+          label="City"
+          type="text"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          required
+          autoComplete="address-level2"
+        />
+        <div className="reg-row-2">
+          <RegField
+            id="vendor-state"
+            label="State"
+            type="text"
+            value={state}
+            onChange={(e) => setState(e.target.value.toUpperCase())}
+            required
+            autoComplete="address-level1"
+            placeholder="ST"
+            maxLength={2}
+          />
+          <RegField
+            id="vendor-zip"
+            label="ZIP code"
+            type="text"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value.replace(/\D/g, ""))}
+            required
+            autoComplete="postal-code"
+            maxLength={5}
+          />
+        </div>
+
+        <StoreHoursScrollPicker value={storeHours} onChange={setStoreHours} />
+
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Referral Info
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            marginBottom: 8,
+          }}
+        >
+          <label style={{ fontSize: 14, color: "#444" }}>
+            Were you referred by someone?
+          </label>
+          <div style={{ display: "flex", gap: 16 }}>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+                fontSize: 14,
+              }}
+            >
+              <input
+                type="radio"
+                name="wasReferred"
+                value="yes"
+                checked={wasReferred === "yes"}
+                onChange={() => setWasReferred("yes")}
+              />
+              Yes
+            </label>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                cursor: "pointer",
+                fontSize: 14,
+              }}
+            >
+              <input
+                type="radio"
+                name="wasReferred"
+                value="no"
+                checked={wasReferred === "no"}
+                onChange={() => {
+                  setWasReferred("no");
+                  setReferralCode("");
+                }}
+              />
+              No
+            </label>
           </div>
-        </form>
-      </RegPage>
+          {wasReferred === "yes" && (
+            <RegField
+              id="referral-code"
+              label="Referral Code"
+              type="text"
+              value={referralCode}
+              onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+              placeholder="e.g. JA120525"
+              autoComplete="off"
+              maxLength={10}
+            />
+          )}
+        </div>
+
+        {!signedInUser && (
+          <>
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 800,
+            color: "#d4af37",
+            textTransform: "uppercase",
+            letterSpacing: 1.2,
+            marginTop: 32,
+            marginBottom: 16,
+            borderBottom: "1px solid #f0f0f0",
+            paddingBottom: 8,
+          }}
+        >
+          Security
+        </div>
+        <RegField
+          id="vendor-password"
+          label="Password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+        />
+        <RegField
+          id="vendor-confirm-password"
+          label="Confirm password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          autoComplete="new-password"
+        />
+
+        <p
+          style={{
+            fontSize: 12,
+            color: "#667085",
+            marginBottom: 12,
+            lineHeight: 1.4,
+          }}
+        >
+          {passwordRequirementsText}
+        </p>
+          </>
+        )}
+        <p style={{ fontSize: 13, marginBottom: 16 }}>
+          Review terms:{" "}
+          <Link to="/terms/partner">Partner Terms and Conditions</Link>
+        </p>
+        <label
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontSize: 14,
+            cursor: "pointer",
+            marginBottom: 24,
+          }}
+          htmlFor="vendor-register-terms-agree"
+        >
+          <input
+            id="vendor-register-terms-agree"
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            required
+          />
+          <span>I agree to the terms and conditions.</span>
+        </label>
+
+        <RegAlert variant="error">{error}</RegAlert>
+
+        <div className="reg-actions">
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "16px",
+              background: "#121212",
+              color: "#fff",
+              border: "none",
+              borderRadius: 12,
+              fontWeight: 700,
+              fontSize: 16,
+              cursor: loading ? "not-allowed" : "pointer",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+              transition: "transform 0.1s",
+            }}
+          >
+            {loading ? "Creating partner…" : "Submit application"}
+          </button>
+        </div>
+      </form>
+      )}
+    </RegPage>
     </>
   );
 };

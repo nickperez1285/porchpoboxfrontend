@@ -12,9 +12,11 @@ import {
 import { doc, getDoc } from "firebase/firestore";
 import { RegPage, RegField, RegAlert } from "./RegFormPrimitives";
 import Seo from "./Seo";
+import { resolvePartnerLogin } from "../utils/partnerLogin";
 
 const Login = ({ title = "Login", redirectTo = "/profile" }) => {
   const navigate = useNavigate();
+  const isPartnerLogin = redirectTo === "/partner";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -37,6 +39,18 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
         email,
         password,
       );
+
+      if (isPartnerLogin) {
+        const result = await resolvePartnerLogin(credential.user);
+        if (result.action === "error") {
+          setError(result.message);
+          await signOut(auth);
+          return;
+        }
+        navigate(result.path);
+        return;
+      }
+
       const vendorDoc = await getDoc(doc(db, "partners", credential.user.uid));
       if (vendorDoc.exists()) {
         navigate("/partner");
@@ -58,7 +72,17 @@ const Login = ({ title = "Login", redirectTo = "/profile" }) => {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
 
-      // Check if user is a partner
+      if (isPartnerLogin) {
+        const partnerResult = await resolvePartnerLogin(result.user);
+        if (partnerResult.action === "error") {
+          setError(partnerResult.message);
+          await signOut(auth);
+          return;
+        }
+        navigate(partnerResult.path);
+        return;
+      }
+
       const vendorDoc = await getDoc(doc(db, "partners", result.user.uid));
       if (vendorDoc.exists()) {
         navigate("/partner");

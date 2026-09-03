@@ -546,13 +546,15 @@ const Partners = ({ user, partnerProfile, authLoading }) => {
           </Link>
         </div>
         {user && !partnerProfile && (
-          <p style={{ marginTop: 20, color: "#667085" }}>
-            You're signed in but don't have a partner account yet —
+          <p style={{ marginTop: 20, color: "#667085", maxWidth: 520, marginInline: "auto" }}>
+            You're signed in but don't have a partner account yet. If you registered
+            with email and password, use Partner Login with those credentials instead
+            of Google. Otherwise,
             <Link
               to="/partner/register"
               style={{ color: "#d4af37", marginLeft: 4 }}
             >
-              register here
+              complete partner registration here
             </Link>
             .
           </p>

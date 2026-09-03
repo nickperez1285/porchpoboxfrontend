@@ -41,7 +41,7 @@ const preventionTips = [
   {
     icon: "🛒",
     title: "Use pickup or locker options",
-    text: "Amazon Locker and carrier pickup points remove the doorstep entirely — the package never sits on your porch.",
+    text: "Porch P.O. Box and carrier pickup points remove the doorstep entirely — the package never sits on your porch.",
   },
   {
     icon: "🔒",
@@ -51,7 +51,7 @@ const preventionTips = [
   {
     icon: "🚚",
     title: "Hold for pickup at the carrier",
-    text: "UPS, FedEx, and USPS can hold packages at their local facility for you to collect on your schedule.",
+    text: "Porch P.O. Box, UPSn , FedEx, and USPS can hold packages at their local facility for you to collect on your schedule.",
   },
 ];
 
