@@ -83,19 +83,17 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
     "/vendor/login",
     "/admin/login",
   ].includes(location.pathname);
-  const onCustomerProfilePage = location.pathname === "/profile";
-  const primaryLink = onCustomerProfilePage
-    ? { to: "/", label: "Home" }
-    : {
-        to: user ? (partnerProfile ? "/partner" : "/profile") : "/login",
-        label: user
-          ? partnerProfile
-            ? isMobile
-              ? "Partner"
-              : "Partner Portal"
-            : "Profile"
-          : "Login",
-      };
+  const primaryLink = {
+    to: user ? (partnerProfile ? "/partner" : "/profile") : "/login",
+    label: user
+      ? partnerProfile
+        ? isMobile
+          ? "Partner"
+          : "Partner Portal"
+        : "Profile"
+      : "Login",
+  };
+  const onPrimaryRoute = !!user && location.pathname === primaryLink.to;
 
   const handleLogout = async () => {
     try {
@@ -109,7 +107,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
     <header className="app-header">
       <div className="header-top">
         <div className="header-logo-wrap">
-          <a href="https://porchpobox.com/" className="header-logo-link">
+          <Link to="/" className="header-logo-link" aria-label="Porch P.O. Box home">
             <img
               src="/logo.webp"
               alt="Porch P.O. Box"
@@ -119,7 +117,7 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
               className="header-logo"
             />
             <span className="header-logo-name">Porch P.O. Box</span>
-          </a>
+          </Link>
         </div>
         {!authLoading && !hideAuthLinks && (
           <nav className="header-nav">
@@ -142,9 +140,11 @@ const Header = ({ authLoading, isAdmin, user, userStatus, partnerProfile }) => {
             )}
             {user ? (
               <>
-                <Link to={primaryLink.to} className="header-link">
-                  {primaryLink.label}
-                </Link>
+                {!onPrimaryRoute && (
+                  <Link to={primaryLink.to} className="header-link">
+                    {primaryLink.label}
+                  </Link>
+                )}
                 <button
                   type="button"
                   onClick={handleLogout}

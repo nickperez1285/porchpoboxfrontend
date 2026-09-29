@@ -48,6 +48,6 @@ export async function getRawText(): Promise<string> {
     return text || '';
   } catch (error) {
     console.error('Text detection failed:', error);
-    return '';
+    return ''; andy
   }
 }

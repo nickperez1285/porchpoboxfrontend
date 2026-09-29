@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { signOut } from "firebase/auth";
+import { Link } from "react-router-dom";
 import { collection, doc, onSnapshot } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import PrefLocationModal from "./PrefLocationModal";
 import "./Profile.css";
 
@@ -15,7 +14,6 @@ const SectionLabel = ({ children }) => (
 );
 
 const Profile = ({ user }) => {
-  const navigate = useNavigate();
   const [profileData, setProfileData] = useState(null);
   const [packageHistory, setPackageHistory] = useState([]);
   const [packagesLoading, setPackagesLoading] = useState(false);
@@ -88,15 +86,6 @@ const Profile = ({ user }) => {
       unsubscribePackageHistory();
     };
   }, [user.uid]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
 
   const [addressCopied, setAddressCopied] = useState(false);
 
@@ -188,33 +177,15 @@ const Profile = ({ user }) => {
           })()}
         </div>
 
-        {/* ── Delivery Address ── (show whenever a preferred partner is set; street may be filled later) */}
+        {/* ── Delivery Address ── (single section: choose a partner, or show the saved address) */}
         <div style={{ marginBottom: 28 }}>
-          {profileData && !hasPrefLocation && (
-            <div className="profile-location-cta">
-              <div className="profile-location-cta-icon">📍</div>
-              <div className="profile-location-cta-body">
-                <div className="profile-location-cta-title">
-                  Set up your delivery location
-                </div>
-                <div className="profile-location-cta-sub">
-                  Pick a trusted Porch P.O. Box partner so your packages have a
-                  safe place to go.
-                </div>
-              </div>
-              <button
-                type="button"
-                className="profile-location-cta-btn"
-                onClick={() => setShowPrefModal(true)}
-              >
-                Choose Your Location →
-              </button>
-            </div>
+          {showPrefModal && (
+            <PrefLocationModal
+              user={user}
+              onDone={() => setShowPrefModal(false)}
+            />
           )}
-          {profileData?.prefLocation &&
-          (profileData.prefLocation.id ||
-            profileData.prefLocation.businessName ||
-            profileData.prefLocation.streetAddress) ? (
+          {hasPrefLocation ? (
             <div className="profile-address-card">
               <div className="profile-address-header">
                 <div>
@@ -305,33 +276,29 @@ const Profile = ({ user }) => {
               </div>
             </div>
           ) : (
-            <div className="profile-no-address">
-              {showPrefModal && (
-                <PrefLocationModal
-                  user={user}
-                  onDone={() => setShowPrefModal(false)}
-                />
-              )}
-              <div className="profile-address-header">
-                <div className="profile-address-label">
-                  <span>📦</span> Your Package Delivery Address
+            profileData && (
+              <div className="profile-location-cta">
+                <div className="profile-location-cta-icon">📍</div>
+                <div className="profile-location-cta-body">
+                  <div className="profile-address-label">
+                    <span>📦</span> Your Package Delivery Address
+                  </div>
+                  <div className="profile-location-cta-title">
+                    Please select your preferred Porch P.O. Box location
+                  </div>
+                  <div className="profile-location-cta-sub">
+                    You need to choose a partner location before subscribing.
+                  </div>
                 </div>
-                <div className="no-address-title">
-                  Please select your preferred Porch P.O. Box location
-                </div>
-
-                <div className="no-address-text">
-                  You need to choose a partner location before subscribing.
-                </div>
+                <button
+                  type="button"
+                  className="profile-location-cta-btn"
+                  onClick={() => setShowPrefModal(true)}
+                >
+                  Select Location
+                </button>
               </div>
-              <button
-                type="button"
-                className="btn-set-location"
-                onClick={() => setShowPrefModal(true)}
-              >
-                Select Location
-              </button>
-            </div>
+            )
           )}
         </div>
 
@@ -487,13 +454,6 @@ const Profile = ({ user }) => {
               <Link to="/profile/settings" className="btn-profile-action">
                 ⚙️ Settings
               </Link>
-              <button
-                type="button"
-                className="btn-logout"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
             </div>
           </Card>
         </div>
